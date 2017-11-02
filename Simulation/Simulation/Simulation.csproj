@@ -85,7 +85,10 @@
     <Compile Include="Configuration\LoadPrediction.cs" />
     <Compile Include="Configuration\PredictionSource.cs" />
     <Compile Include="Configuration\SimulationSize.cs" />
+    <Compile Include="DataCenter\ContainerRegistry.cs" />
+    <Compile Include="DataCenter\Image.cs" />
     <Compile Include="DataCenter\IMessageHandler.cs" />
+    <Compile Include="DataCenter\InformationModules\ContainerRegistryTable.cs" />
     <Compile Include="DataCenter\NetworkInterfaceCard.cs" />
     <Compile Include="DataCenter\IStart.cs" />
     <Compile Include="DataCenter\InformationModules\ILoadManager.cs" />

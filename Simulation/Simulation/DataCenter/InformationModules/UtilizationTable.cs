@@ -7,6 +7,10 @@ using Simulation.Loads;
 
 namespace Simulation.DataCenter.InformationModules
 {
+    /// <summary>
+    /// Utilization table is a key value store for all the Hosts of the systems 
+    /// Utilization states <see cref="UtilizationStates"/>
+    /// </summary>
     public class UtilizationTable
     {
         private readonly Dictionary<int, UtilizationStates> _utilization = new Dictionary<int, UtilizationStates>();
@@ -37,6 +41,7 @@ namespace Simulation.DataCenter.InformationModules
 
         /// <summary>
         /// Implement Ordering and In Order Proping Limit
+        /// SelfNote: Cannot remember this function
         /// </summary>
         /// <param name="state"></param>
         /// <param name="senderId"></param>

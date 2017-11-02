@@ -68,10 +68,10 @@ namespace Simulation.DataCenter
                 throw new NotImplementedException();
             }
             Started = true;
-            Thread hostThread = new Thread(() =>
-            {
-            });
-            hostThread.Start();
+            //Thread hostThread = new Thread(() =>
+            //{
+            //});
+            //hostThread.Start();
         }
         public override void StopMachine()
         {
