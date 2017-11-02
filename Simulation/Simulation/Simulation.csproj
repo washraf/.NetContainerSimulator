@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D781CC20-D23C-4112-A924-BA767B29E3CC}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Simulation</RootNamespace>
+    <AssemblyName>Simulation</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Accounting\ContainerMeasureValue.cs" />
+    <Compile Include="Accounting\IAccountingModule.cs" />
+    <Compile Include="Accounting\LoadMeasureValue.cs" />
+    <Compile Include="Accounting\MeasureValueHolder.cs" />
+    <Compile Include="Accounting\MeasuresValues.cs" />
+    <Compile Include="Configuration\LoadChangeAction.cs" />
+    <Compile Include="Configuration\StartUtilizationPercent.cs" />
+    <Compile Include="Accounting\GraphItems.cs" />
+    <Compile Include="Configuration\LoadChangeStrategy.cs" />
+    <Compile Include="Configuration\LoadCreationStrategy.cs" />
+    <Compile Include="Configuration\LoadPrediction.cs" />
+    <Compile Include="Configuration\PredictionSource.cs" />
+    <Compile Include="Configuration\SimulationSize.cs" />
+    <Compile Include="DataCenter\IMessageHandler.cs" />
+    <Compile Include="DataCenter\NetworkInterfaceCard.cs" />
+    <Compile Include="DataCenter\IStart.cs" />
+    <Compile Include="DataCenter\InformationModules\ILoadManager.cs" />
+    <Compile Include="DataCenter\InformationModules\ContainerTable.cs" />
+    <Compile Include="DataCenter\InformationModules\UtilizationTable.cs" />
+    <Compile Include="Helpers\AccoutingHelpers.cs" />
+    <Compile Include="Helpers\SimpleLinerRegression.cs" />
+    <Compile Include="LocationStrategies\Other2015\Auction2015.cs" />
+    <Compile Include="Messages\CancelEvacuation.cs" />
+    <Compile Include="Messages\Other\OtherPushRequest.cs" />
+    <Compile Include="Messages\Other\WinnerAnnouncementMessage.cs" />
+    <Compile Include="Modules\LoadManagement\CommonLoadManager.cs" />
+    <Compile Include="Modules\LoadManagement\HostLoadManager.cs" />
+    <Compile Include="DataCenter\InformationModules\ISwitchTable.cs" />
+    <Compile Include="DataCenter\InformationModules\MachineTable.cs" />
+    <Compile Include="Helpers\CheckpointAndResotoreCalculator.cs" />
+    <Compile Include="Loads\LoadGenerator.cs" />
+    <Compile Include="LocationStrategies\Auctions\Auction.cs" />
+    <Compile Include="LocationStrategies\LocationStrategy.cs" />
+    <Compile Include="LocationStrategies\StrategyActionType.cs" />
+    <Compile Include="LocationStrategies\Bid.cs" />
+    <Compile Include="LocationStrategies\Auctions\PullAuction.cs" />
+    <Compile Include="LocationStrategies\Auctions\PushAuction.cs" />
+    <Compile Include="Accounting\AccountingModule.cs" />
+    <Compile Include="DataCenter\Component.cs" />
+    <Compile Include="DataCenter\Container.cs" />
+    <Compile Include="DataCenter\MachineController.cs" />
+    <Compile Include="DataCenter\Machine.cs" />
+    <Compile Include="LocationStrategies\Strategies.cs" />
+    <Compile Include="LocationStrategies\InOrderProping\InOrderProping.cs" />
+    <Compile Include="Loads\Load.cs" />
+    <Compile Include="Loads\ContainerLoadInfo.cs" />
+    <Compile Include="Configuration\Global.cs" />
+    <Compile Include="Loads\HostLoadInfo.cs" />
+    <Compile Include="Helpers\RandomNumberGenerator.cs" />
+    <Compile Include="DataCenter\HostMachine.cs" />
+    <Compile Include="DataCenter\MasterMachine.cs" />
+    <Compile Include="Loads\UtilizationStates.cs" />
+    <Compile Include="Messages\InitiateMigration.cs" />
+    <Compile Include="Messages\MigrateContainer.cs" />
+    <Compile Include="Messages\PullLoadAvailiability.cs" />
+    <Compile Include="Messages\PushLoadAvailability.cs" />
+    <Compile Include="Messages\Message.cs" />
+    <Compile Include="DataCenter\NetworkSwitch.cs" />
+    <Compile Include="Messages\MessageTypes.cs" />
+    <Compile Include="Messages\PushPullRequest.cs" />
+    <Compile Include="Messages\RejectRequest.cs" />
+    <Compile Include="Messages\UtilizationStateChange.cs" />
+    <Compile Include="Modules\Management\Host\HostHandlerModule.cs" />
+    <Compile Include="Modules\Management\Host\Mine\MyHostHandlerModule.cs" />
+    <Compile Include="Modules\Management\Host\Other\OtherHostHandlerModule2009.cs" />
+    <Compile Include="Modules\Management\Host\Other\OtherHostHandlerModule2015.cs" />
+    <Compile Include="Modules\Management\Master\MasterHandlerModule.cs" />
+    <Compile Include="Modules\Management\Master\Mine\AuctionManagement.cs" />
+    <Compile Include="Modules\Management\Master\Mine\InorderPropingManagement.cs" />
+    <Compile Include="Modules\Management\Master\Mine\MineCommon.cs" />
+    <Compile Include="Modules\Management\Master\Other\OtherMaster2009.cs" />
+    <Compile Include="Modules\Management\Master\Other\OtherMaster2015.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimulationController\SimulationController.cs" />
+    <Compile Include="SimulationController\ISimulationController.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Checkpoint_Restore\Checkpoint_Restore.csproj">
+      <Project>{837421D8-8788-4C3E-8E58-B546830D0579}</Project>
+      <Name>Checkpoint_Restore</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

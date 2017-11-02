@@ -1,0 +1,82 @@
+﻿using System;
+using Simulation.Configuration;
+
+namespace Simulation.Loads
+{
+    public class HostLoadInfo
+    {
+        public HostLoadInfo(int hostId,Load currentLoad,int containersCount,double cpu,double mem,double io)
+        {
+            HostId = hostId;
+            CurrentLoad = currentLoad;
+            ContainersCount = containersCount;
+            CPUUtil = cpu;
+            MemoryUtil = mem;
+            IOUtil = io;
+        }
+        /// <summary>
+        /// The Current Load of the Host in terms of CPU Usage, Memory and IO/S
+        /// </summary>
+        public Load CurrentLoad { get; private set; }
+
+        public int ContainersCount { get; set; }
+        public int HostId { get; private set; }
+        /// <summary>
+        /// Ration between the Current Host CPU Load and The Max CPU Load
+        /// </summary>
+        public double CPUUtil { get; private set; }
+        /// <summary>
+        /// Ration between the Current Used Memory and The Max Memory
+        /// </summary>
+        public double MemoryUtil { get; private set;}
+        /// <summary>
+        /// Ration between the Current IO/S Load and The Max IO/S
+        /// </summary>
+        public double IOUtil { get; private set; }
+
+
+        private UtilizationStates GetFloatState(double v,double min,double max)
+        {
+            if (v > max)
+                return UtilizationStates.OverUtilization;
+
+            if (v < min)
+                return UtilizationStates.UnderUtilization;
+            return UtilizationStates.Normal;
+        }
+
+        /// <summary>
+        /// Should Indicate the load of the host to be either High, Normal or Under
+        /// Use Only CPU Time
+        /// </summary>
+        /// <returns></returns>
+        public UtilizationStates CalculateTotalUtilizationState(double min, double max)
+        {
+            UtilizationStates cpu = GetFloatState(Volume,min,max);
+            return cpu;
+        }
+
+        //Only CPU
+        /// <summary>
+        /// Should Always be in percentage form
+        /// </summary>
+        public double Volume
+        {
+            get
+            {
+                //double volume = 1/((1 - CPUUtil)*(1 - IOUtil)*(1 - MemoryUtil));
+                var volume = CPUUtil;
+                if (Double.IsNaN(volume) || volume<0)
+                {
+                    throw new NotImplementedException();
+                }
+                return volume;
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"{HostId}, {CurrentLoad},{ContainersCount},{CPUUtil},{MemoryUtil},{IOUtil}";
+        }
+    }
+}
