@@ -14,9 +14,10 @@ namespace Simulation.Configuration
     {
         /// <summary>
         /// Each Step is ten seconds => 30 Min
+        /// Ideal steps = 180
         /// </summary>
-        public static int Steps = 180;
-        public static int NoOfTrials { get; } = 10;
+        public static int Steps = 60;
+        public static int NoOfTrials { get; } = 1;
 
         public static int GetSimulationTime
         {
@@ -41,6 +42,12 @@ namespace Simulation.Configuration
         {
             switch (SimulationSize)
             {
+                case SimulationSize.Five:
+                    Second = 100;
+                    break;
+                case SimulationSize.Ten:
+                    Second = 2;
+                    break;
                 case SimulationSize.Twenty:
                     Second = CurrentStrategy != Strategies.Zhao ? 5 : 10;
                     break;
@@ -84,6 +91,9 @@ namespace Simulation.Configuration
                 case Strategies.ForsmanPush:
                 case Strategies.ForsmanPull:
                     LoadPrediction = LoadPrediction.Ewma;
+                    break;
+                case Strategies.Auction:
+                    LoadPrediction = LoadPrediction.Arma;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(alg), alg, null);
@@ -144,6 +154,7 @@ namespace Simulation.Configuration
         public static Load ContainerLoadPostNormal { get; } = new Load(7.5, 640, 7.5);
         public static StrategyActionType OtherPushPullStrategy { get; set; } = StrategyActionType.PushAction;
         public static StartUtilizationPercent StartUtilizationPercent { get; set; } = StartUtilizationPercent.Fifty;
+        public static int TestedItems { get; } = 3;
 
         ///// <summary>
         ///// Packet size / Bit rate

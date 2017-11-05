@@ -6,17 +6,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Simulation.Helpers;
 using Simulation.Messages;
-using Simulation.Auctions;
 using Simulation.Configuration;
 using Simulation.DataCenter.InformationModules;
 using Simulation.Loads;
 using Simulation.LocationStrategies;
-using Simulation.LocationStrategies.Auctions;
-using Simulation.LocationStrategies.InOrderProping;
-using Simulation.Modules.Management;
 using Simulation.Modules.Management.Master;
-using Simulation.Modules.Management.Master.Mine;
-using Simulation.Modules.Management.Master.Other;
+using Simulation.Modules.Management.Master.WAshraf2017;
 
 namespace Simulation.DataCenter
 {
@@ -44,13 +39,13 @@ namespace Simulation.DataCenter
                     _handler = new InorderPropingManagement(CommunicationModule, powerController, holder);
                     break;
                 case Strategies.Zhao:
-                    _handler = new OtherMaster2009(CommunicationModule);
+                    _handler = new NoMasterHandlerModule(CommunicationModule);
                     break;
                 case Strategies.ForsmanPush:
-                    _handler = new OtherMaster2015(CommunicationModule);
+                    _handler = new NoMasterHandlerModule(CommunicationModule);
                     break;
                 case Strategies.ForsmanPull:
-                    _handler = new OtherMaster2015(CommunicationModule);
+                    _handler = new NoMasterHandlerModule(CommunicationModule);
                     break;
 
                 default:

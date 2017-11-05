@@ -10,7 +10,7 @@ using Simulation.Loads;
 using Simulation.LocationStrategies;
 using Simulation.Messages;
 
-namespace Simulation.Modules.Management.Master.Mine
+namespace Simulation.Modules.Management.Master.WAshraf2017
 {
     public abstract class MineCommon : MasterHandlerModule
     {

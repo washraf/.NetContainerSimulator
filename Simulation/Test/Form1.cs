@@ -67,6 +67,8 @@ namespace Test
 
                     var sizes = new List<SimulationSize>()
                     {
+                        //SimulationSize.Five,
+                        //SimulationSize.Ten,
                         SimulationSize.Twenty,
                         //SimulationSize.Fifty,
                         //SimulationSize.Hundred,
@@ -83,6 +85,11 @@ namespace Test
 
                     var algorithms = new List<Strategies>()
                     {
+                        Strategies.Auction,
+                        Strategies.Auction,
+                        Strategies.Auction,
+                        Strategies.Auction,
+
                         Strategies.InOrderProping,
                         //Strategies.Zhao,
                         //Strategies.ForsmanPush,
@@ -113,7 +120,7 @@ namespace Test
                                     Global.SetCurrentStrategy(alg);
                                     foreach (var predictor in predictors)
                                     {
-                                        if (alg == Strategies.InOrderProping)
+                                        if (alg == Strategies.InOrderProping|| alg == Strategies.Auction)
                                         {
                                             Global.LoadPrediction = predictor;   
                                         }

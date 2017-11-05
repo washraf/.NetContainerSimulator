@@ -77,7 +77,7 @@ namespace Simulation.SimulationController
                 {
                     var conId = RandomNumberGenerator.GetContainerRandomNumber();
                     //var i = r.Next(1, (int)CurrentSimulationSize + 1);
-                    (hosts[i] as HostMachine).AddContainer(new Container(conId, load, CurrentPrediction));
+                    (hosts[i] as HostMachine).AddContainer(new Container(conId, load, CurrentPrediction,0));
                 }
             }
 

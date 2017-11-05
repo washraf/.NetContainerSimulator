@@ -4,7 +4,7 @@ using System.Linq;
 using Simulation.LocationStrategies;
 using Simulation.LocationStrategies.Auctions;
 
-namespace Simulation.Auctions
+namespace Simulation.LocationStrategies.Auctions
 {
     public class PullAuction:Auction
     {
@@ -35,16 +35,18 @@ namespace Simulation.Auctions
         {
             if (ValidBids.Any())
             {
-                Bid winner = ValidBids.First();
-                var volume = ValidBids.Last().NewLoadInfo.Volume;
-                foreach (var bid in ValidBids)
-                {
-                    if (volume < bid.NewLoadInfo.Volume)
-                    {
-                        volume = bid.NewLoadInfo.Volume;
-                        winner = bid;
-                    }
-                }
+
+                var winner = ValidBids.OrderBy(x => x.NewLoadInfo.Volume).Last();
+                //Bid winner = ValidBids.First();
+                //var volume = ValidBids.First().NewLoadInfo.Volume;
+                //foreach (var bid in ValidBids)
+                //{
+                //    if (volume < bid.NewLoadInfo.Volume)
+                //    {
+                //        volume = bid.NewLoadInfo.Volume;
+                //        winner = bid;
+                //    }
+                //}
                 return winner;
             }
             //throw new Exception();

@@ -14,13 +14,12 @@ namespace Simulation.Helpers
 
         public CheckpointAndResotoreCalculator()
         {
-                var data = DataLoader.Load(@"D:\Normal_log");
-                Data = DataCleaner.CleanData(data);
+            var data = DataLoader.Load(@"D:\Normal_log");
+            Data = DataCleaner.CleanData(data);
         }
 
         public int GetCheckpointTime(double size)
         {
-
             int v = DataCleaner.GetNearstFifty(Convert.ToInt32(size));
             while (!Data.ContainsKey(v))
             {

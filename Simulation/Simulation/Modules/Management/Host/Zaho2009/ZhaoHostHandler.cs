@@ -15,13 +15,16 @@ using Simulation.Modules.LoadManagement;
 
 namespace Simulation.Modules.Management.Host.Other
 {
-    public class OtherHostHandlerModule2009:HostHandlerModule
+    /// <summary>
+    /// http://ieeexplore.ieee.org/document/5331732/?reload=true
+    /// </summary>
+    public class ZhaorHostHandler:HostHandlerModule
     {
         private readonly CommonLoadManager _commonLoadManager;
         private object _hostLock = new object();
         //public int BidLock { get; set; } = -1;
 
-        public OtherHostHandlerModule2009(NetworkInterfaceCard communicationModule, ContainerTable containerTable, ILoadManager loadManager,CommonLoadManager commonLoadManager) : base(communicationModule, containerTable, loadManager)
+        public ZhaorHostHandler(NetworkInterfaceCard communicationModule, ContainerTable containerTable, ILoadManager loadManager,CommonLoadManager commonLoadManager) : base(communicationModule, containerTable, loadManager)
         {
             _commonLoadManager = commonLoadManager;
         }
@@ -56,11 +59,11 @@ namespace Simulation.Modules.Management.Host.Other
             Dictionary<int, double> pdis = CalculatePropDistributionForAllHosts(hosts);
             Random r = new Random(Guid.NewGuid().GetHashCode());
             List<ContainerToHost> list = new List<ContainerToHost>();
-            foreach (var container in _containerTable.GetAllContainers())
+            foreach (var container in ContainerTable.GetAllContainers())
             {
                 var k = r.GetRandomFromDictionary(pdis);
                 var cdash = _commonLoadManager.GetHostLoadInfoByHostIdAfterContainer(k,container.GetContainerNeededLoadInfo()).Volume;//Should be after adding the current container
-                var c = _loadManager.GetNeededHostLoadInfo().Volume;
+                var c = LoadManager.GetNeededHostLoadInfo().Volume;
                 if (cdash < c)
                 {
                     list.Add(new ContainerToHost(container.ContainerId,k,c-cdash));
@@ -80,9 +83,9 @@ namespace Simulation.Modules.Management.Host.Other
 
         private void MigrationContainer(ContainerToHost result)
         {
-            var con = _containerTable.GetContainerById(result.ConId);
+            var con = ContainerTable.GetContainerById(result.ConId);
             var size = (int)con.GetContainerNeededLoadInfo().CurrentLoad.MemorySize * 1024;
-            _containerTable.LockContainer(con.ContainerId);
+            ContainerTable.LockContainer(con.ContainerId);
             con.Checkpoint(this.MachineId);
 
             MigrateContainerRequest request =
@@ -103,7 +106,7 @@ namespace Simulation.Modules.Management.Host.Other
 
         private void UpdateInformation()
         {
-            _commonLoadManager.UpdateHostLoadInfo(_loadManager.GetNeededHostLoadInfo());
+            _commonLoadManager.UpdateHostLoadInfo(LoadManager.GetNeededHostLoadInfo());
         }
 
         public override void HandleMessage(Message message)
@@ -128,7 +131,7 @@ namespace Simulation.Modules.Management.Host.Other
         {
             if (message.Done)
             {
-                _containerTable.FreeLockedContainer();
+                ContainerTable.FreeLockedContainer();
                 //ResetBackOff();
 
                 //_containersTable.Remove(sendContainerResponce.ContainerId);
@@ -146,7 +149,7 @@ namespace Simulation.Modules.Management.Host.Other
             {
                 //BidLock = message.SenderId;
                 message.MigratedContainer.Restore(this.MachineId);
-                _containerTable.AddContainer(message.MigratedContainer.ContainerId, message.MigratedContainer);
+                ContainerTable.AddContainer(message.MigratedContainer.ContainerId, message.MigratedContainer);
                 var responce =
                     new MigrateContainerResponse(message.SenderId, this.MachineId, message.MigratedContainer.ContainerId,
                         true);
@@ -165,24 +168,6 @@ namespace Simulation.Modules.Management.Host.Other
             //ResetBackOff();
         }
 
-
-
-        #region --Not Used --
-        protected override void TryToChangeSystemState(UtilizationStates hostState)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void SendPullRequest()
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override bool SendPushRequest()
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
     }
 
 }

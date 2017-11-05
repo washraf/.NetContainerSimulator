@@ -16,11 +16,11 @@ namespace Simulation.Modules.Management.Host
 {
     public abstract class HostHandlerModule:IMessageHandler
     {
-        protected readonly ContainerTable _containerTable;
-        protected readonly ILoadManager _loadManager;
+        protected readonly ContainerTable ContainerTable;
+        protected readonly ILoadManager LoadManager;
         public NetworkInterfaceCard CommunicationModule { get; set; }
-        protected int MachineId;
-        protected int _failuresCount;
+        protected int MachineId { get; set; }
+        protected int FailuresCount { get; set; }
         protected int BackOff { get; } = Global.CheckRate;
         public bool Started { get; set; }
 
@@ -30,8 +30,8 @@ namespace Simulation.Modules.Management.Host
         public HostHandlerModule(NetworkInterfaceCard communicationModule,ContainerTable containerTable,ILoadManager loadManager)
         {
             MachineId = communicationModule.MachineId;
-            _containerTable = containerTable;
-            _loadManager = loadManager;
+            ContainerTable = containerTable;
+            LoadManager = loadManager;
             CommunicationModule = communicationModule;
             
         }
@@ -39,29 +39,27 @@ namespace Simulation.Modules.Management.Host
 
         #region --long running--
         public abstract void MachineAction();
-        protected abstract void TryToChangeSystemState(UtilizationStates hostState);
-        protected abstract void SendPullRequest();
-        protected abstract bool SendPushRequest();
         #endregion
 
+        #region  --Back Off Control --
         protected void ResetBackOff()
         {
-            _failuresCount = 0;
+            FailuresCount = 0;
         }
 
         protected void IncreaseBackOffTime()
         {
-            _failuresCount++;
-            if (_failuresCount >= 8)
+            FailuresCount++;
+            if (FailuresCount >= 8)
             {
-                _failuresCount = 0;
+                FailuresCount = 0;
             }
         }
 
         protected int GetBackOffTime()
         {
             Random r = new Random(Guid.NewGuid().GetHashCode());
-            int range = Convert.ToInt32(Convert.ToInt32(Math.Pow(2, _failuresCount)-1)*0.5);
+            int range = Convert.ToInt32(Convert.ToInt32(Math.Pow(2, FailuresCount)-1)*0.5);
             var random = r.Next(0, range);
             var t  = (random + 1) * Global.CheckRate;
             if (random <= 23)
@@ -74,15 +72,6 @@ namespace Simulation.Modules.Management.Host
             //var num = r.Next(-1 * Global.CheckRate / 2, Global.CheckRate / 2);
             //return BackOff + num;
         }
-        protected ContainerLoadInfo GetToBeRemovedContainerLoadInfo()
-        {
-            var r = _containerTable.SelectContainerByCondition();
-            if (r == null)
-                return null;
-            else
-            {
-                return r.GetContainerPredictedLoadInfo();
-            }
-        }
+        #endregion
     }
 }

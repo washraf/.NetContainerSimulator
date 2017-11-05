@@ -81,6 +81,11 @@ namespace Simulation.DataCenter.InformationModules
             }
         }
         HashSet<int> _hashSet = new HashSet<int>();  
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public Container SelectContainerByCondition()
         {
             lock (_lock)

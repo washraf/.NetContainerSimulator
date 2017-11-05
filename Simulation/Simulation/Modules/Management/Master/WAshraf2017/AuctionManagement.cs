@@ -3,20 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Simulation.Auctions;
+using Simulation.Configuration;
 using Simulation.DataCenter;
 using Simulation.DataCenter.InformationModules;
 using Simulation.Helpers;
 using Simulation.Loads;
 using Simulation.LocationStrategies;
 using Simulation.LocationStrategies.Auctions;
+using Simulation.LocationStrategies.WAshraf2017;
 using Simulation.Messages;
 
-namespace Simulation.Modules.Management.Master.Mine
+namespace Simulation.Modules.Management.Master.WAshraf2017
 {
     public class AuctionManagement : MineCommon
     {
         private Auction _currentAuction;
+        private InOrderProping _currentProping;
         public AuctionManagement(NetworkInterfaceCard communicationModule,
             IMachinePowerController powerController,
             UtilizationTable holder) 
@@ -24,12 +26,14 @@ namespace Simulation.Modules.Management.Master.Mine
         {
         }
 
-       
         protected override void HandlePushRequest(PushRequest message, List<int> candidates)
         {
+            var ncandidates = candidates.Take(Global.TestedItems).ToList();
             int instanceId = Helpers.RandomNumberGenerator.GetInstanceRandomNumber();
-            PushAuction pushAuction = new PushAuction(instanceId, message.SenderId, message.SelectedContainerLoadInfo.ContainerId, candidates);
-            foreach (var candidateHostId in candidates)
+            PushAuction pushAuction = new PushAuction(instanceId, message.SenderId, message.SelectedContainerLoadInfo.ContainerId, ncandidates);
+            Console.WriteLine($"\tMaster: Initiate a Push Auction of Host#{message.SenderId} with #{instanceId}");
+
+            foreach (var candidateHostId in ncandidates)
             {
                 if (candidateHostId == 0)
                 {
@@ -48,10 +52,15 @@ namespace Simulation.Modules.Management.Master.Mine
 
         protected override void HandlePullRequest(PullRequest message, List<int> candidates)
         {
+
+            var ncandidates = candidates.Take(Global.TestedItems).ToList();
+
             int instanceId = RandomNumberGenerator.GetInstanceRandomNumber();
-            int count = candidates.Count();
-            PullAuction pullAuction = new PullAuction(instanceId, message.SenderId, candidates);
-            foreach (var candidateHostId in candidates)
+           // int count = candidates.Count();
+            PullAuction pullAuction = new PullAuction(instanceId, message.SenderId, ncandidates);
+            Console.WriteLine($"\tMaster: Initiate a Pull Auction of Host#{message.SenderId} with #{instanceId}");
+
+            foreach (var candidateHostId in ncandidates)
             {
                 if (candidateHostId == 0)
                 {
@@ -59,7 +68,6 @@ namespace Simulation.Modules.Management.Master.Mine
                 }
                 PullLoadAvailabilityRequest request = new PullLoadAvailabilityRequest(candidateHostId, this.MachineId, instanceId);
                 CommunicationModule.SendMessage(request);
-                //Console.WriteLine($"+\n\tSending Message for Host #{candidateHostId} and Auction #{auctionId}");
             }
             if (_currentAuction != null)
                 throw new NotImplementedException();
@@ -76,11 +84,17 @@ namespace Simulation.Modules.Management.Master.Mine
                 var winner = _currentAuction.GetWinnerBid();
                 if (winner == null)
                 {
+                    Console.WriteLine($"\tMaster: No Winner ---------");
+
                     InitiateRejectAction(_currentAuction.Owner, _currentAuction.ActionType);
                 }
                 else
                 {
-                    if (winner.Reason == BidReasons.None) { }
+                    Console.WriteLine($"\tMaster: Winner Is Host #{winner.BiddingHost}");
+                    if (winner.Reason == BidReasons.None)
+                    {
+                        
+                    }
                     else if (winner.Reason == BidReasons.Evacuate)
                     {
                         //EvacuatingHost = message.SenderId;
@@ -103,14 +117,14 @@ namespace Simulation.Modules.Management.Master.Mine
                 //Cancel All Bids
                 foreach (var candidate in _currentAuction.GetAllCandidates())
                 {
-                    if (winner != null && candidate != winner.BiddingHost)
+                    if (winner==null ||candidate != winner.BiddingHost)
                     {
                         BidCancellationRequest request = new BidCancellationRequest(candidate, this.MachineId, _currentAuction.InstanceId);
                         CommunicationModule.SendMessage(request);
-                        //Console.WriteLine($"send cancel to {bidder} on auction {currentAuction.AuctionId}");
+                        Console.WriteLine($"\tMaster: Send cancel to {candidate} on auction {_currentAuction.InstanceId}");
                     }
                 }
-                //Console.WriteLine($"\t - Closing Auction #{currentAuction.AuctionId}");
+                Console.WriteLine($"\t Master: Closing Auction #{_currentAuction.InstanceId}");
                 //Auctions.Remove(currentAuction);
 
                 _currentAuction = null;
@@ -121,5 +135,6 @@ namespace Simulation.Modules.Management.Master.Mine
                 Used = 0;
             }
         }
+
     }
 }

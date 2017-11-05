@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 using Simulation.Loads;
 using Simulation.LocationStrategies;
 
-namespace Simulation.LocationStrategies.InOrderProping
+namespace Simulation.LocationStrategies.WAshraf2017
 {
+    /// <summary>
+    /// Inorder proping strategy where it passes by all candidates one by one till if finds a fit node
+    /// </summary>
     public class InOrderProping:LocationStrategy
     {
 

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Simulation.DataCenter;
 using Simulation.Messages;
 
-namespace Simulation.Modules.Management.Master.Other
+namespace Simulation.Modules.Management.Master
 {
-    public class OtherMaster2009: MasterHandlerModule
+    public class NoMasterHandlerModule : MasterHandlerModule
     {
-        public OtherMaster2009(NetworkInterfaceCard communicationModule) : base(communicationModule)
+        public NoMasterHandlerModule(NetworkInterfaceCard communicationModule) : base(communicationModule)
         {
         }
 

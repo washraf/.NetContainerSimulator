@@ -1,5 +1,4 @@
 ﻿using System;
-using Simulation.Auctions;
 using Simulation.Helpers;
 using Simulation.Loads;
 

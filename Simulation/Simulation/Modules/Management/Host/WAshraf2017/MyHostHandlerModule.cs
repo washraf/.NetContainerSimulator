@@ -11,9 +11,9 @@ using Simulation.Loads;
 using Simulation.LocationStrategies;
 using Simulation.Messages;
 
-namespace Simulation.Modules.Management.Host.Mine
+namespace Simulation.Modules.Management.Host.WAshraf2017
 {
-    public class MyHostHandlerModule:HostHandlerModule
+    public class MyHostHandlerModule:PushPullHostHandler
     {
         
         #region --Properties--
@@ -31,14 +31,7 @@ namespace Simulation.Modules.Management.Host.Mine
         #region -- Long Running --
         public override void MachineAction()
         {
-            //if (BidLock == -1 && !EvacuateMode)
-            //{
-                
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException();
-            //}
+            
             BidLock = -1;
             EvacuateMode = false;
             //inital sleep before push or pull
@@ -47,16 +40,12 @@ namespace Simulation.Modules.Management.Host.Mine
             {
                 //change to time based on backoff algorithm 
                 var bft = GetBackOffTime();
-                //if (EvacuateMode)
-                //{
-                //    bft = 5*Global.Second;
-                //}
                 Thread.Sleep(bft);
                 lock (_hostLock)
                 {
                     if (BidLock == -1 && !EvacuateMode)
                     {
-                        var s = _loadManager.CheckSystemState(true, MinUtilization, MaxUtilization); //can this be up
+                        var s = LoadManager.CheckSystemState(true, MinUtilization, MaxUtilization); //can this be up
                         TryToChangeSystemState(s);
                     }
                     else if (EvacuateMode && BidLock == -1)
@@ -75,6 +64,11 @@ namespace Simulation.Modules.Management.Host.Mine
 
 
         }
+
+        /// <summary>
+        /// Either send a push or pull request
+        /// </summary>
+        /// <param name="hostState"></param>
         protected override void TryToChangeSystemState(UtilizationStates hostState)
         {
 
@@ -88,20 +82,38 @@ namespace Simulation.Modules.Management.Host.Mine
             }
 
         }
+
+        /// <summary>
+        /// container selection by condition
+        /// </summary>
+        /// <returns></returns>
+        protected ContainerLoadInfo GetToBeRemovedContainerLoadInfo()
+        {
+            var r = ContainerTable.SelectContainerByCondition();
+            if (r == null)
+                return null;
+            else
+            {
+                return r.GetContainerPredictedLoadInfo();
+            }
+        }
+
         protected override void SendPullRequest()
         {
+            Console.WriteLine($"I'm Host #{MachineId} and I am pulling a container and I have {ContainerTable.GetContainersCount()} contatiners");
+
             BidLock = 0;
-            PullRequest pullRequest = new PullRequest(0, this.MachineId, _loadManager.GetPredictedHostLoadInfo());
+            PullRequest pullRequest = new PullRequest(0, this.MachineId, LoadManager.GetPredictedHostLoadInfo());
             CommunicationModule.SendMessage(pullRequest);
         }
         protected override bool SendPushRequest()
         {
             BidLock = 0;
             var containerLoadInfo = GetToBeRemovedContainerLoadInfo();
-            //Console.WriteLine($"I'm Host #{HostId} and I am Pushing container #{key} and I have {GetContainersCount()} contatiners");
+            Console.WriteLine($"I'm Host #{MachineId} and I am Pushing container #{containerLoadInfo} and I have {ContainerTable.GetContainersCount()} contatiners");
             if (containerLoadInfo != null)
             {
-                PushRequest m = new PushRequest(0, this.MachineId, _loadManager.GetPredictedHostLoadInfo(), containerLoadInfo);
+                PushRequest m = new PushRequest(0, this.MachineId, LoadManager.GetPredictedHostLoadInfo(), containerLoadInfo);
                 CommunicationModule.SendMessage(m);
                 return true;
             }
@@ -140,7 +152,6 @@ namespace Simulation.Modules.Management.Host.Mine
                     case MessageTypes.MigrateContainerResponse:
                         HandleMigrateContainerResponce(message as MigrateContainerResponse);
                         break;
-
                     case MessageTypes.RejectRequest:
                         HandleRejectRequest(message as RejectRequest);
                         break;
@@ -152,13 +163,9 @@ namespace Simulation.Modules.Management.Host.Mine
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
-
                 }
             }
         }
-
-        
-
         #endregion
 
         private void HandleBidCancellationRequest(BidCancellationRequest bidCancellationRequest)
@@ -178,6 +185,7 @@ namespace Simulation.Modules.Management.Host.Mine
         }
         private void HandleRejectRequest(RejectRequest message)
         {
+            Console.WriteLine($"Host #{MachineId} request was rejected");
             if (EvacuateMode)
             {
                 
@@ -205,7 +213,7 @@ namespace Simulation.Modules.Management.Host.Mine
             if (message.RejectAction == RejectActions.CancelEvacuation)
             {
                 EvacuateMode = false;
-                //Console.WriteLine("Cancel Evacuation");
+                Console.WriteLine($"Cancel Evacuation By Rejection for Host# {MachineId}");
             }
             BidLock = -1;
 
@@ -215,8 +223,8 @@ namespace Simulation.Modules.Management.Host.Mine
             //Console.WriteLine($" \n\n\n\n \t\t\t From Push with Love{message.ContainerId}");
             Task t = new Task(() =>
             {
-                var container = _containerTable.GetContainerById(message.ContainerId);
-                _containerTable.LockContainer(message.ContainerId);
+                var container = ContainerTable.GetContainerById(message.ContainerId);
+                ContainerTable.LockContainer(message.ContainerId);
                 container.Checkpoint(this.MachineId);
                 var size = (int)container.GetContainerNeededLoadInfo().CurrentLoad.MemorySize * 1024;
                 MigrateContainerRequest request = new MigrateContainerRequest(message.TargetHost, this.MachineId,
@@ -231,7 +239,7 @@ namespace Simulation.Modules.Management.Host.Mine
         {
             Task t = new Task(() =>
             {
-                _containerTable.AddContainer(message.MigratedContainer.ContainerId, message.MigratedContainer);
+                ContainerTable.AddContainer(message.MigratedContainer.ContainerId, message.MigratedContainer);
                 message.MigratedContainer.Restore(this.MachineId);
                 var responce =
                     new MigrateContainerResponse(message.SenderId, this.MachineId, message.MigratedContainer.ContainerId,
@@ -246,12 +254,12 @@ namespace Simulation.Modules.Management.Host.Mine
         {
             if (message.Done)
             {
-                _containerTable.FreeLockedContainer();
+                ContainerTable.FreeLockedContainer();
                 //_containersTable.Remove(sendContainerResponce.ContainerId);
             }
             else
             {
-                _containerTable.UnLockContainer();
+                ContainerTable.UnLockContainer();
             }
             //Release Lock
             BidLock = -1;
@@ -260,17 +268,13 @@ namespace Simulation.Modules.Management.Host.Mine
         #region --Push Message Handlers--
         private void HandlePushLoadAvailabilityRequest(PushLoadAvailabilityRequest message)
         {
-            //Console.WriteLine($"Push : I'm Host #{HostId}: I've got message from # {message.SenderId}" +
-            //                  $" for auction # {message.AuctionId}");
-            //if (EvacuateMode && BidLock == -1)
-            //{
-            //    throw new Exception("Should take load");
-            //}
+            Console.WriteLine($"Push : I'm Host #{MachineId}: I've got message from # {message.SenderId}" +
+                              $" for auction # {message.AuctionId}");
             Bid bid;
-            if (BidLock == -1 && !EvacuateMode && _loadManager.CanITakeLoad(message.NewContainerLoadInfo))
+            if (BidLock == -1 && !EvacuateMode && LoadManager.CanITakeLoad(message.NewContainerLoadInfo))
             {
 
-                var load = _loadManager.GetHostLoadInfoAfterContainer(message.NewContainerLoadInfo);
+                var load = LoadManager.GetHostLoadInfoAfterContainer(message.NewContainerLoadInfo);
 
                 var newState = load.CalculateTotalUtilizationState(MinUtilization,MaxUtilization);
                 if (newState == UtilizationStates.OverUtilization)
@@ -281,21 +285,18 @@ namespace Simulation.Modules.Management.Host.Mine
                 }
                 else
                 {
-
                     bid = new Bid(MachineId, true, load, message.AuctionId, message.NewContainerLoadInfo.ContainerId,
                         BidReasons.None);
                     BidLock = bid.AuctionId;
                 }
-                //Console.WriteLine($"I am Host #{HostId} I am bidding for AuctionId {bid.AuctionId}");
+                Console.WriteLine($"I am Host #{MachineId} I am bidding for AuctionId {bid.AuctionId}");
             }
             else
             {
-                //Console.WriteLine($"I am Host #{HostId} I am Not I'm not Bidlocked {BidLock} and PushLock {PushPullLock}");
-
+                Console.WriteLine($"I am Host #{MachineId} I am Not I'm not Bidlocked {BidLock}");
                 bid = new Bid(MachineId, false, null, message.AuctionId, message.NewContainerLoadInfo.ContainerId,
                     BidReasons.CantBid);
             }
-
 
             //Console.WriteLine($"I am Host #{HostId} bidding Push Auction {message.AuctionId} with {bid.Valid}");
 
@@ -303,15 +304,14 @@ namespace Simulation.Modules.Management.Host.Mine
                         new LoadAvailabilityResponce(message.SenderId, this.MachineId, message.AuctionId, bid);
             // var responce = new GetHostLoadInfoResponce(this.HostId, load);
             CommunicationModule.SendMessage(availabilityResponce);
-
         }
         #endregion
 
         #region --Pull Message Handlers
         private void HandlePullLoadAvailabilityRequest(PullLoadAvailabilityRequest message)
         {
-            //Console.WriteLine($"Pull : I'm Host #{HostId}: I've got message from # {message.SenderId}" +
-            //                 $" for auction # {message.AuctionId}");
+            Console.WriteLine($"Pull : I'm Host #{MachineId}: I've got message from # {message.SenderId}" +
+                             $" for auction # {message.AuctionId}");
 
             Bid bid;
             if (BidLock == -1 && !EvacuateMode)
@@ -319,8 +319,8 @@ namespace Simulation.Modules.Management.Host.Mine
                 ContainerLoadInfo selectedContainerload = GetToBeRemovedContainerLoadInfo();
                 if (selectedContainerload != null)
                 {
-                    var oldstate = _loadManager.GetPredictedHostLoadInfo().CalculateTotalUtilizationState(MinUtilization,MaxUtilization);
-                    var load = _loadManager.GetHostLoadInfoAWithoutContainer(selectedContainerload);
+                    var oldstate = LoadManager.GetPredictedHostLoadInfo().CalculateTotalUtilizationState(MinUtilization,MaxUtilization);
+                    var load = LoadManager.GetHostLoadInfoAWithoutContainer(selectedContainerload);
                     var newState = load.CalculateTotalUtilizationState(MinUtilization, MaxUtilization);
                     if (oldstate == UtilizationStates.Normal && newState == UtilizationStates.UnderUtilization)
                     {
@@ -331,26 +331,16 @@ namespace Simulation.Modules.Management.Host.Mine
                         var breason = BidReasons.None;
                         if (oldstate == UtilizationStates.UnderUtilization)
                         {
-                            //if (_toBeEvacuated > 1)
-                            //{
                             EvacuateMode = true;
                             breason = BidReasons.Evacuate;
-                            //}
-                            //else
-                            //{
-                            //    _toBeEvacuated++;
-                            //}
                         }
-                        //else
-                        //{
-                        //    _toBeEvacuated = 0;
-                        //}
+
                         bid = new Bid(MachineId, true, load, message.AuctionId, selectedContainerload.ContainerId, breason);
                         BidLock = bid.AuctionId;
 
                     }
 
-                    //Console.WriteLine($"I am Host #{HostId} I am bidding for AuctionId {bid.AuctionId}");
+                    Console.WriteLine($"I am Host #{MachineId} I am bidding for AuctionId {bid.AuctionId}");
                 }
                 else
                 {
@@ -360,12 +350,12 @@ namespace Simulation.Modules.Management.Host.Mine
             }
             else
             {
-                //Console.WriteLine($"I am Host #{HostId} I am Not I'm not Bidlocked {BidLock} and PushLock {PushPullLock}");
+                Console.WriteLine($"I am Host #{MachineId} I am Not I'm not Bidlocked {BidLock}");
 
                 bid = new Bid(MachineId, false, null, message.AuctionId, -1, BidReasons.CantBid);
             }
 
-            //Console.WriteLine($"I am Host #{HostId} for Pull Auction {message.AuctionId} with {bid.Valid}");
+            Console.WriteLine($"I am Host #{MachineId} for Pull Auction {message.AuctionId} with {bid.Valid}");
 
             LoadAvailabilityResponce availabilityResponce =
                         new LoadAvailabilityResponce(message.SenderId, this.MachineId, message.AuctionId, bid);
@@ -373,8 +363,10 @@ namespace Simulation.Modules.Management.Host.Mine
             CommunicationModule.SendMessage(availabilityResponce);
         }
         #endregion
+
         private void HandleCancelEvacuation(CancelEvacuation message)
         {
+            Console.WriteLine($"I Cancelling Evacuation I am Host #{MachineId} ");
             if (!EvacuateMode)
             {
                 throw new NotImplementedException("Cancel what wasn't active");

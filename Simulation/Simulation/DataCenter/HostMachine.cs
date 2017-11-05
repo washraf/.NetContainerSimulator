@@ -14,8 +14,9 @@ using Simulation.LocationStrategies;
 using Simulation.Messages;
 using Simulation.Modules.LoadManagement;
 using Simulation.Modules.Management.Host;
-using Simulation.Modules.Management.Host.Mine;
+using Simulation.Modules.Management.Host.Forsman2015;
 using Simulation.Modules.Management.Host.Other;
+using Simulation.Modules.Management.Host.WAshraf2017;
 
 namespace Simulation.DataCenter
 {
@@ -54,15 +55,15 @@ namespace Simulation.DataCenter
 
                     break;
                 case Strategies.Zhao:
-                    _handler = new OtherHostHandlerModule2009(CommunicationModule, _containerTable, _loadManager,Global.CommonLoadManager);
+                    _handler = new ZhaorHostHandler(CommunicationModule, _containerTable, _loadManager,Global.CommonLoadManager);
 
                     break;
                 case Strategies.ForsmanPush:
-                    _handler = new OtherHostHandlerModule2015(CommunicationModule, _containerTable, _loadManager,StrategyActionType.PushAction);
+                    _handler = new ForsmanHostHandler(CommunicationModule, _containerTable, _loadManager,StrategyActionType.PushAction);
 
                     break;
                 case Strategies.ForsmanPull:
-                    _handler = new OtherHostHandlerModule2015(CommunicationModule, _containerTable, _loadManager,StrategyActionType.PullAction);
+                    _handler = new ForsmanHostHandler(CommunicationModule, _containerTable, _loadManager,StrategyActionType.PullAction);
 
                     break;
                 default:

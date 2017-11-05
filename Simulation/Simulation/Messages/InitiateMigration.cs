@@ -1,5 +1,3 @@
-using Simulation.Auctions;
-
 namespace Simulation.Messages
 {
     public class InitiateMigration : Message

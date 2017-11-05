@@ -11,21 +11,21 @@ using Simulation.Helpers;
 using Simulation.Loads;
 using Simulation.LocationStrategies;
 using Simulation.LocationStrategies.Auctions;
-using Simulation.LocationStrategies.Other2015;
+using Simulation.LocationStrategies.Forsman2015;
 using Simulation.Messages;
 using Simulation.Messages.Other;
 
-namespace Simulation.Modules.Management.Host.Other
+namespace Simulation.Modules.Management.Host.Forsman2015
 {
-    public class OtherHostHandlerModule2015:HostHandlerModule
+    public class ForsmanHostHandler:PushPullHostHandler
     {
         private readonly StrategyActionType _currentActionType;
         public int BidLock { get; set; } = -1;
-        private Auction2015 _currentAuction;
+        private ForsmanAuction _currentAuction;
         private object _hostLock = new object();
 
 
-        public OtherHostHandlerModule2015(NetworkInterfaceCard communicationModule, ContainerTable containerTable, ILoadManager loadManager, StrategyActionType currentActionType) : base(communicationModule, containerTable, loadManager)
+        public ForsmanHostHandler(NetworkInterfaceCard communicationModule, ContainerTable containerTable, ILoadManager loadManager, StrategyActionType currentActionType) : base(communicationModule, containerTable, loadManager)
         {
             _currentActionType = currentActionType;
             MaxUtilization = Global.OtherMaxUtilization;
@@ -78,7 +78,7 @@ namespace Simulation.Modules.Management.Host.Other
                 {
                     if (BidLock == -1)
                     {
-                        var s = _loadManager.CheckSystemState(false, MinUtilization, MaxUtilization); //can this be up
+                        var s = LoadManager.CheckSystemState(false, MinUtilization, MaxUtilization); //can this be up
                         TryToChangeSystemState(s);
                     }
                 }
@@ -101,22 +101,22 @@ namespace Simulation.Modules.Management.Host.Other
         protected override void SendPullRequest()
         {
             int total = (int)Global.SimulationSize - 1;
-            var load = _loadManager.GetPredictedHostLoadInfo();
-            _currentAuction = new PullAuction2015(load, total);
+            var load = LoadManager.GetPredictedHostLoadInfo();
+            _currentAuction = new ForsmanPullAuction(load, total);
             BidLock = 0;
             OtherPullRequest m = new OtherPullRequest(-1, this.MachineId, load, this.MachineId);
             CommunicationModule.SendMessage(m);
         }
         protected override bool SendPushRequest()
         {
-            var list = _containerTable.GetAllContainersLoadInfo();
+            var list = ContainerTable.GetAllContainersLoadInfo();
                 //.Where(x=>
                 //_loadManager.GetHostLoadInfoAWithoutContainer(x)
                 //.CalculateTotalUtilizationState(MinUtilization,MaxUtilization)!= UtilizationStates.UnderUtilization )
                 //.ToList();
             int total = (int)Global.SimulationSize - 1;
-            var load = _loadManager.GetPredictedHostLoadInfo();
-            _currentAuction = new PushAuction2015(load, list, total);
+            var load = LoadManager.GetPredictedHostLoadInfo();
+            _currentAuction = new ForsmanPushAuction(load, list, total);
             BidLock = 0;
             OtherPushRequest m = new OtherPushRequest(-1, this.MachineId, load, this.MachineId, list);
             CommunicationModule.SendMessage(m);
@@ -162,9 +162,9 @@ namespace Simulation.Modules.Management.Host.Other
 
         private void HandleInitiateMigrationRequest(InitiateMigration message)
         {
-            var con = _containerTable.GetContainerById(message.ContainerId);
+            var con = ContainerTable.GetContainerById(message.ContainerId);
             var size = (int)con.GetContainerNeededLoadInfo().CurrentLoad.MemorySize * 1024;
-            _containerTable.LockContainer(con.ContainerId);
+            ContainerTable.LockContainer(con.ContainerId);
             con.Checkpoint(this.MachineId);
             MigrateContainerRequest request =
                 new MigrateContainerRequest(message.SenderId, this.MachineId, con, size);
@@ -176,14 +176,14 @@ namespace Simulation.Modules.Management.Host.Other
         {
             if (message.Done)
             {
-                _containerTable.FreeLockedContainer();
+                ContainerTable.FreeLockedContainer();
                 //ResetBackOff();
 
                 //_containersTable.Remove(sendContainerResponce.ContainerId);
             }
             else
             {
-                _containerTable.UnLockContainer();
+                ContainerTable.UnLockContainer();
             }
             //Release Lock
             BidLock = -1;
@@ -191,7 +191,7 @@ namespace Simulation.Modules.Management.Host.Other
         private void HandleMigrateContainerRequest(MigrateContainerRequest message)
         {
             message.MigratedContainer.Restore(this.MachineId);
-            _containerTable.AddContainer(message.MigratedContainer.ContainerId, message.MigratedContainer);
+            ContainerTable.AddContainer(message.MigratedContainer.ContainerId, message.MigratedContainer);
             var responce =
                 new MigrateContainerResponse(message.SenderId, this.MachineId, message.MigratedContainer.ContainerId,
                     true);
@@ -234,9 +234,9 @@ namespace Simulation.Modules.Management.Host.Other
                     CommunicationModule.SendMessage(responce);
                     if (_currentActionType == StrategyActionType.PushAction)
                     {
-                        var con = _containerTable.GetContainerById(winner.ContainerId);
+                        var con = ContainerTable.GetContainerById(winner.ContainerId);
                         var size = (int)con.GetContainerNeededLoadInfo().CurrentLoad.MemorySize * 1024;
-                        _containerTable.LockContainer(con.ContainerId);
+                        ContainerTable.LockContainer(con.ContainerId);
                         con.Checkpoint(this.MachineId);
                         MigrateContainerRequest request =
                             new MigrateContainerRequest(winner.BiddingHost, this.MachineId, con, size);
@@ -271,12 +271,12 @@ namespace Simulation.Modules.Management.Host.Other
             {
                 BidLock = message.SenderId;
                 List<Bid> bids = new List<Bid>();
-                var load = _loadManager.GetPredictedHostLoadInfo();
+                var load = LoadManager.GetPredictedHostLoadInfo();
 
                 foreach (var conload in message.ContainerLoads)
                 {
-                    var nload = _loadManager.GetHostLoadInfoAfterContainer(conload);
-                    if (_loadManager.CanITakeLoad(conload))
+                    var nload = LoadManager.GetHostLoadInfoAfterContainer(conload);
+                    if (LoadManager.CanITakeLoad(conload))
                         //&& nload.CalculateTotalUtilizationState(MinUtilization,MaxUtilization)
                         //!=UtilizationStates.OverUtilization)
                     {
@@ -303,13 +303,13 @@ namespace Simulation.Modules.Management.Host.Other
             {
                 BidLock = message.SenderId;
                 List<Bid> bids = new List<Bid>();
-                var load = _loadManager.GetPredictedHostLoadInfo();
+                var load = LoadManager.GetPredictedHostLoadInfo();
 
-                foreach (var cont in _containerTable.GetAllContainers())
+                foreach (var cont in ContainerTable.GetAllContainers())
                 {
                     var  conload = cont.GetContainerPredictedLoadInfo();
-                    var nload = _loadManager.GetHostLoadInfoAWithoutContainer(conload);
-                    if (_loadManager.CanITakeLoad(conload))
+                    var nload = LoadManager.GetHostLoadInfoAWithoutContainer(conload);
+                    if (LoadManager.CanITakeLoad(conload))
                         //&& nload.CalculateTotalUtilizationState(MinUtilization, MaxUtilization) != UtilizationStates.UnderUtilization)
                     {
                         Bid bid = new Bid(MachineId, true, nload, message.AuctionId, conload.ContainerId,

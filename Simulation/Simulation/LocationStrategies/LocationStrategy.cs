@@ -9,7 +9,7 @@ namespace Simulation.LocationStrategies
 {
     public abstract class LocationStrategy
     {
-        public LocationStrategy(int auctionId,int owner,List<int> candidates, StrategyActionType actionType)
+        protected LocationStrategy(int auctionId,int owner,List<int> candidates, StrategyActionType actionType)
         {
             InstanceId = auctionId;
             Owner = owner;

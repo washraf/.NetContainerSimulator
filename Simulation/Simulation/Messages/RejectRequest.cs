@@ -1,4 +1,3 @@
-using Simulation.Auctions;
 using Simulation.LocationStrategies;
 
 namespace Simulation.Messages

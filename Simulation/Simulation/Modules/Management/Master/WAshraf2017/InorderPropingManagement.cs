@@ -7,10 +7,10 @@ using Simulation.DataCenter;
 using Simulation.DataCenter.InformationModules;
 using Simulation.Loads;
 using Simulation.LocationStrategies;
-using Simulation.LocationStrategies.InOrderProping;
+using Simulation.LocationStrategies.WAshraf2017;
 using Simulation.Messages;
 
-namespace Simulation.Modules.Management.Master.Mine
+namespace Simulation.Modules.Management.Master.WAshraf2017
 {
     public class InorderPropingManagement: MineCommon
     {
