@@ -8,7 +8,7 @@ using Simulation.Configuration;
 using Simulation.Helpers;
 using Simulation.Loads;
 
-namespace Simulation.DataCenter
+namespace Simulation.DataCenter.Containers
 {
     public class Container : Component
     {

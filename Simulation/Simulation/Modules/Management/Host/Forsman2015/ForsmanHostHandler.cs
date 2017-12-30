@@ -281,7 +281,7 @@ namespace Simulation.Modules.Management.Host.Forsman2015
                         //!=UtilizationStates.OverUtilization)
                     {
                         Bid bid = new Bid(MachineId, true, nload, message.AuctionId, conload.ContainerId,
-                            BidReasons.None);
+                            BidReasons.ValidBid);
                         bids.Add(bid);
                     }
                 }
@@ -313,7 +313,7 @@ namespace Simulation.Modules.Management.Host.Forsman2015
                         //&& nload.CalculateTotalUtilizationState(MinUtilization, MaxUtilization) != UtilizationStates.UnderUtilization)
                     {
                         Bid bid = new Bid(MachineId, true, nload, message.AuctionId, conload.ContainerId,
-                            BidReasons.None,conload);
+                            BidReasons.ValidBid,conload);
                         bids.Add(bid);
                     }
                 }

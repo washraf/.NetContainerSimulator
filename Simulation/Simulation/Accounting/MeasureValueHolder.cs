@@ -16,24 +16,27 @@ namespace Simulation.Accounting
         public StartUtilizationPercent StartUtilization { get; set; }
         public LoadChangeAction ChangeAction { get; set; }
         public LoadPrediction Prediction { get; set; }
+        public TestedHosts Tested { get; }
 
         public string Name
         {
             get
             {
                 return SimulationSize.ToString() + "_" + StartUtilization.ToString() + "_" + ChangeAction.ToString() +
-                       "_" + Prediction.ToString() + "_" + Strategy.ToString();
+                       "_" + Prediction.ToString() + "_" + Strategy.ToString()+"_"+Tested;
             }
         }
 
         public MeasureValueHolder(Strategies strategy, SimulationSize simulationSize,
-            StartUtilizationPercent startUtilization, LoadChangeAction change, LoadPrediction prediction)
+            StartUtilizationPercent startUtilization, LoadChangeAction change, LoadPrediction prediction,
+            TestedHosts tested)
         {
             Strategy = strategy;
             SimulationSize = simulationSize;
             StartUtilization = startUtilization;
             ChangeAction = change;
             Prediction = prediction;
+            Tested = tested;
         }
 
         
@@ -51,7 +54,7 @@ namespace Simulation.Accounting
                 throw new ArgumentOutOfRangeException();
             }
             MeasureValueHolder final = new MeasureValueHolder(first.Strategy, first.SimulationSize,
-                first.StartUtilization, first.ChangeAction, first.Prediction);
+                first.StartUtilization, first.ChangeAction, first.Prediction,first.Tested);
             //Prepare for first
             foreach (var listItem in first.MeasuredValuesList)
             {
@@ -104,7 +107,7 @@ namespace Simulation.Accounting
         public static MeasureValueHolder operator /(MeasureValueHolder first, int c)
         {
             MeasureValueHolder final = new MeasureValueHolder(first.Strategy, first.SimulationSize,
-                first.StartUtilization, first.ChangeAction, first.Prediction);
+                first.StartUtilization, first.ChangeAction, first.Prediction,first.Tested);
             foreach (var listItem in first.MeasuredValuesList)
             {
                 final.MeasuredValuesList.Add(listItem/c);
@@ -210,7 +213,7 @@ namespace Simulation.Accounting
                             (int) this.SimulationSize + "\\" +
                             this.StartUtilization + "_" + ChangeAction + "\\" +
                             Prediction + "\\" + DateTime.Now.ToShortDateString() + "\\" +
-                            Strategy + "\\";
+                            Strategy + "\\"+Tested+"\\";
                     if(trialno!=-1)
                            folder+=trialno + "\\";
             try

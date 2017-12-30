@@ -7,10 +7,10 @@ using Simulation.Loads;
 
 namespace Simulation.Messages
 {
-    public class VolumeStateChange : Message
+    public class HostStateChange : Message
     {
 
-        public VolumeStateChange(int target, int sender,UtilizationStates state,double volume) :
+        public HostStateChange(int target, int sender,UtilizationStates state,double volume) :
             base(target, sender, MessageTypes.UtilizationStateChange)
         {
             State = state;

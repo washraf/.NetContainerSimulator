@@ -92,7 +92,7 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
             }
             else
             {
-                if (message.HostBid.Reason == BidReasons.None) { }
+                if (message.HostBid.Reason == BidReasons.ValidBid) { }
                 else if (message.HostBid.Reason == BidReasons.Evacuate)
                 {
                     //EvacuatingHost = message.SenderId;

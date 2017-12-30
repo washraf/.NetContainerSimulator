@@ -11,6 +11,7 @@ using Simulation.DataCenter.InformationModules;
 using Simulation.Loads;
 using Simulation.LocationStrategies;
 using Simulation.Modules.Management.Master;
+using Simulation.Modules.Management.Master.Proposed;
 using Simulation.Modules.Management.Master.WAshraf2017;
 
 namespace Simulation.DataCenter
@@ -28,14 +29,14 @@ namespace Simulation.DataCenter
                 CommunicationModule.Started = value;
             }
         }
-        public MasterMachine(NetworkSwitch networkSwitch, IMachinePowerController powerController, UtilizationTable holder,Strategies strategy) : base(0, networkSwitch)
+        public MasterMachine(NetworkSwitch networkSwitch, IMachinePowerController powerController, UtilizationTable holder,Strategies strategy, TestedHosts testedHosts) : base(0, networkSwitch)
         {
             switch (strategy)
             {
-                case Strategies.Auction:
-                    _handler = new AuctionManagement(CommunicationModule, powerController, holder);
+                case Strategies.WAshraf2017Auction:
+                    _handler = new AuctionManagement(CommunicationModule, powerController, holder, testedHosts);
                     break;
-                case Strategies.InOrderProping:
+                case Strategies.WAshraf2017:
                     _handler = new InorderPropingManagement(CommunicationModule, powerController, holder);
                     break;
                 case Strategies.Zhao:
@@ -47,7 +48,9 @@ namespace Simulation.DataCenter
                 case Strategies.ForsmanPull:
                     _handler = new NoMasterHandlerModule(CommunicationModule);
                     break;
-
+                case Strategies.Proposed2018:
+                    _handler = new ProposedMasterHandler(CommunicationModule,powerController,holder,testedHosts);
+                    break;
                 default:
 
                     throw new ArgumentOutOfRangeException(nameof(strategy), strategy, null);

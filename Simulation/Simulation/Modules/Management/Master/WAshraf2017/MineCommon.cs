@@ -14,7 +14,7 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
 {
     public abstract class MineCommon : MasterHandlerModule
     {
-        public IMachinePowerController PowerController { get; set; }
+        protected IMachinePowerController PowerController { get; set; }
         protected int Used { set; get; } = 0;
         private int _pushFailures = 0;
         /// <summary>
@@ -37,7 +37,7 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
         {
             if (message.MessageType == MessageTypes.UtilizationStateChange)
             {
-                HandleUtilizationStateChange(message as VolumeStateChange);
+                HandleUtilizationStateChange(message as HostStateChange);
                 return;
             }
             lock (MasterLock)
@@ -62,7 +62,7 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
                 }
             }
         }
-        private void HandleUtilizationStateChange(VolumeStateChange message)
+        private void HandleUtilizationStateChange(HostStateChange message)
         {
             DataHolder.SetUtilization(message.SenderId, message.State);
         }

@@ -19,16 +19,19 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
     {
         private Auction _currentAuction;
         private InOrderProping _currentProping;
+        private readonly TestedHosts TestedHostsCount;
+
         public AuctionManagement(NetworkInterfaceCard communicationModule,
             IMachinePowerController powerController,
-            UtilizationTable holder) 
+            UtilizationTable holder, TestedHosts testedHosts) 
             : base(communicationModule,powerController,holder)
         {
+            TestedHostsCount = testedHosts;
         }
 
         protected override void HandlePushRequest(PushRequest message, List<int> candidates)
         {
-            var ncandidates = candidates.Take(Global.TestedItems).ToList();
+            var ncandidates = candidates.Take((int)TestedHostsCount).ToList();
             int instanceId = Helpers.RandomNumberGenerator.GetInstanceRandomNumber();
             PushAuction pushAuction = new PushAuction(instanceId, message.SenderId, message.SelectedContainerLoadInfo.ContainerId, ncandidates);
             Console.WriteLine($"\tMaster: Initiate a Push Auction of Host#{message.SenderId} with #{instanceId}");
@@ -53,7 +56,7 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
         protected override void HandlePullRequest(PullRequest message, List<int> candidates)
         {
 
-            var ncandidates = candidates.Take(Global.TestedItems).ToList();
+            var ncandidates = candidates.Take((int)TestedHostsCount).ToList();
 
             int instanceId = RandomNumberGenerator.GetInstanceRandomNumber();
            // int count = candidates.Count();
@@ -91,7 +94,7 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
                 else
                 {
                     Console.WriteLine($"\tMaster: Winner Is Host #{winner.BiddingHost}");
-                    if (winner.Reason == BidReasons.None)
+                    if (winner.Reason == BidReasons.ValidBid)
                     {
                         
                     }

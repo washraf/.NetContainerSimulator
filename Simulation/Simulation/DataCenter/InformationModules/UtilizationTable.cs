@@ -17,6 +17,7 @@ namespace Simulation.DataCenter.InformationModules
         private object _lock = new object();
         public void SetUtilization(int id, UtilizationStates state)
         {
+
             lock (_lock)
             {
                 _utilization[id] = state;

@@ -14,6 +14,7 @@ using Simulation.Helpers;
 using Simulation.Loads;
 using Simulation.LocationStrategies;
 using Simulation.Modules.LoadManagement;
+using Simulation.DataCenter.Containers;
 
 namespace Simulation.SimulationController
 {
@@ -24,7 +25,7 @@ namespace Simulation.SimulationController
         public StartUtilizationPercent UtilizationPercent { get; set; }
         public LoadPrediction CurrentPrediction { set; get; }
         public LoadChangeAction ChangeAction { get; set; }
-
+        public TestedHosts TestedHostsCount { get; }
         public MachineTable MachineTableObject { get; private set; }
         public MachineController MachineControllerObject { get; private set; }
         public NetworkSwitch NetworkSwitchObject { get; private set; }
@@ -32,12 +33,13 @@ namespace Simulation.SimulationController
 
         public UtilizationTable UtilizationTable { get; private set; }
 
-        public SimulationController(Strategies strategies, SimulationSize size, StartUtilizationPercent utilizationPercent, LoadPrediction currentPrediction, LoadChangeAction changeAction)
+        public SimulationController(Strategies strategies, SimulationSize size, StartUtilizationPercent utilizationPercent, LoadPrediction currentPrediction, LoadChangeAction changeAction, TestedHosts testedHosts)
         {
             CurrentStrategy = strategies;
             CurrentSimulationSize = size;
             UtilizationPercent = utilizationPercent;
             ChangeAction = changeAction;
+            TestedHostsCount = testedHosts;
             CurrentPrediction = currentPrediction;
             MachineTableObject = new MachineTable();
             UtilizationTable = new UtilizationTable();
@@ -51,7 +53,7 @@ namespace Simulation.SimulationController
             //Global.CommonLoadManager.Clear();
             Global.CommonLoadManager = new CommonLoadManager(AccountingModuleObject);
             Machine master = new MasterMachine(NetworkSwitchObject, MachineControllerObject, UtilizationTable,
-                Global.CurrentStrategy);
+                Global.CurrentStrategy, TestedHostsCount);
             MachineControllerObject.AddHost(master);
             var h = new Load(Global.DataCenterHostConfiguration);
 

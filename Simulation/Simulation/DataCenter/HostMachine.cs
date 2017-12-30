@@ -16,7 +16,9 @@ using Simulation.Modules.LoadManagement;
 using Simulation.Modules.Management.Host;
 using Simulation.Modules.Management.Host.Forsman2015;
 using Simulation.Modules.Management.Host.Other;
+using Simulation.Modules.Management.Host.Proposed;
 using Simulation.Modules.Management.Host.WAshraf2017;
+using Simulation.DataCenter.Containers;
 
 namespace Simulation.DataCenter
 {
@@ -40,18 +42,19 @@ namespace Simulation.DataCenter
         private ContainerTable _containerTable;
         private ILoadManager _loadManager;
         #endregion
+
         public HostMachine(int id, Load maxLoad, NetworkSwitch networkSwitch, LoadPrediction currentLoadPrediction,Strategies strategy) : base(id, networkSwitch)
         {
             _containerTable = new ContainerTable(id);
             _loadManager = new HostLoadManager(this.MachineId, maxLoad, currentLoadPrediction, this.CommunicationModule, _containerTable);
             switch (strategy)
             {
-                case Strategies.Auction:
-                    _handler = new MyHostHandlerModule(CommunicationModule, _containerTable, _loadManager);
+                case Strategies.WAshraf2017Auction:
+                    _handler = new WAshrafHostHandlerModule(CommunicationModule, _containerTable, _loadManager);
 
                     break;
-                case Strategies.InOrderProping:
-                    _handler = new MyHostHandlerModule(CommunicationModule, _containerTable, _loadManager);
+                case Strategies.WAshraf2017:
+                    _handler = new WAshrafHostHandlerModule(CommunicationModule, _containerTable, _loadManager);
 
                     break;
                 case Strategies.Zhao:
@@ -64,7 +67,9 @@ namespace Simulation.DataCenter
                     break;
                 case Strategies.ForsmanPull:
                     _handler = new ForsmanHostHandler(CommunicationModule, _containerTable, _loadManager,StrategyActionType.PullAction);
-
+                    break;
+                case Strategies.Proposed2018:
+                    _handler = new ProposedHostHandlerModule(CommunicationModule,_containerTable,_loadManager);
                     break;
                 default:
 

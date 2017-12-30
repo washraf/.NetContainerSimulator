@@ -13,7 +13,7 @@ using Simulation.Messages;
 
 namespace Simulation.Modules.Management.Host.WAshraf2017
 {
-    public class MyHostHandlerModule:PushPullHostHandler
+    public class WAshrafHostHandlerModule:PushPullHostHandler
     {
         
         #region --Properties--
@@ -23,7 +23,7 @@ namespace Simulation.Modules.Management.Host.WAshraf2017
         private object _hostLock = new object();
         #endregion
 
-        public MyHostHandlerModule(NetworkInterfaceCard communicationModule, ContainerTable containerTable, ILoadManager loadManager) : base(communicationModule, containerTable, loadManager)
+        public WAshrafHostHandlerModule(NetworkInterfaceCard communicationModule, ContainerTable containerTable, ILoadManager loadManager) : base(communicationModule, containerTable, loadManager)
         {
             MinUtilization = Global.MinUtilization;
             MaxUtilization = Global.MaxUtilization;
@@ -286,7 +286,7 @@ namespace Simulation.Modules.Management.Host.WAshraf2017
                 else
                 {
                     bid = new Bid(MachineId, true, load, message.AuctionId, message.NewContainerLoadInfo.ContainerId,
-                        BidReasons.None);
+                        BidReasons.ValidBid);
                     BidLock = bid.AuctionId;
                 }
                 Console.WriteLine($"I am Host #{MachineId} I am bidding for AuctionId {bid.AuctionId}");
@@ -328,7 +328,7 @@ namespace Simulation.Modules.Management.Host.WAshraf2017
                     }
                     else
                     {
-                        var breason = BidReasons.None;
+                        var breason = BidReasons.ValidBid;
                         if (oldstate == UtilizationStates.UnderUtilization)
                         {
                             EvacuateMode = true;

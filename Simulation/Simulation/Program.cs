@@ -45,12 +45,8 @@ namespace Simulation
 
             var algorithms = new List<Strategies>()
             {
-                Strategies.Auction,
-                Strategies.Auction,
-                Strategies.Auction,
-                Strategies.Auction,
-
-                Strategies.InOrderProping,
+                Strategies.WAshraf2017Auction,
+                Strategies.WAshraf2017,
                 //Strategies.Zhao,
                 //Strategies.ForsmanPush,
                 //Strategies.ForsmanPull,
@@ -80,7 +76,7 @@ namespace Simulation
                             Global.SetCurrentStrategy(alg);
                             foreach (var predictor in predictors)
                             {
-                                if (alg == Strategies.InOrderProping || alg == Strategies.Auction)
+                                if (alg == Strategies.WAshraf2017 || alg == Strategies.WAshraf2017Auction)
                                 {
                                     Global.LoadPrediction = predictor;
                                 }
@@ -104,7 +100,8 @@ namespace Simulation
                                             Global.SimulationSize,
                                             Global.StartUtilizationPercent,
                                             Global.LoadPrediction,
-                                            Global.ChangeAction);
+                                            Global.ChangeAction,
+                                            Global.TestedItems);
                                     ConsolePrinting(controller);
                                     controller.StartSimulation();
                                     //var etime = DateTime.Now;

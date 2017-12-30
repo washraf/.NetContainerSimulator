@@ -27,7 +27,7 @@ namespace Simulation.Accounting
         //private Thread myThread = null;
 
         Dictionary<MessageTypes, int> _currentRequests = new Dictionary<MessageTypes, int>();
-        public MeasureValueHolder MeasureHolder { get;} = new MeasureValueHolder(Global.CurrentStrategy,Global.SimulationSize, Global.StartUtilizationPercent, Global.ChangeAction, Global.LoadPrediction);
+        public MeasureValueHolder MeasureHolder { get;} = new MeasureValueHolder(Global.CurrentStrategy,Global.SimulationSize, Global.StartUtilizationPercent, Global.ChangeAction, Global.LoadPrediction, Global.TestedItems);
        
 
         //public List<MeasuresValues> MeasuredValuesList { set; get; } = new List<MeasuresValues>();

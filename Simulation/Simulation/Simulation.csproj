@@ -85,6 +85,7 @@
     <Compile Include="Configuration\LoadPrediction.cs" />
     <Compile Include="Configuration\PredictionSource.cs" />
     <Compile Include="Configuration\SimulationSize.cs" />
+    <Compile Include="Configuration\TestedHosts.cs" />
     <Compile Include="DataCenter\ContainerRegistry.cs" />
     <Compile Include="DataCenter\Image.cs" />
     <Compile Include="DataCenter\IMessageHandler.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="LocationStrategies\Forsman2015\ForsmanPullAuction.cs" />
     <Compile Include="LocationStrategies\Forsman2015\PushAuction2015.cs" />
     <Compile Include="Messages\CancelEvacuation.cs" />
+    <Compile Include="Messages\MigrateContainerResponse.cs" />
     <Compile Include="Messages\Other\OtherPushRequest.cs" />
     <Compile Include="Messages\Other\WinnerAnnouncementMessage.cs" />
     <Compile Include="Modules\LoadManagement\CommonLoadManager.cs" />
@@ -116,7 +118,7 @@
     <Compile Include="LocationStrategies\Auctions\PushAuction.cs" />
     <Compile Include="Accounting\AccountingModule.cs" />
     <Compile Include="DataCenter\Component.cs" />
-    <Compile Include="DataCenter\Container.cs" />
+    <Compile Include="DataCenter\Containers\Container.cs" />
     <Compile Include="DataCenter\MachineController.cs" />
     <Compile Include="DataCenter\Machine.cs" />
     <Compile Include="LocationStrategies\Strategies.cs" />
@@ -140,11 +142,13 @@
     <Compile Include="Messages\RejectRequest.cs" />
     <Compile Include="Messages\UtilizationStateChange.cs" />
     <Compile Include="Modules\Management\Host\HostHandlerModule.cs" />
+    <Compile Include="Modules\Management\Host\Proposed\ProposedHostHandlerModule.cs" />
     <Compile Include="Modules\Management\Host\PushPullHostHandler.cs" />
     <Compile Include="Modules\Management\Host\Zaho2009\ZhaoHostHandler.cs" />
     <Compile Include="Modules\Management\Host\Forsman2015\ForsmanHostHandler.cs" />
-    <Compile Include="Modules\Management\Host\WAshraf2017\MyHostHandlerModule.cs" />
+    <Compile Include="Modules\Management\Host\WAshraf2017\WAshrafHostHandlerModule.cs" />
     <Compile Include="Modules\Management\Master\MasterHandlerModule.cs" />
+    <Compile Include="Modules\Management\Master\Proposed\ProposedMasterHandler.cs" />
     <Compile Include="Modules\Management\Master\WAshraf2017\AuctionManagement.cs" />
     <Compile Include="Modules\Management\Master\WAshraf2017\InorderPropingManagement.cs" />
     <Compile Include="Modules\Management\Master\WAshraf2017\MineCommon.cs" />

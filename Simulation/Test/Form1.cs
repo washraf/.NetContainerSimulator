@@ -59,9 +59,9 @@ namespace Test
                 {
                     var predictors = new List<LoadPrediction>()
                     {
-                        //LoadPrediction.None,
+                        LoadPrediction.None,
                         //LoadPrediction.Ewma,
-                        LoadPrediction.Arma,
+                        //LoadPrediction.Arma,
                         //LoadPrediction.LinReg,
                     };
 
@@ -69,9 +69,9 @@ namespace Test
                     {
                         //SimulationSize.Five,
                         //SimulationSize.Ten,
-                        SimulationSize.Twenty,
+                        //SimulationSize.Twenty,
                         //SimulationSize.Fifty,
-                        //SimulationSize.Hundred,
+                        SimulationSize.Hundred,
                         //SimulationSize.TwoHundred
                     };
 
@@ -85,12 +85,8 @@ namespace Test
 
                     var algorithms = new List<Strategies>()
                     {
-                        Strategies.Auction,
-                        Strategies.Auction,
-                        Strategies.Auction,
-                        Strategies.Auction,
-
-                        Strategies.InOrderProping,
+                       Strategies.Proposed2018,
+                       //Strategies.WAshraf2017,
                         //Strategies.Zhao,
                         //Strategies.ForsmanPush,
                         //Strategies.ForsmanPull,
@@ -101,6 +97,13 @@ namespace Test
                         LoadChangeAction.VeryHightBurst,
                         //LoadChangeAction.VeryHightDrain,
                         //LoadChangeAction.VreyHighOpposite
+                    };
+                    var testingRange = new List<TestedHosts>()
+                    {
+                        TestedHosts.One,
+                        TestedHosts.Five,
+                        TestedHosts.Ten,
+                        TestedHosts.Twenty,
                     };
 
 
@@ -118,19 +121,9 @@ namespace Test
                                 foreach (var alg in algorithms)
                                 {
                                     Global.SetCurrentStrategy(alg);
-                                    foreach (var predictor in predictors)
+                                    foreach (var testing in testingRange)
                                     {
-                                        if (alg == Strategies.InOrderProping|| alg == Strategies.Auction)
-                                        {
-                                            Global.LoadPrediction = predictor;   
-                                        }
-                                        else if (predictor == LoadPrediction.None)
-                                        {
-                                            
-                                        }
-                                        else
-                                            continue;
-
+                                        Global.TestedItems = testing;
                                         #region --ALL--
 
                                         btn_Start.Invoke(new Action(() => { btn_Start.Enabled = false; }));
@@ -145,7 +138,8 @@ namespace Test
                                                     Global.SimulationSize,
                                                     Global.StartUtilizationPercent,
                                                     Global.LoadPrediction,
-                                                    Global.ChangeAction);
+                                                    Global.ChangeAction,
+                                                    Global.TestedItems);
                                             controller.StartSimulation();
                                             //var etime = DateTime.Now;
                                             //MessageBox.Show((etime - stime).TotalSeconds.ToString());
@@ -489,7 +483,7 @@ namespace Test
             try
             {
                 Global.SetCurrentStrategy((Strategies)cb_Strategy.SelectedValue);
-                if (Global.CurrentStrategy == Strategies.InOrderProping || Global.CurrentStrategy == Strategies.Auction)
+                if (Global.CurrentStrategy == Strategies.WAshraf2017 || Global.CurrentStrategy == Strategies.WAshraf2017Auction)
                     cb_Prediction.SelectedIndex = 3;
                 else if (Global.CurrentStrategy == Strategies.Zhao)
                 {
@@ -552,9 +546,9 @@ namespace Test
 
                 LoadPrediction loadPrediction = (LoadPrediction)Enum.Parse(typeof(LoadPrediction), config[5]);
                 Strategies strategy = (Strategies)Enum.Parse(typeof(Strategies), config[7]);
-
+                TestedHosts testedHosts = (TestedHosts)Enum.Parse(typeof(TestedHosts), config[8]);
                 MeasureValueHolder holder =
-                    new MeasureValueHolder(strategy, simulationSize, precent, changeAction, loadPrediction);
+                    new MeasureValueHolder(strategy, simulationSize, precent, changeAction, loadPrediction,testedHosts);
                 using (StreamReader reader = new StreamReader(stream))
                 {
                     reader.ReadLine();

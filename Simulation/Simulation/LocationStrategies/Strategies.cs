@@ -8,10 +8,11 @@ namespace Simulation.LocationStrategies
 {
     public enum Strategies
     {
-        Auction,
-        InOrderProping,
+        WAshraf2017Auction,
+        WAshraf2017,
         Zhao,
         ForsmanPush,
-        ForsmanPull
+        ForsmanPull,
+        Proposed2018
     }
 }

@@ -63,7 +63,7 @@ namespace Test
             myPane.XAxis.Title.Text = $"Number of Availble Hosts (N)";
             myPane.YAxis.Title.Text = yAxis.ToString();
             Dictionary<Strategies, PointPairList> all = new Dictionary<Strategies, PointPairList>();
-            all.Add(Strategies.InOrderProping,new PointPairList());
+            all.Add(Strategies.WAshraf2017,new PointPairList());
             all.Add(Strategies.Zhao, new PointPairList());
             all.Add(Strategies.ForsmanPush, new PointPairList());
             all.Add(Strategies.ForsmanPull, new PointPairList());
@@ -122,7 +122,7 @@ namespace Test
             foreach (var a in all)
             {
                 LineItem l = new LineItem
-                    (a.Key==Strategies.InOrderProping?"Proposed Algorithm":a.Key.ToString(),
+                    (a.Key==Strategies.WAshraf2017?"Proposed Algorithm":a.Key.ToString(),
                     a.Value, GetColor(a.Key), SymbolType.Square,3);
                 l.Symbol.Size = 5;
                 l.Symbol.Fill = new Fill(GetColor(a.Key));
@@ -155,7 +155,7 @@ namespace Test
         {
             switch (key)
             {
-                case Strategies.InOrderProping:
+                case Strategies.WAshraf2017:
                     return DashStyle.Solid;
                     break;
                 case Strategies.Zhao:
@@ -176,7 +176,7 @@ namespace Test
         {
             switch (key)
             {
-                case Strategies.InOrderProping:
+                case Strategies.WAshraf2017:
                     return Color.Red;
                     break;
                 case Strategies.Zhao:

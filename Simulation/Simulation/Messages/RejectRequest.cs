@@ -5,8 +5,10 @@ namespace Simulation.Messages
     public enum RejectActions
     {
         Nothing,
+        Busy,
         Evacuate,
-        CancelEvacuation
+        CancelEvacuation,
+        TestWalid
     }
     public class RejectRequest : Message
     {

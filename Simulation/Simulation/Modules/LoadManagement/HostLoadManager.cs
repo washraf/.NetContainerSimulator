@@ -290,7 +290,7 @@ namespace Simulation.Modules.LoadManagement
 
         private void ReportUtilizationStateChange(UtilizationStates hoststate, double util)
         {
-            VolumeStateChange change = new VolumeStateChange(0, this.MachineId, hoststate, util);
+            HostStateChange change = new HostStateChange(0, this.MachineId, hoststate, util);
             _networkCard.SendMessage(change);
         }
     }

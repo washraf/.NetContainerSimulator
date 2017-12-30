@@ -5,7 +5,8 @@ namespace Simulation.LocationStrategies
 {
     public enum BidReasons
     {
-        None,
+        //None,
+        ValidBid,
         Empty,
         FullLoad,
         MinimumLoad,

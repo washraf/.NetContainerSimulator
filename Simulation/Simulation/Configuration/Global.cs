@@ -16,7 +16,7 @@ namespace Simulation.Configuration
         /// Each Step is ten seconds => 30 Min
         /// Ideal steps = 180
         /// </summary>
-        public static int Steps = 60;
+        public static int Steps = 180;
         public static int NoOfTrials { get; } = 1;
 
         public static int GetSimulationTime
@@ -24,10 +24,10 @@ namespace Simulation.Configuration
             
             get
             {
-                return 9000 * Global.Second;
+                //return 9000 * Global.Second;
                 //return 21600 * Global.Second;
                 //good with 50
-                //return 18000 * Global.Second;
+                return 18000 * Global.Second;
             }
 
         }
@@ -74,25 +74,28 @@ namespace Simulation.Configuration
         }
 
         public static LoadPrediction LoadPrediction { get; set; } = LoadPrediction.None;
-        public static Strategies CurrentStrategy { get; private set; } = Strategies.InOrderProping;
+        public static Strategies CurrentStrategy { get; private set; } = Strategies.WAshraf2017;
 
         public static void SetCurrentStrategy(Strategies alg)
         {
             CurrentStrategy = alg;
             switch (alg)
             {
-                case Strategies.InOrderProping:
+                case Strategies.WAshraf2017:
                     //LoadPrediction = LoadPrediction.LinReg;
                     break;
                 case Strategies.Zhao:
                     LoadPrediction = LoadPrediction.None;
 
                     break;
+                case Strategies.Proposed2018:
+                    LoadPrediction = LoadPrediction.None;
+                    break;
                 case Strategies.ForsmanPush:
                 case Strategies.ForsmanPull:
                     LoadPrediction = LoadPrediction.Ewma;
                     break;
-                case Strategies.Auction:
+                case Strategies.WAshraf2017Auction:
                     LoadPrediction = LoadPrediction.Arma;
                     break;
                 default:
@@ -154,7 +157,7 @@ namespace Simulation.Configuration
         public static Load ContainerLoadPostNormal { get; } = new Load(7.5, 640, 7.5);
         public static StrategyActionType OtherPushPullStrategy { get; set; } = StrategyActionType.PushAction;
         public static StartUtilizationPercent StartUtilizationPercent { get; set; } = StartUtilizationPercent.Fifty;
-        public static int TestedItems { get; } = 3;
+        public static TestedHosts TestedItems { get; set; } = TestedHosts.Five ;
 
         ///// <summary>
         ///// Packet size / Bit rate

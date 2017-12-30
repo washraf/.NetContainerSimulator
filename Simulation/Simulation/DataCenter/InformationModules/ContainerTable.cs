@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Simulation.Loads;
+using Simulation.DataCenter.Containers;
 
 namespace Simulation.DataCenter.InformationModules
 {
