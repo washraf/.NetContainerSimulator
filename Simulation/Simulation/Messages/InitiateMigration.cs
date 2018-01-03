@@ -14,15 +14,4 @@ namespace Simulation.Messages
         public int ContainerId { get; private set; }
     }
 
-    public class BidCancellationRequest : Message
-    {
-        public BidCancellationRequest(int target, int sender, int auctionId) :
-            base(target, sender, MessageTypes.BidCancellationRequest)
-        {
-            AuctionId = auctionId;
-        }
-
-        public int AuctionId { get; private set; }
-    }
-
 }

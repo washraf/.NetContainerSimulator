@@ -11,56 +11,40 @@ using Simulation.DataCenter.InformationModules;
 using Simulation.Helpers;
 using Simulation.Loads;
 using Simulation.Messages;
+using Simulation.DataCenter.Machines;
 
 namespace Simulation.Accounting
 {
     public class AccountingModule:IAccountingModule
     {
-        public AccountingModule(MachineTable machineTable)
+        public AccountingModule(MachineTable machineTable, UtilizationTable utilizationTable,
+            Strategies currentStrategy, SimulationSize simulationSize,
+            StartUtilizationPercent startUtilizationPercent,
+            LoadChangeAction changeAction, LoadPrediction loadPrediction,
+            TestedHosts testedHosts, ContainersType containersType)
         {
             ClearInformation();
             _machineTable = machineTable;
-
+            this._utilizationTable = utilizationTable;
+            MeasureHolder = new MeasureValueHolder(currentStrategy, simulationSize,startUtilizationPercent, 
+                changeAction, loadPrediction, testedHosts, containersType);
         }
         private object _lock = new object();
 
         //private Thread myThread = null;
 
         Dictionary<MessageTypes, int> _currentRequests = new Dictionary<MessageTypes, int>();
-        public MeasureValueHolder MeasureHolder { get;} = new MeasureValueHolder(Global.CurrentStrategy,Global.SimulationSize, Global.StartUtilizationPercent, Global.ChangeAction, Global.LoadPrediction, Global.TestedItems);
+        //Dictionary<int, int> _imagePulls = new Dictionary<int, int>();
+
+        public MeasureValueHolder MeasureHolder { get;} 
        
-
-        //public List<MeasuresValues> MeasuredValuesList { set; get; } = new List<MeasuresValues>();
-        //private bool _started;
-        private MachineTable _machineTable;
-
-        //public void StartCounting()
-        //{
-        //    //lock (_lock)
-        //    {
-        //        //ClearInformation();
-        //        //_started = true;
-        //        //myThread = new Thread(Start);
-        //        //myThread.Start();
-        //    }
-        //}
+        private readonly MachineTable _machineTable;
+        private readonly UtilizationTable _utilizationTable;
 
         public void StopCounting()
         {
             CollectMigrationCounts();
-            //lock (_lock)
-            //{
-            //    _started = false;
-            //}
         }
-        //private void Start()
-        //{
-        //    while (_started)
-        //    {
-        //        CleanAndAdd();
-        //        Thread.Sleep(Global.AccountTime);
-        //    }
-        //}
 
         public void ReadCurrentState()
         {
@@ -74,9 +58,12 @@ namespace Simulation.Accounting
                 double max = CalculateNeededVolumeMax(loads);
 
                 double predictedAvg = CalculateVolumeAverage(predictedLoads);
-                int underUtilized, overUtilizedHosts;
-                CalculateOutOfBoundHosts(out underUtilized,out overUtilizedHosts);
+
+                CalculateOutOfBoundHosts(out int underUtilized, out int overUtilizedHosts,out int normal,out int evacuating);
+
                 int slaViolations = CalculateSlaViolations();
+
+                double imagePulls = _currentRequests[MessageTypes.ImagePullRequest];
                 var mvalues = new MeasuresValues(
                     _currentRequests[MessageTypes.PushRequest],
                     _currentRequests[MessageTypes.PullRequest],
@@ -92,9 +79,12 @@ namespace Simulation.Accounting
                     max,
                     underUtilized,
                     overUtilizedHosts,
+                    normal,
+                    evacuating,
                     slaViolations,
                     loads.PowerConsumption(),
-                    loads.StandardDeviation()
+                    loads.StandardDeviation(),
+                    imagePulls
                     );
                 ClearInformation();
                 MeasureHolder.LoadMeasureValueList.Add(new LoadMeasureValue(loads));
@@ -102,6 +92,27 @@ namespace Simulation.Accounting
             }
 
         }
+
+        public void RequestCreated(MessageTypes type)
+        {
+            lock (_lock)
+            {
+                _currentRequests[type]++;
+            }
+        }
+        //public void ImagePulled(int imageId)
+        //{
+        //    lock (_lock)
+        //    {
+        //        if(_imagePulls.ContainsKey(imageId))
+        //        _imagePulls[imageId]++;
+        //        else
+        //        {
+        //            _imagePulls.Add(imageId, 1);
+        //        }
+        //    }
+        //}
+
 
         private double CalculateNeededVolumeMax(List<HostLoadInfo> loads)
         {
@@ -116,7 +127,7 @@ namespace Simulation.Accounting
         private List<HostLoadInfo> GetLoadList(bool predicted)
         {
             List<HostLoadInfo> loads = new List<HostLoadInfo>();
-            foreach (var machine in _machineTable.GetAllMachines().Skip(1))
+            foreach (var machine in _machineTable.GetAllMachines().Skip(1).Where(x=>x.MachineId<int.MaxValue))
             {
                 if (predicted)
                 {
@@ -133,7 +144,7 @@ namespace Simulation.Accounting
         private int CalculateSlaViolations()
         {
             int slaViolations = 0;
-            foreach (var machine in _machineTable.GetAllMachines().Skip(1))
+            foreach (var machine in _machineTable.GetAllMachines().Skip(1).Where(x => x.MachineId < int.MaxValue))
             {
                 slaViolations+=(machine as HostMachine).CalculateSlaViolations();
             }
@@ -148,18 +159,12 @@ namespace Simulation.Accounting
                 {
                     _currentRequests[t] = 0;
                 }
+                //_imagePulls.Clear();
             }
             
         }
 
-        public void RequestCreated(MessageTypes type)
-        {
-            lock (_lock)
-            {
-                _currentRequests[type] ++;
-            }
-        }
-
+       
         
 
         private double CalculateVolumeAverage(List<HostLoadInfo> loads )
@@ -197,24 +202,25 @@ namespace Simulation.Accounting
             }
             return (int)max;
         }
-        private void CalculateOutOfBoundHosts(out int u,out int o)
+        private void CalculateOutOfBoundHosts(out int u,out int o,out int n, out int e)
         {
-
-            int under = 0,over = 0;
-            foreach (var l in _machineTable.GetAllMachines().Skip(1))
-            {
-                var host = l as HostMachine;
-                if (host.GetNeededHostLoadInfo().Volume < host.MinUtilization)
-                {
-                    under++;
-                }
-                else if (host.GetNeededHostLoadInfo().Volume > host.MaxUtilization)
-                {
-                    over++;
-                }
-            }
-            u = under;
-            o = over;
+            //int under = 0,over = 0;
+            //foreach (var l in _machineTable.GetAllMachines().Skip(1).Where(x => x.MachineId < int.MaxValue))
+            //{
+            //    var host = l as HostMachine;
+            //    if (host.GetNeededHostLoadInfo().Volume < host.MinUtilization)
+            //    {
+            //        under++;
+            //    }
+            //    else if (host.GetNeededHostLoadInfo().Volume > host.MaxUtilization)
+            //    {
+            //        over++;
+            //    }
+            //}
+            u = _utilizationTable.GetCandidateHosts(UtilizationStates.UnderUtilization,0).Count;
+            o = _utilizationTable.GetCandidateHosts(UtilizationStates.OverUtilization, 0).Count;
+            e = _utilizationTable.GetCandidateHosts(UtilizationStates.Evacuating, 0).Count;
+            n = _utilizationTable.GetCandidateHosts(UtilizationStates.Normal, 0).Count;
         }
 
         private void CollectMigrationCounts()
@@ -222,7 +228,7 @@ namespace Simulation.Accounting
             lock (_lock)
             {
                 Dictionary<int, ContainerMeasureValue> finalDictionary = new Dictionary<int, ContainerMeasureValue>();
-                foreach (var machine in _machineTable.GetAllMachines().Skip(1))
+                foreach (var machine in _machineTable.GetAllMachines().Skip(1).Where(x => x.MachineId < int.MaxValue))
                 {
                     var host = machine as HostMachine;
                     foreach (var conDictionary in host.CollectMigrationCounts())

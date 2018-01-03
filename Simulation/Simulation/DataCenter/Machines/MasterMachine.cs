@@ -13,8 +13,9 @@ using Simulation.LocationStrategies;
 using Simulation.Modules.Management.Master;
 using Simulation.Modules.Management.Master.Proposed;
 using Simulation.Modules.Management.Master.WAshraf2017;
+using Simulation.DataCenter.Network;
 
-namespace Simulation.DataCenter
+namespace Simulation.DataCenter.Machines
 {
     public class MasterMachine : Machine
     {
@@ -29,7 +30,9 @@ namespace Simulation.DataCenter
                 CommunicationModule.Started = value;
             }
         }
-        public MasterMachine(NetworkSwitch networkSwitch, IMachinePowerController powerController, UtilizationTable holder,Strategies strategy, TestedHosts testedHosts) : base(0, networkSwitch)
+        public MasterMachine(NetworkSwitch networkSwitch, IMachinePowerController powerController,
+            UtilizationTable holder, Strategies strategy, TestedHosts testedHosts) 
+            : base(0, networkSwitch)
         {
             switch (strategy)
             {
@@ -55,7 +58,7 @@ namespace Simulation.DataCenter
 
                     throw new ArgumentOutOfRangeException(nameof(strategy), strategy, null);
             }
-            StartMachine();
+            //StartMachine();
         }
 
         #region --Properties--
@@ -87,7 +90,11 @@ namespace Simulation.DataCenter
         {
             _handler.HandleMessage(message);
         }
-        
+
+        public override Message HandleRequestData(Message message)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }

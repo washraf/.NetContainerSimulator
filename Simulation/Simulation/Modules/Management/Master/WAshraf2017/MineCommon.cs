@@ -9,6 +9,7 @@ using Simulation.DataCenter.InformationModules;
 using Simulation.Loads;
 using Simulation.LocationStrategies;
 using Simulation.Messages;
+using Simulation.DataCenter.Machines;
 
 namespace Simulation.Modules.Management.Master.WAshraf2017
 {
@@ -16,7 +17,7 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
     {
         protected IMachinePowerController PowerController { get; set; }
         protected int Used { set; get; } = 0;
-        private int _pushFailures = 0;
+        //private int _pushFailures = 0;
         /// <summary>
         /// This is a must to enable evacuation mode at multiple host
         /// Don't Change

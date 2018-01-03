@@ -157,16 +157,12 @@ namespace Test
             {
                 case Strategies.WAshraf2017:
                     return DashStyle.Solid;
-                    break;
                 case Strategies.Zhao:
                     return DashStyle.Dash;
-                    break;
                 case Strategies.ForsmanPush:
                     return DashStyle.Dot;
-                    break;
                 case Strategies.ForsmanPull:
                     return DashStyle.DashDotDot;
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(key), key, null);
             }
@@ -178,16 +174,12 @@ namespace Test
             {
                 case Strategies.WAshraf2017:
                     return Color.Red;
-                    break;
                 case Strategies.Zhao:
                     return Color.Blue;
-                    break;
                 case Strategies.ForsmanPush:
                     return Color.Green;
-                    break;
                 case Strategies.ForsmanPull:
                     return Color.Black;
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(key), key, null);
             }

@@ -10,7 +10,6 @@ namespace Simulation.Messages.Other
 {
     public class OtherPushRequest : Request
     {
-
         public OtherPushRequest(int target, int sender, HostLoadInfo hostLoad,int auctionId, List<ContainerLoadInfo> containerLoads) : base(target, sender, hostLoad, MessageTypes.PushRequest)
         {
             AuctionId = auctionId;

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Simulation.Accounting;
 using Simulation.DataCenter.InformationModules;
 using Simulation.Loads;
+using Simulation.DataCenter.Machines;
 
 namespace Simulation.DataCenter.InformationModules
 {

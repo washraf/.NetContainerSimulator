@@ -117,7 +117,7 @@ namespace Simulation.Configuration
             UpdateTime();
         }
 
-        public static LoadChangeAction ChangeAction { get; set; } = LoadChangeAction.VeryHightBurst;
+        public static LoadChangeAction ChangeAction { get; set; } = LoadChangeAction.Burst;
 
         //Test Default 0.7, 0.9
         //From energy paper its best to be from 0.7 to 0.8
@@ -212,6 +212,7 @@ namespace Simulation.Configuration
         //    return Convert.ToInt32(result);
         //}
 
+        //Move to network resource
         public static CommonLoadManager CommonLoadManager = null;
     }
 }

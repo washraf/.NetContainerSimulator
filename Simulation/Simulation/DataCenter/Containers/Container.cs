@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Simulation.Configuration;
 using Simulation.Helpers;
 using Simulation.Loads;
+using Simulation.DataCenter.Core;
 
 namespace Simulation.DataCenter.Containers
 {
@@ -17,7 +18,6 @@ namespace Simulation.DataCenter.Containers
         private CheckpointAndResotoreCalculator _calculator;
         public int ContainerId { get; }
         private LoadPrediction CurrentLoadPrediction { get; set; }
-        public int ImageId { get; }
         private Load NeededLoad { get; set; }
         public override bool Started { get; set; } = false;
         private Load LastPredictedLoad { get; set; }
@@ -26,12 +26,12 @@ namespace Simulation.DataCenter.Containers
         public int MigrationCount { get; private set; } = 0;
         public double DownTime { get; private set; } = 0;
 
-        public Container(int containerId, Load containerLoad, LoadPrediction currentLoadPrediction,int imageId)
+        public Container(int containerId, Load containerLoad, LoadPrediction currentLoadPrediction)
         {
             _calculator = new CheckpointAndResotoreCalculator();
             ContainerId = containerId;
             CurrentLoadPrediction = currentLoadPrediction;
-            ImageId = imageId;
+            //ImageId = imageId;
             //MaxLoad = maxLoad;
             NeededLoad = new Load(containerLoad);
             Started = true;

@@ -41,7 +41,7 @@ namespace Simulation.DataCenter.InformationModules
                 return ContainersTable[conId];
             }
         }
-        public void AddContainer(int containerId, Container container)
+        public virtual void AddContainer(int containerId, Container container)
         {
             lock (_lock)
             {
@@ -63,8 +63,8 @@ namespace Simulation.DataCenter.InformationModules
         {
             lock (_lock)
             {
-                if (MigratedContainer == null) ;
-                //throw new NotImplementedException("How come");
+                if (MigratedContainer == null) 
+                    throw new NotImplementedException("How come");
                 else
                 {
                     MigratedContainer = null;
@@ -84,7 +84,7 @@ namespace Simulation.DataCenter.InformationModules
         HashSet<int> _hashSet = new HashSet<int>();  
 
         /// <summary>
-        /// 
+        /// Update to different conditions
         /// </summary>
         /// <returns></returns>
         public Container SelectContainerByCondition()

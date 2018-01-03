@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Simulation.DataCenter.Machines;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Simulation.DataCenter.InformationModules
@@ -65,11 +66,11 @@ namespace Simulation.DataCenter.InformationModules
             }
         }
 
-        public int GetMachinesCount()
+        public int GetHostsCount()
         {
             lock (_lock)
             {
-                return _machineTable.Count;
+                return _machineTable.Where(x=>x.Key>0 && x.Key<int.MaxValue).Count();
             }
         }
 

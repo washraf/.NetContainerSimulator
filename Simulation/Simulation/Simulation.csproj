@@ -77,6 +77,7 @@
     <Compile Include="Accounting\LoadMeasureValue.cs" />
     <Compile Include="Accounting\MeasureValueHolder.cs" />
     <Compile Include="Accounting\MeasuresValues.cs" />
+    <Compile Include="Configuration\ContainerTypes.cs" />
     <Compile Include="Configuration\LoadChangeAction.cs" />
     <Compile Include="Configuration\StartUtilizationPercent.cs" />
     <Compile Include="Accounting\GraphItems.cs" />
@@ -86,24 +87,36 @@
     <Compile Include="Configuration\PredictionSource.cs" />
     <Compile Include="Configuration\SimulationSize.cs" />
     <Compile Include="Configuration\TestedHosts.cs" />
-    <Compile Include="DataCenter\ContainerRegistry.cs" />
-    <Compile Include="DataCenter\Image.cs" />
-    <Compile Include="DataCenter\IMessageHandler.cs" />
+    <Compile Include="DataCenter\Containers\DockerContainer.cs" />
+    <Compile Include="DataCenter\Machines\DockerRegistryMachine.cs" />
+    <Compile Include="DataCenter\Images\Image.cs" />
+    <Compile Include="DataCenter\Core\IMessageHandler.cs" />
     <Compile Include="DataCenter\InformationModules\ContainerRegistryTable.cs" />
-    <Compile Include="DataCenter\NetworkInterfaceCard.cs" />
-    <Compile Include="DataCenter\IStart.cs" />
+    <Compile Include="DataCenter\InformationModules\DockerContainerTable.cs" />
+    <Compile Include="DataCenter\InformationModules\ImageManager.cs" />
+    <Compile Include="DataCenter\Machines\NetworkInterfaceCard.cs" />
+    <Compile Include="DataCenter\Core\IStart.cs" />
     <Compile Include="DataCenter\InformationModules\ILoadManager.cs" />
     <Compile Include="DataCenter\InformationModules\ContainerTable.cs" />
     <Compile Include="DataCenter\InformationModules\UtilizationTable.cs" />
     <Compile Include="Helpers\AccoutingHelpers.cs" />
+    <Compile Include="Helpers\ListHelpers.cs" />
     <Compile Include="Helpers\SimpleLinerRegression.cs" />
     <Compile Include="LocationStrategies\Forsman2015\ForsmanAuction.cs" />
     <Compile Include="LocationStrategies\Forsman2015\ForsmanPullAuction.cs" />
     <Compile Include="LocationStrategies\Forsman2015\PushAuction2015.cs" />
+    <Compile Include="Messages\BidCancellationRequest.cs" />
     <Compile Include="Messages\CancelEvacuation.cs" />
+    <Compile Include="Messages\EvacuationDone.cs" />
+    <Compile Include="Messages\ImagePullRequest.cs" />
+    <Compile Include="Messages\ImagePullResponce.cs" />
+    <Compile Include="Messages\ImageTreeRequest.cs" />
+    <Compile Include="Messages\ImageTreeResponce.cs" />
+    <Compile Include="Messages\LoadAvailabilityResponce.cs" />
     <Compile Include="Messages\MigrateContainerResponse.cs" />
     <Compile Include="Messages\Other\OtherPushRequest.cs" />
     <Compile Include="Messages\Other\WinnerAnnouncementMessage.cs" />
+    <Compile Include="Messages\PullLoadAvailabilityRequest.cs" />
     <Compile Include="Modules\LoadManagement\CommonLoadManager.cs" />
     <Compile Include="Modules\LoadManagement\HostLoadManager.cs" />
     <Compile Include="DataCenter\InformationModules\ISwitchTable.cs" />
@@ -117,26 +130,25 @@
     <Compile Include="LocationStrategies\Auctions\PullAuction.cs" />
     <Compile Include="LocationStrategies\Auctions\PushAuction.cs" />
     <Compile Include="Accounting\AccountingModule.cs" />
-    <Compile Include="DataCenter\Component.cs" />
+    <Compile Include="DataCenter\Core\Component.cs" />
     <Compile Include="DataCenter\Containers\Container.cs" />
-    <Compile Include="DataCenter\MachineController.cs" />
-    <Compile Include="DataCenter\Machine.cs" />
-    <Compile Include="LocationStrategies\Strategies.cs" />
+    <Compile Include="DataCenter\Machines\MachineController.cs" />
+    <Compile Include="DataCenter\Machines\Machine.cs" />
+    <Compile Include="Configuration\Strategies.cs" />
     <Compile Include="LocationStrategies\WAshraf2017\InOrderProping.cs" />
     <Compile Include="Loads\Load.cs" />
     <Compile Include="Loads\ContainerLoadInfo.cs" />
     <Compile Include="Configuration\Global.cs" />
     <Compile Include="Loads\HostLoadInfo.cs" />
     <Compile Include="Helpers\RandomNumberGenerator.cs" />
-    <Compile Include="DataCenter\HostMachine.cs" />
-    <Compile Include="DataCenter\MasterMachine.cs" />
+    <Compile Include="DataCenter\Machines\HostMachine.cs" />
+    <Compile Include="DataCenter\Machines\MasterMachine.cs" />
     <Compile Include="Loads\UtilizationStates.cs" />
     <Compile Include="Messages\InitiateMigration.cs" />
     <Compile Include="Messages\MigrateContainer.cs" />
-    <Compile Include="Messages\PullLoadAvailiability.cs" />
     <Compile Include="Messages\PushLoadAvailability.cs" />
     <Compile Include="Messages\Message.cs" />
-    <Compile Include="DataCenter\NetworkSwitch.cs" />
+    <Compile Include="DataCenter\Network\NetworkSwitch.cs" />
     <Compile Include="Messages\MessageTypes.cs" />
     <Compile Include="Messages\PushPullRequest.cs" />
     <Compile Include="Messages\RejectRequest.cs" />
@@ -155,6 +167,11 @@
     <Compile Include="Modules\Management\Master\NoMasterHandlerModule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimulationController\ContainerFactory.cs" />
+    <Compile Include="SimulationController\HostFactory.cs" />
+    <Compile Include="SimulationController\MachineFactory.cs" />
+    <Compile Include="SimulationController\MasterFactory.cs" />
+    <Compile Include="SimulationController\RegistryFactory.cs" />
     <Compile Include="SimulationController\SimulationController.cs" />
     <Compile Include="SimulationController\ISimulationController.cs" />
   </ItemGroup>
@@ -167,7 +184,9 @@
       <Name>Checkpoint_Restore</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Todo.html" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

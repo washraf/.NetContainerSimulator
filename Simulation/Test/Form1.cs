@@ -69,10 +69,10 @@ namespace Test
                     {
                         //SimulationSize.Five,
                         //SimulationSize.Ten,
-                        //SimulationSize.Twenty,
-                        //SimulationSize.Fifty,
+                        SimulationSize.Twenty,
+                        SimulationSize.Fifty,
                         SimulationSize.Hundred,
-                        //SimulationSize.TwoHundred
+                        SimulationSize.TwoHundred
                     };
 
 
@@ -80,7 +80,7 @@ namespace Test
                     {
                         //StartUtilizationPercent.Thrity,
                         StartUtilizationPercent.Fifty,
-                        //StartUtilizationPercent.Seventy,
+                        StartUtilizationPercent.Seventy,
                     };
 
                     var algorithms = new List<Strategies>()
@@ -94,8 +94,8 @@ namespace Test
 
                     var cactions = new List<LoadChangeAction>()
                     {
-                        LoadChangeAction.VeryHightBurst,
-                        //LoadChangeAction.VeryHightDrain,
+                        LoadChangeAction.Burst,
+                        LoadChangeAction.Drain,
                         //LoadChangeAction.VreyHighOpposite
                     };
                     var testingRange = new List<TestedHosts>()
@@ -139,7 +139,8 @@ namespace Test
                                                     Global.StartUtilizationPercent,
                                                     Global.LoadPrediction,
                                                     Global.ChangeAction,
-                                                    Global.TestedItems);
+                                                    Global.TestedItems,
+                                                    ContainersType.D);
                                             controller.StartSimulation();
                                             //var etime = DateTime.Now;
                                             //MessageBox.Show((etime - stime).TotalSeconds.ToString());
@@ -314,15 +315,28 @@ namespace Test
                         myLabel.Text = $"Average No of Hosts {_measuredValueListsTrials[t].AverageHosts}";
 
                         break;
-                    case GraphItems.OutOfBoundHosts:
+                    case GraphItems.HostsStates:
+                        //list.Clear()
                         list.Add(new PointPairList());
-                        labeList.Add($"Over utilized of Trial {_measuredValueListsTrials[t].Name}");
+                        list.Add(new PointPairList());
+                        list.Add(new PointPairList());
+                        labeList.Clear();
+                        labeList.Add($"Under of {_measuredValueListsTrials[t].Name}");
+                        labeList.Add($"Over of {_measuredValueListsTrials[t].Name}");
+                        labeList.Add($"Normal of {_measuredValueListsTrials[t].Name}");
+                        labeList.Add($"Evacuating of {_measuredValueListsTrials[t].Name}");
+
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].UnderHosts);
                             list[1].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].OverHosts);
+                            list[2].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].NormalHosts);
+                            list[3].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].EvacuatingHosts);
                         }
-                        myLabel.Text = $"Total Under = {_measuredValueListsTrials[t].TotalUnderUtilized} Over = {_measuredValueListsTrials[t].TotalOverUtilized}";
+                        myLabel.Text = $"Under:{_measuredValueListsTrials[t].FinalUnderUtilized} " +
+                            $"Over:{_measuredValueListsTrials[t].FinalOverUtilized} " +
+                            $"Normal:{_measuredValueListsTrials[t].FinalNormalUtilized} " +
+                            $"Evacuating:{_measuredValueListsTrials[t].FinalEvacuatingUtilized} ";
 
                         break;
                     case GraphItems.TotalMessages:
@@ -401,6 +415,15 @@ namespace Test
                         }
                         myLabel.Text = $"Average Down time of all containers in All the trial = {_measuredValueListsTrials[t].AvgDownTime}";
 
+                        break;
+
+                    case GraphItems.ImagePulls:
+                        for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
+                        {
+                            list[0].Add(i * unit,
+                                _measuredValueListsTrials[t].MeasuredValuesList[i].ImagePulls);
+                        }
+                        myLabel.Text = $"Total ImagePulls of trial = {_measuredValueListsTrials[t].ImagePulls}";
                         break;
                     default:
                         throw new NotImplementedException();
@@ -545,10 +568,16 @@ namespace Test
                     (LoadChangeAction)Enum.Parse(typeof(LoadChangeAction), config[4].Split('_')[1]);
 
                 LoadPrediction loadPrediction = (LoadPrediction)Enum.Parse(typeof(LoadPrediction), config[5]);
-                Strategies strategy = (Strategies)Enum.Parse(typeof(Strategies), config[7]);
+                Strategies strategy = (Strategies)Enum.Parse(typeof(Strategies), config[7].Split('_')[0]);
+                ContainersType containerType = ContainersType.N;
+                if(strategy == Strategies.Proposed2018 && config[7].Split('_').Count()>1)
+                {
+                    containerType = (ContainersType)Enum.Parse(typeof(ContainersType), config[7].Split('_')[1]);
+
+                }
                 TestedHosts testedHosts = (TestedHosts)Enum.Parse(typeof(TestedHosts), config[8]);
                 MeasureValueHolder holder =
-                    new MeasureValueHolder(strategy, simulationSize, precent, changeAction, loadPrediction,testedHosts);
+                    new MeasureValueHolder(strategy, simulationSize, precent, changeAction, loadPrediction,testedHosts,containerType);
                 using (StreamReader reader = new StreamReader(stream))
                 {
                     reader.ReadLine();
@@ -564,24 +593,28 @@ namespace Test
                         double noHosts = Convert.ToDouble(line[6]);
                         double underHosts = Convert.ToDouble(line[7]);
                         double overHosts = Convert.ToDouble(line[8]);
-                        double migrations = Convert.ToDouble(line[9]);
-                        double pushRequests = Convert.ToDouble(line[10]);
-                        double pushLoadAvailabilityRequest = Convert.ToDouble(line[11]);
-                        double pullRequests = Convert.ToDouble(line[12]);
-                        double pullLoadAvailabilityRequest = Convert.ToDouble(line[13]);
-                        double totalMessages = Convert.ToDouble(line[14]);
-                        double slaViolations = Convert.ToDouble(line[15]);
-                        double minNeeded = Convert.ToDouble(line[16]);
-                        double maxNeeded = Convert.ToDouble(line[17]);
-                        double power = Convert.ToDouble(line[18]);
-                        double stdDev = Convert.ToDouble(line[19]);
-
+                        double normalHosts = Convert.ToDouble(line[9]);
+                        double evacuatingHosts = Convert.ToDouble(line[10]);
+                        double migrations = Convert.ToDouble(line[11]);
+                        double pushRequests = Convert.ToDouble(line[12]);
+                        double pushLoadAvailabilityRequest = Convert.ToDouble(line[13]);
+                        double pullRequests = Convert.ToDouble(line[14]);
+                        double pullLoadAvailabilityRequest = Convert.ToDouble(line[15]);
+                        double totalMessages = Convert.ToDouble(line[16]);
+                        double slaViolations = Convert.ToDouble(line[17]);
+                        double minNeeded = Convert.ToDouble(line[18]);
+                        double maxNeeded = Convert.ToDouble(line[19]);
+                        double power = Convert.ToDouble(line[20]);
+                        double stdDev = Convert.ToDouble(line[21]);
+                        double imagePulls = Convert.ToDouble(line[22]);
                         MeasuresValues m = new MeasuresValues(pushRequests, pullRequests, idealHostCount, noHosts,
                             migrations,
                             totalMessages, entropy, predictedEntropy, pushLoadAvailabilityRequest,
                             pullLoadAvailabilityRequest,
-                            avgRealVolume, avgPredictedVolume, minNeeded, maxNeeded, underHosts, overHosts, slaViolations,
-                            power, stdDev);
+                            avgRealVolume, avgPredictedVolume, minNeeded, maxNeeded,
+                            underHosts, overHosts,normalHosts,evacuatingHosts,
+                            slaViolations,
+                            power, stdDev,imagePulls);
                         holder.MeasuredValuesList.Add(m);
                     }
                 }

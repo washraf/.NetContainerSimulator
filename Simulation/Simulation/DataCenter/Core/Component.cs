@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Simulation.Messages;
 
-namespace Simulation.DataCenter
+namespace Simulation.DataCenter.Core
 {
     public abstract class Component
     {

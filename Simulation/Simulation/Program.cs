@@ -54,7 +54,7 @@ namespace Simulation
 
             var cactions = new List<LoadChangeAction>()
             {
-                LoadChangeAction.VeryHightBurst,
+                LoadChangeAction.Burst,
                 //LoadChangeAction.VeryHightDrain,
                 //LoadChangeAction.VreyHighOpposite
             };
@@ -101,7 +101,8 @@ namespace Simulation
                                             Global.StartUtilizationPercent,
                                             Global.LoadPrediction,
                                             Global.ChangeAction,
-                                            Global.TestedItems);
+                                            Global.TestedItems,
+                                            ContainersType.N);
                                     ConsolePrinting(controller);
                                     controller.StartSimulation();
                                     //var etime = DateTime.Now;
@@ -168,7 +169,7 @@ namespace Simulation
                     //        $" and lamdba = {host.MaxUtilization}" +
                     //        $" and Volume = {host.GetPredictedHostLoadInfo().Volume}");
                     //}
-                    Console.WriteLine($"###Total is {controller.MachineControllerObject.GetMachinesCount()}");
+                    //Console.WriteLine($"###Total is {controller.MachineControllerObject.GetMachinesCount()}");
                     Thread.Sleep(500);
                 }
             });

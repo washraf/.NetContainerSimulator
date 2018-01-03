@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Simulation.Configuration;
 using Simulation.DataCenter;
 using Simulation.Messages;
+using Simulation.DataCenter.Core;
 
 namespace Simulation.Modules.Management.Master
 {
@@ -25,5 +26,9 @@ namespace Simulation.Modules.Management.Master
         }
 
         public abstract void HandleMessage(Message message);
+        public Message HandleRequestData(Message message)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

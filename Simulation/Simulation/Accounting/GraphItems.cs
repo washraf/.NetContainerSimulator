@@ -4,18 +4,19 @@ namespace Simulation.Accounting
     {
         Entropy,
         PowerConsumption,
+        NoHosts,
+        ImagePulls,
+        MigrationCount,
+        UtilizationSlaViolations,
         AverageNeededVolume,
         NeededLoadStandardDeviation,
-        NoHosts,
-        OutOfBoundHosts,
+        HostsStates,
         PushRequests,
         PullRequests,
         TotalMessages,
         Migrations,
         PushLoadAvailabilityRequest,
         PullLoadAvailabilityRequest,
-        MigrationCount,
-        UtilizationSlaViolations,
         ContainerDownTime,
     }
 }

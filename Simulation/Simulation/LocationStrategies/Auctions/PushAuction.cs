@@ -16,17 +16,6 @@ namespace Simulation.LocationStrategies.Auctions
             ContainerId = containerId;
         }
 
-        //public override AuctionFailureAction GetAction()
-        //{
-        //    return AuctionFailureAction.AddHost;
-
-        //    //var count = InValidBids.Count(x => x.Reason == BidReasons.FullLoad);
-        //    //if (count == ExpectedBids)// && ValidBids.Count==0)
-        //    //{
-        //    //    return AuctionFailureAction.AddHost;
-        //    //}
-        //    //return AuctionFailureAction.Nothing;
-        //}
         private int ContainerId { get; set; }
 
         public override Bid GetWinnerBid()
@@ -37,8 +26,6 @@ namespace Simulation.LocationStrategies.Auctions
 
                 return winner;
             }
-            //throw new Exception();
-
             return null;
         }
     }

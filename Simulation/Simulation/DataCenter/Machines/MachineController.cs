@@ -11,52 +11,57 @@ using Simulation.Helpers;
 using Simulation.Loads;
 using Simulation.LocationStrategies;
 using Simulation.SimulationController;
+using Simulation.DataCenter.Machines;
+using Simulation.DataCenter.Network;
+using Simulation.DataCenter.Core;
 
-namespace Simulation.DataCenter
+namespace Simulation.DataCenter.Machines
 {
-    public class MachineController : IMachinePowerController,IStart
+    public class MachineController : IMachinePowerController, IStart
     {
         public bool Started { get; set; } = true;
-
         public MachineTable MachineTable { get; set; }
         private NetworkSwitch Network { get; set; }
         private MachineTable ReadyMachineTable { get; set; }
+        private MachineTable PoweredOffMachinesTable { get; set; }
         public Strategies Strategy { get; set; }
+        public ContainersType ContainerTypes { get; }
         private UtilizationTable DataHolder { get; set; }
         public bool StartingMachine { get; set; } = false;
-
-
         private object _lock = new object();
 
-        public MachineController(UtilizationTable holder, MachineTable machineTable,NetworkSwitch network,Strategies strategy)
+        public MachineController(UtilizationTable holder, MachineTable machineTable, NetworkSwitch network, Strategies strategy, ContainersType containerTypes)
         {
             MachineTable = machineTable;
             Network = network;
             ReadyMachineTable = new MachineTable();
+            PoweredOffMachinesTable = new MachineTable();
+
             Strategy = strategy;
+            ContainerTypes = containerTypes;
             DataHolder = holder;
             Task t = new Task(async () =>
             {
                 while (Started)
                 {
-                    var currentTotal = MachineTable.GetMachinesCount()-1;
+                    var currentTotal = MachineTable.GetHostsCount();
                     var mcount = Convert.ToInt32(currentTotal * 0.05);
-                    var rcount = ReadyMachineTable.GetMachinesCount();
-                    if (currentTotal+rcount<=((int)Global.SimulationSize-1))
+                    var rcount = ReadyMachineTable.GetHostsCount();
+                    if (!StartingMachine)
                     {
-                        if (mcount > rcount)
+                        if (mcount > rcount && PoweredOffMachinesTable.GetHostsCount() > 0)
                         {
-                            CreateANewMachine();
+                            await WakeIdleHost();
                         }
                         else if (mcount < rcount)
                         {
-                            KillOldMachine();
+                            await PowerOffExtraMachines();
                         }
                     }
-                    else
-                    {
-                        
-                    }
+                    //else
+                    //{
+
+                    //}
                     await Task.Delay(Global.Second);
                 }
             });
@@ -64,38 +69,39 @@ namespace Simulation.DataCenter
         }
 
 
-        private void CreateANewMachine()
+        private async Task WakeIdleHost()
         {
             if (!StartingMachine)
             {
-                Task t = new Task(async() =>
-                {
-                    var l = Global.DataCenterHostConfiguration;
-                    var machine = new HostMachine(RandomNumberGenerator.GetHostRandomNumber(), l, Network,
-                        Global.LoadPrediction, Strategy);
-                    ReadyMachineTable.AddMachine(machine.MachineId, machine);
-                    StartingMachine = true;
-                    await Task.Delay(Global.Second * 60);
-                    StartingMachine = false;
-                });
-                t.Start();
+                //Task t = new Task(async () =>
+                //{
+                //var l = Global.DataCenterHostConfiguration;
+                StartingMachine = true;
+                var machine = PoweredOffMachinesTable.GetAllMachines().Last();
+                await Task.Delay(Global.Second * 60);
+                ReadyMachineTable.AddMachine(machine.MachineId, machine);
+                PoweredOffMachinesTable.RemoveMachine(machine.MachineId);
+                StartingMachine = false;
+                //});
+                //t.Start();
             }
 
         }
-        private void KillOldMachine()
+        private async Task PowerOffExtraMachines()
         {
             if (!StartingMachine)
             {
-                Task t = new Task(async () =>
-                {
-                    var l = Global.DataCenterHostConfiguration;
-                    var machine = ReadyMachineTable.GetAllMachines().Last();
-                    ReadyMachineTable.RemoveMachine(machine.MachineId);
-                    StartingMachine = true;
-                    await Task.Delay(Global.Second * 60);
-                    StartingMachine = false;
-                });
-                t.Start();
+                //Task t = new Task(async () =>
+                //{
+                //var l = Global.DataCenterHostConfiguration;
+                StartingMachine = true;
+                var machine = ReadyMachineTable.GetAllMachines().Last();
+                ReadyMachineTable.RemoveMachine(machine.MachineId);
+                PoweredOffMachinesTable.AddMachine(machine.MachineId, machine);
+                await Task.Delay(Global.Second * 60);
+                StartingMachine = false;
+                //});
+                //t.Start();
             }
         }
 
@@ -104,13 +110,17 @@ namespace Simulation.DataCenter
             lock (_lock)
             {
                 //NetworkSwitch.Started = true;
-                foreach (var machine in MachineTable.GetAllMachines().Skip(1))
+                foreach (var machine in MachineTable.GetAllMachines().Skip(1).Where(x => x.MachineId < int.MaxValue))
                 {
                     DataHolder.SetUtilization(machine.MachineId, UtilizationStates.Normal);
 
                     machine.StartMachine();
                 }
                 MachineTable.GetMachineById(0).StartMachine();
+                if (ContainerTypes == ContainersType.D)
+                {
+                    MachineTable.GetMachineById(int.MaxValue).StartMachine();
+                }
             }
         }
 
@@ -127,7 +137,7 @@ namespace Simulation.DataCenter
             }
         }
 
-        public void AddHost(Machine machine)
+        public void AddMachine(Machine machine)
         {
             lock (_lock)
             {
@@ -139,7 +149,7 @@ namespace Simulation.DataCenter
         {
             lock (_lock)
             {
-                if (ReadyMachineTable.GetMachinesCount() != 0)
+                if (ReadyMachineTable.GetHostsCount() != 0)
                 {
                     Machine machine = ReadyMachineTable.GetAllMachines().First();
                     ReadyMachineTable.RemoveMachine(machine.MachineId);
@@ -148,20 +158,22 @@ namespace Simulation.DataCenter
                     machine.StartMachine();
                 }
             }
+
         }
 
-        
 
-        public int GetMachinesCount()
-        {
-            lock (_lock)
-            {
-                return MachineTable.GetMachinesCount();
-            }
-        }
+
+        //public int GetMachinesCount()
+        //{
+        //    lock (_lock)
+        //    {
+        //        return MachineTable.GetMachinesCount();
+        //    }
+        //}
 
         public void PowerOffHost(int machineId)
         {
+
             lock (_lock)
             {
                 var machine = MachineTable.GetMachineById(machineId);
@@ -173,15 +185,18 @@ namespace Simulation.DataCenter
                 else
                 {
                     machine.StopMachine();
+                    //PoweredOffMachinesTable.AddMachine(machine.MachineId, machine);
                     MachineTable.RemoveMachine(machineId);
                     DataHolder.RemoveUtilization(machineId);
-                    ReadyMachineTable.AddMachine(machineId,machine);
-                    Console.WriteLine($"( ) Power off Host #{machineId}");
+                    ReadyMachineTable.AddMachine(machineId, machine);
+                    //Console.WriteLine($"( ) Power off Host #{machineId}");
 
                     //return true;
                 }
             }
+
         }
+    
 
     }
 

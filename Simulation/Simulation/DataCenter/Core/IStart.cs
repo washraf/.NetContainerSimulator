@@ -1,4 +1,4 @@
-﻿namespace Simulation.DataCenter
+﻿namespace Simulation.DataCenter.Core
 {
     public interface IStart
     {

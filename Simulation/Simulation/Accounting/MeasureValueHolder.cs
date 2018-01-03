@@ -9,7 +9,7 @@ namespace Simulation.Accounting
 {
     public class MeasureValueHolder
     {
-        private MeasureValueHolder measureValueHolder;
+       // private MeasureValueHolder measureValueHolder;
 
         public Strategies Strategy { get; set; }
         public SimulationSize SimulationSize { get; set; }
@@ -17,19 +17,20 @@ namespace Simulation.Accounting
         public LoadChangeAction ChangeAction { get; set; }
         public LoadPrediction Prediction { get; set; }
         public TestedHosts Tested { get; }
+        public ContainersType ContainerType { get; }
 
         public string Name
         {
             get
             {
-                return SimulationSize.ToString() + "_" + StartUtilization.ToString() + "_" + ChangeAction.ToString() +
-                       "_" + Prediction.ToString() + "_" + Strategy.ToString()+"_"+Tested;
+                return (int)SimulationSize + "_" + (int)StartUtilization + "_" + ChangeAction.ToString() +
+                       "_" + Prediction.ToString() + "_" + Strategy.ToString()+"_"+ContainerType+"_"+(int)Tested;
             }
         }
 
         public MeasureValueHolder(Strategies strategy, SimulationSize simulationSize,
             StartUtilizationPercent startUtilization, LoadChangeAction change, LoadPrediction prediction,
-            TestedHosts tested)
+            TestedHosts tested, ContainersType containerType)
         {
             Strategy = strategy;
             SimulationSize = simulationSize;
@@ -37,6 +38,7 @@ namespace Simulation.Accounting
             ChangeAction = change;
             Prediction = prediction;
             Tested = tested;
+            ContainerType = containerType;
         }
 
         
@@ -54,7 +56,7 @@ namespace Simulation.Accounting
                 throw new ArgumentOutOfRangeException();
             }
             MeasureValueHolder final = new MeasureValueHolder(first.Strategy, first.SimulationSize,
-                first.StartUtilization, first.ChangeAction, first.Prediction,first.Tested);
+                first.StartUtilization, first.ChangeAction, first.Prediction,first.Tested,first.ContainerType);
             //Prepare for first
             foreach (var listItem in first.MeasuredValuesList)
             {
@@ -107,7 +109,7 @@ namespace Simulation.Accounting
         public static MeasureValueHolder operator /(MeasureValueHolder first, int c)
         {
             MeasureValueHolder final = new MeasureValueHolder(first.Strategy, first.SimulationSize,
-                first.StartUtilization, first.ChangeAction, first.Prediction,first.Tested);
+                first.StartUtilization, first.ChangeAction, first.Prediction,first.Tested,first.ContainerType);
             foreach (var listItem in first.MeasuredValuesList)
             {
                 final.MeasuredValuesList.Add(listItem/c);
@@ -145,14 +147,23 @@ namespace Simulation.Accounting
             get { return MeasuredValuesList.Select(x => x.Entropy).Average(); }
         }
 
-        public double TotalUnderUtilized
+        public double FinalUnderUtilized
         {
-            get { return MeasuredValuesList.Select(x => x.UnderHosts).Sum(); }
+            get { return MeasuredValuesList.Select(x => x.UnderHosts).Last(); }
         }
 
-        public double TotalOverUtilized
+        public double FinalOverUtilized
         {
-            get { return MeasuredValuesList.Select(x => x.OverHosts).Sum(); }
+            get { return MeasuredValuesList.Select(x => x.OverHosts).Last(); }
+        }
+        public double FinalNormalUtilized
+        {
+            get { return MeasuredValuesList.Select(x => x.NormalHosts).Last(); }
+        }
+
+        public double FinalEvacuatingUtilized
+        {
+            get { return MeasuredValuesList.Select(x => x.EvacuatingHosts).Last(); }
         }
 
         public double TotalPushRequests
@@ -204,6 +215,11 @@ namespace Simulation.Accounting
         {
             get { return MeasuredValuesList.Average(x => x.StdDev); }
         }
+
+        public double ImagePulls
+        {
+            get { return MeasuredValuesList.Sum(x => x.ImagePulls); }
+        }
         #endregion
 
         #region --Write To Disk--
@@ -213,7 +229,7 @@ namespace Simulation.Accounting
                             (int) this.SimulationSize + "\\" +
                             this.StartUtilization + "_" + ChangeAction + "\\" +
                             Prediction + "\\" + DateTime.Now.ToShortDateString() + "\\" +
-                            Strategy + "\\"+Tested+"\\";
+                            Strategy+"_"+ContainerType + "\\"+Tested+"\\";
                     if(trialno!=-1)
                            folder+=trialno + "\\";
             try
@@ -231,6 +247,8 @@ namespace Simulation.Accounting
                                      "NoHosts," +
                                      "UnderHosts," +
                                      "OverHosts," +
+                                     "NormalHosts," +
+                                     "EvacuatingHosts," +
                                      "Migrations," +
                                      "PushRequests," +
                                      "PushLoadAvailabilityRequest," +
@@ -241,7 +259,8 @@ namespace Simulation.Accounting
                                      "MinNeeded," +
                                      "MaxNeeded," +
                                      "Power," +
-                                     "stdDev");
+                                     "stdDev,",
+                                     "ImagePulls");
 
                     for (int i = 0; i < this.MeasuredValuesList.Count; i++)
                     {
@@ -255,6 +274,8 @@ namespace Simulation.Accounting
                                          $"{value.NoHosts}," +
                                          $"{value.UnderHosts}," +
                                          $"{value.OverHosts}," +
+                                         $"{value.NormalHosts}," +
+                                         $"{value.EvacuatingHosts}," +
                                          $"{value.Migrations}," +
                                          $"{value.PushRequests}," +
                                          $"{value.PushLoadAvailabilityRequest}," +
@@ -265,7 +286,8 @@ namespace Simulation.Accounting
                                          $"{value.MinNeeded}," +
                                          $"{value.MaxNeeded}," +
                                          $"{value.Power}," +
-                                         $"{value.StdDev}");
+                                         $"{value.StdDev},"+
+                                         $"{value.ImagePulls}");
 
                     }
                     writer.Flush();

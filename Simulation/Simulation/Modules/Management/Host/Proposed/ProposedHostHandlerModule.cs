@@ -26,7 +26,19 @@ namespace Simulation.Modules.Management.Host.Proposed
     {
         public HostCurrentAction CurrentAction { get; set; } = HostCurrentAction.None;
         public int AuctionId { get; set; }
-        public bool EvacuationMode = false;
+        private bool evacuationMode = false;
+        public bool EvacuationMode
+        {
+            get { return evacuationMode; }
+            set
+            {
+                if(!value)
+                {
+
+                }
+                evacuationMode = value;
+            }
+        }
 
     }
     public class ProposedHostHandlerModule:PushPullHostHandler
@@ -58,15 +70,30 @@ namespace Simulation.Modules.Management.Host.Proposed
                             break;
                         }
                     }
-                    else if ( _hostState.CurrentAction == HostCurrentAction.None)
+                    else if (_hostState.CurrentAction == HostCurrentAction.None && !_hostState.EvacuationMode)
                     {
                         var s = LoadManager.CheckSystemState(true, MinUtilization, MaxUtilization); //can this be up
                         TryToChangeSystemState(s);
+                        if (_hostState.EvacuationMode)
+                        {
+
+                        }
                     }
                 }
             }
-            var message = new EvacuationDone(0, this.MachineId);
-            CommunicationModule.SendMessage(message);
+            lock (_hostLock)
+            {
+                
+                if (Started)
+                {
+                    if (ContainerTable.GetContainersCount() > 0)
+                    {
+
+                    }
+                    var message = new EvacuationDone(0, this.MachineId);
+                    CommunicationModule.SendMessage(message);
+                }
+            }
         }
 
         protected override void TryToChangeSystemState(UtilizationStates hostState)

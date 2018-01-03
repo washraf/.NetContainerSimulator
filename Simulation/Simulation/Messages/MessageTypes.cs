@@ -20,6 +20,11 @@
         EvacuationDone,
         WinnerAnnouncementMessage,
         CommonLoadManager,
-        CancelEvacuation
+        CancelEvacuation,
+        //Images
+        ImageTreeRequest,
+        ImageTreeResponce,
+        ImagePullRequest,
+        ImagePullResponce
     }
 }

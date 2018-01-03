@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Simulation.Messages;
+using Simulation.DataCenter.Network;
+using Simulation.DataCenter.Core;
 
-namespace Simulation.DataCenter
+namespace Simulation.DataCenter.Machines
 {
     public abstract class Machine : Component,IMessageHandler
     {
@@ -19,6 +21,7 @@ namespace Simulation.DataCenter
         public abstract void StartMachine();
         public abstract void StopMachine();
         public abstract void HandleMessage(Message message);
+        public abstract Message HandleRequestData(Message message);
     }
 
 

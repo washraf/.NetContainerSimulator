@@ -12,13 +12,14 @@ using Simulation.LocationStrategies;
 using Simulation.LocationStrategies.Auctions;
 using Simulation.LocationStrategies.WAshraf2017;
 using Simulation.Messages;
+using Simulation.DataCenter.Machines;
 
 namespace Simulation.Modules.Management.Master.WAshraf2017
 {
     public class AuctionManagement : MineCommon
     {
         private Auction _currentAuction;
-        private InOrderProping _currentProping;
+        //private InOrderProping _currentProping;
         private readonly TestedHosts TestedHostsCount;
 
         public AuctionManagement(NetworkInterfaceCard communicationModule,

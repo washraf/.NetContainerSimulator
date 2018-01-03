@@ -15,77 +15,97 @@ using Simulation.Loads;
 using Simulation.LocationStrategies;
 using Simulation.Modules.LoadManagement;
 using Simulation.DataCenter.Containers;
+using Simulation.DataCenter.Machines;
+using Simulation.DataCenter.Network;
 
 namespace Simulation.SimulationController
 {
     public class SimulationController : ISimulationController
     {
-        public Strategies CurrentStrategy { get; set; }
+        private readonly Strategies _currentStrategy;
         public SimulationSize CurrentSimulationSize { get; private set; }
         public StartUtilizationPercent UtilizationPercent { get; set; }
-        public LoadPrediction CurrentPrediction { set; get; }
+        private LoadPrediction _currentLoadPrediction;
+        private readonly ContainersType containerType;
+
         public LoadChangeAction ChangeAction { get; set; }
         public TestedHosts TestedHostsCount { get; }
         public MachineTable MachineTableObject { get; private set; }
         public MachineController MachineControllerObject { get; private set; }
-        public NetworkSwitch NetworkSwitchObject { get; private set; }
+
+        private NetworkSwitch _networkSwitchObject;
+
         public IAccountingModule AccountingModuleObject { get; private set; }
 
         public UtilizationTable UtilizationTable { get; private set; }
 
-        public SimulationController(Strategies strategies, SimulationSize size, StartUtilizationPercent utilizationPercent, LoadPrediction currentPrediction, LoadChangeAction changeAction, TestedHosts testedHosts)
+        private readonly MachineFactory _masterFactory;
+        private readonly MachineFactory _hostFactory;
+        private readonly MachineFactory _registryFactory;
+        private readonly ContainerFactory _containerFactory;
+
+        public SimulationController(Strategies strategy, SimulationSize size,
+            StartUtilizationPercent utilizationPercent,
+            LoadPrediction currentPrediction, LoadChangeAction changeAction,
+            TestedHosts testedHosts, ContainersType containerType)
         {
-            CurrentStrategy = strategies;
+            _currentStrategy = strategy;
             CurrentSimulationSize = size;
             UtilizationPercent = utilizationPercent;
             ChangeAction = changeAction;
             TestedHostsCount = testedHosts;
-            CurrentPrediction = currentPrediction;
+            this.containerType = containerType;
+            _currentLoadPrediction = currentPrediction;
             MachineTableObject = new MachineTable();
             UtilizationTable = new UtilizationTable();
-            AccountingModuleObject = new AccountingModule(MachineTableObject);
-            NetworkSwitchObject = new NetworkSwitch(MachineTableObject, AccountingModuleObject);
-            MachineControllerObject = new MachineController(UtilizationTable, MachineTableObject,NetworkSwitchObject, Global.CurrentStrategy);
+            AccountingModuleObject = new AccountingModule(MachineTableObject, UtilizationTable,_currentStrategy,CurrentSimulationSize, UtilizationPercent,ChangeAction,currentPrediction,testedHosts,containerType);
+            _networkSwitchObject = new NetworkSwitch(MachineTableObject, AccountingModuleObject);
+
+            MachineControllerObject = new MachineController(UtilizationTable, MachineTableObject,_networkSwitchObject, _currentStrategy,containerType);
+            _masterFactory = new MasterFactory(_networkSwitchObject, MachineControllerObject, UtilizationTable,
+                _currentStrategy, TestedHostsCount);
+            var h = new Load(Global.DataCenterHostConfiguration);
+            _hostFactory = new HostFactory(h,
+                    _networkSwitchObject, _currentLoadPrediction, _currentStrategy,containerType);
+            _registryFactory = new RegistryFactory(_networkSwitchObject, CurrentSimulationSize);
+            _containerFactory = new ContainerFactory(containerType,CurrentSimulationSize,currentPrediction);
         }
 
         public void StartSimulation()
         {
-            //Global.CommonLoadManager.Clear();
+            //Common Load Manager for Zhao (refactor to be a network resource)
             Global.CommonLoadManager = new CommonLoadManager(AccountingModuleObject);
-            Machine master = new MasterMachine(NetworkSwitchObject, MachineControllerObject, UtilizationTable,
-                Global.CurrentStrategy, TestedHostsCount);
-            MachineControllerObject.AddHost(master);
-            var h = new Load(Global.DataCenterHostConfiguration);
 
-            for (int i = 1; i <= (int) CurrentSimulationSize; i++)
+            //Master Machine
+            Machine master = _masterFactory.GetMachine();
+            MachineControllerObject.AddMachine(master);
+
+            //Host Machines
+            for (int i = 1; i <= (int)CurrentSimulationSize; i++)
             {
-                MachineControllerObject.AddHost(new HostMachine(RandomNumberGenerator.GetHostRandomNumber(), h,
-                    NetworkSwitchObject, Global.LoadPrediction, Global.CurrentStrategy));
+                MachineControllerObject.AddMachine(_hostFactory.GetMachine());
+            }
+            //Add registry when needed
+            if (containerType == ContainersType.D)
+            {
+                Machine registry = _registryFactory.GetMachine();
+                MachineControllerObject.AddMachine(registry);
             }
 
-            //Should Be replaceي with Load Controller
-            //hostController.RemoveHost(2);
             var hosts = MachineTableObject.GetAllMachines();
-            //Assign Load
-            //var startLoad = Global.ContainerLoadNormal;
-            //var endLoad = Global.ContainerLoadPostNormal;
 
             for (int i = 1; i <= (int) CurrentSimulationSize; i++)
             {
-                //int conId = RandomNumberGenerator.GetContainerRandomNumber();
-                //Random r = new Random();
                 List<Load> loads = LoadGenerator.GenerateLoadList(UtilizationPercent, CurrentSimulationSize);
                 foreach (var load in loads)
                 {
-                    var conId = RandomNumberGenerator.GetContainerRandomNumber();
-                    //var i = r.Next(1, (int)CurrentSimulationSize + 1);
-                    (hosts[i] as HostMachine).AddContainer(new Container(conId, load, CurrentPrediction,0));
+                    
+                    (hosts[i] as HostMachine).AddContainer( _containerFactory.GetContainer(load));
                 }
             }
 
             MachineControllerObject.StartSimulation();
-            //StartWaveSimmulationAction((int)(Global.GetSimulationTime *0.6),Global.SecondWaveChange);
-            //AccountingModuleObject.StartCounting();
+
             var done = false;
             for (int x = 0; x <= Global.GetSimulationTime; x += Global.AccountTime)
             {
@@ -93,10 +113,10 @@ namespace Simulation.SimulationController
                 Thread.Sleep(Global.AccountTime);
                 if (x >= Global.GetSimulationTime/2 && !done)
                 {
-                    if (ChangeAction == LoadChangeAction.VreyHighOpposite)
+                    if (ChangeAction == LoadChangeAction.Opposite)
                     {
-                        StartWaveSimmulationAction(LoadChangeAction.VeryHightBurst, m => true, m => m.ContainerId % 2 == 0);
-                        StartWaveSimmulationAction(LoadChangeAction.VeryHightDrain, m => true, m => m.ContainerId % 2 == 1);
+                        StartWaveSimmulationAction(LoadChangeAction.Burst, m => true, m => m.ContainerId % 2 == 0);
+                        StartWaveSimmulationAction(LoadChangeAction.Drain, m => true, m => m.ContainerId % 2 == 1);
                     }
                     else
                     {
@@ -111,7 +131,7 @@ namespace Simulation.SimulationController
         private void StartWaveSimmulationAction(LoadChangeAction changeMethod, Func<Machine, bool> hostsFunc,
             Func<Container, bool> contsFunc)
         {
-            var machines = MachineTableObject.GetAllMachines().Skip(1).Where(hostsFunc).ToList();
+            var machines = MachineTableObject.GetAllMachines().Skip(1).Where(x=>x.MachineId<int.MaxValue).Where(hostsFunc).ToList();
 
             for (int i = 0; i < machines.Count; i++)
             {
@@ -122,8 +142,6 @@ namespace Simulation.SimulationController
 
         private void EndSimulation()
         {
-            //AccountingModuleObject.
-            
             AccountingModuleObject.StopCounting();
             MachineControllerObject.EndSimulation();
             RandomNumberGenerator.ClearRandomNumber();

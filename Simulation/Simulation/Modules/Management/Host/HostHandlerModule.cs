@@ -11,6 +11,7 @@ using Simulation.Loads;
 using Simulation.LocationStrategies;
 using Simulation.Messages;
 using Simulation.Modules.LoadManagement;
+using Simulation.DataCenter.Core;
 
 namespace Simulation.Modules.Management.Host
 {
@@ -36,6 +37,11 @@ namespace Simulation.Modules.Management.Host
             
         }
         public abstract void HandleMessage(Message message);
+
+        public Message HandleRequestData(Message message)
+        {
+            throw new NotImplementedException();
+        }
 
         #region --long running--
         public abstract void MachineAction();

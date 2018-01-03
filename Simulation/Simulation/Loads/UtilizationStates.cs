@@ -6,7 +6,7 @@
         OverUtilization,
         UnderUtilization,
         Evacuating,
-        Starting,
+        //Starting,
         //PartialOverUtilization,
         //PartialUnderUtilization,
         //MixedUtilization

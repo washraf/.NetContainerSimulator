@@ -27,12 +27,4 @@ namespace Simulation.Messages
         public int MessageSize { get; private set; }
 
     }
-
-    public class EvacuationDone : Message
-    {
-        public EvacuationDone(int target, int sender) :
-            base(target, sender, MessageTypes.EvacuationDone)
-        {
-        }
-    }
 }

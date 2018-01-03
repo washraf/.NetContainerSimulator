@@ -9,6 +9,7 @@ using Simulation.Loads;
 using Simulation.LocationStrategies;
 using Simulation.LocationStrategies.WAshraf2017;
 using Simulation.Messages;
+using Simulation.DataCenter.Machines;
 
 namespace Simulation.Modules.Management.Master.WAshraf2017
 {

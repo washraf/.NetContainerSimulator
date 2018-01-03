@@ -11,6 +11,7 @@ using Simulation.Messages;
 using Simulation.Configuration;
 using Simulation.Helpers;
 using Simulation.LocationStrategies.Auctions;
+using Simulation.DataCenter.Machines;
 
 namespace Simulation.Modules.Management.Master.Proposed
 {
@@ -42,10 +43,13 @@ namespace Simulation.Modules.Management.Master.Proposed
 
         public override void HandleMessage(Message message)
         {
-            if(message.MessageType == MessageTypes.UtilizationStateChange)
+            if (message.MessageType == MessageTypes.UtilizationStateChange)
             {
-                HandleUtilizationStateChange(message as HostStateChange);
-                return;
+                lock (MasterLock)
+                {
+                    HandleUtilizationStateChange(message as HostStateChange);
+                    return;
+                }
             }
             
             lock (MasterLock)
@@ -70,19 +74,23 @@ namespace Simulation.Modules.Management.Master.Proposed
             }
         }
 
+
+        //Dictionary<int, DateTime> evacuating = new Dictionary<int, DateTime>();
+
         private void HandleUtilizationStateChange(HostStateChange message)
         {
-            walid(message.SenderId, message.State, "Message");
+            if (DataHolder.GetUtilization(message.SenderId) == UtilizationStates.Evacuating)
+            {
+                //var time = DateTime.Now;
+                //var was = evacuating[message.SenderId];
+              //  throw new Exception("Should be impossible");
+            }
+            else
+                DataHolder.SetUtilization(message.SenderId, message.State);
+
         }
 
-        public void walid(int hostId, UtilizationStates state, string s)
-        {
-            if (DataHolder.GetUtilization(hostId) == UtilizationStates.Evacuating && s.Equals("Message"))
-            {
-                return;
-            }
-            DataHolder.SetUtilization(hostId, state);
-        }
+        
 
         private void HandleRequest(Request message)
         {
@@ -272,8 +280,7 @@ namespace Simulation.Modules.Management.Master.Proposed
             {
                 case StrategyActionType.PushAction:
                     if(DataHolder.GetUtilization(hostId) == UtilizationStates.UnderUtilization
-                        || DataHolder.GetUtilization(hostId) == UtilizationStates.Normal
-                        || DataHolder.GetUtilization(hostId) == UtilizationStates.Starting)
+                        || DataHolder.GetUtilization(hostId) == UtilizationStates.Normal)
                     {
                         //throw new NotImplementedException("How come");
                         action = RejectActions.TestWalid;
@@ -281,8 +288,8 @@ namespace Simulation.Modules.Management.Master.Proposed
                     else if (DataHolder.GetUtilization(hostId) == UtilizationStates.Evacuating)
                     {
                         action = RejectActions.CancelEvacuation;
-                        walid(hostId, UtilizationStates.UnderUtilization,"Master");
-                        //DataHolder.SetUtilization(hostId, UtilizationStates.UnderUtilization);
+                        //UpdateSate(hostId, UtilizationStates.UnderUtilization,"Master");
+                        DataHolder.SetUtilization(hostId, UtilizationStates.UnderUtilization);
                     }
                     else if(DataHolder.GetCandidateHosts(UtilizationStates.UnderUtilization,hostId).Count==0
                         && DataHolder.GetCandidateHosts(UtilizationStates.Evacuating,hostId).Count == 0)
@@ -300,8 +307,9 @@ namespace Simulation.Modules.Management.Master.Proposed
                     if (!DataHolder.GetCandidateHosts(UtilizationStates.OverUtilization, hostId).Any())
                     {
                         action = RejectActions.Evacuate;
-                        walid(hostId, UtilizationStates.Evacuating, "Master");
-                        //DataHolder.SetUtilization(hostId, UtilizationStates.Evacuating);
+                        //UpdateSate(hostId, UtilizationStates.Evacuating, "Master");
+                        DataHolder.SetUtilization(hostId, UtilizationStates.Evacuating);
+                        //evacuating.Add(hostId, DateTime.Now);
                     }
                     break;
                 default:
@@ -318,7 +326,10 @@ namespace Simulation.Modules.Management.Master.Proposed
         }
         private void HandleEvacuationDone(EvacuationDone message)
         {
+            if (DataHolder.GetUtilization(message.SenderId) != UtilizationStates.Evacuating)
+                throw new NotImplementedException("Home come");
             PowerController.PowerOffHost(message.SenderId);
+            
             //EvacuatingHost = 0;
             //EvacuatingHosts.Remove(message.SenderId);
 

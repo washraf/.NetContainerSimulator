@@ -2,6 +2,8 @@
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Simulation.Messages;
+using Simulation.DataCenter.Network;
+using Simulation.DataCenter.Core;
 
 namespace Simulation.DataCenter
 {
@@ -10,13 +12,13 @@ namespace Simulation.DataCenter
         public NetworkInterfaceCard(int machineId, NetworkSwitch networkSwitch, IMessageHandler handler)
         {
             MachineId = machineId;
-            Handler = handler;
-            NetworkSwitch = networkSwitch;
+            _handler = handler;
+            _networkSwitch = networkSwitch;
         }
 
         public int MachineId { get; private set; }
-        public IMessageHandler Handler { get; set; }
-        public NetworkSwitch NetworkSwitch;
+        private readonly IMessageHandler _handler;
+        private readonly NetworkSwitch _networkSwitch;
 
         public bool Started { get; set; }
 
@@ -26,7 +28,7 @@ namespace Simulation.DataCenter
             //    throw new NotImplementedException();
             if (message.SenderId != this.MachineId)
                 throw new NotImplementedException();
-            NetworkSwitch.ReceiveMessage(message);
+            _networkSwitch.ReceiveMessage(message);
         }
 
         public bool ReceiveMessage(Message message)
@@ -37,11 +39,7 @@ namespace Simulation.DataCenter
             {
                 Task t = new Task(() =>
                 {
-                    if (MachineId == 0)
-                    {
-
-                    }
-                    Handler.HandleMessage(message);
+                    _handler.HandleMessage(message);
                 });
                 t.Start();
                 return true;
@@ -50,6 +48,18 @@ namespace Simulation.DataCenter
             {
                 throw new NullReferenceException();
             }
+        }
+
+        public Message RequestData(Message message)
+        {
+           // if (!Started)
+           //     return null;
+            return _networkSwitch.RequestData(message);
+        }
+
+        public Message HandleRequestData(Message message)
+        {
+            return _handler.HandleRequestData(message);
         }
     }
 }

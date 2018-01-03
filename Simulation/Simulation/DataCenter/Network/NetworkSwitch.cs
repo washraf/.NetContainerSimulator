@@ -8,8 +8,9 @@ using Simulation.Accounting;
 using Simulation.Configuration;
 using Simulation.DataCenter.InformationModules;
 using Simulation.Messages;
+using Simulation.DataCenter.Core;
 
-namespace Simulation.DataCenter
+namespace Simulation.DataCenter.Network
 {
     public class NetworkSwitch : Component
     {
@@ -30,23 +31,17 @@ namespace Simulation.DataCenter
             {
                 Task t = new Task(() =>
                 {
-                    //lock (CommunicationLock)
                     {
                         if (_switchTable.ValidateMachineId(message.TargetId))
                         {
                             _accountingModule.RequestCreated(message.MessageType);
 
-                            //await Task.Delay(Global.GetNetworkDelay(message.MessageSize,
-                            //    NetWorkSpeed.HundredG, SizeUnit.Byte));
+                            
                             HandleMessage(message);
 
                         }
                         else
                         {
-                            //throw new NotImplementedException();
-                            //if(message.MessageType==MessageTypes.RejectRequest||message.MessageType == MessageTypes.BidCancellationRequest)
-                            //    return false;
-                            //Must be re added
                         }
                     }
                 });
@@ -63,7 +58,6 @@ namespace Simulation.DataCenter
                     throw new NullReferenceException();
                 if (message.TargetId == -1)
                 {
-                    //throw new NotImplementedException("I don't broadcast");
                     List<int> idList = _switchTable.GetAllMachineIds(message.SenderId);
                     foreach (var id in idList)
                     {
@@ -76,6 +70,19 @@ namespace Simulation.DataCenter
                 }
 
             }
+        }
+
+        public Message RequestData(Message message)
+        {
+            if(Started)
+            {
+                if (message == null)
+                    throw new NullReferenceException();
+                _accountingModule.RequestCreated(message.MessageType);
+                var machine = _switchTable.GetMachineById(message.TargetId);
+                return machine.CommunicationModule.HandleRequestData(message);
+            }
+            return null;
         }
     }
 }

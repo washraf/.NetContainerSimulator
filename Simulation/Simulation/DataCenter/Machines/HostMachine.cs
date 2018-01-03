@@ -19,8 +19,9 @@ using Simulation.Modules.Management.Host.Other;
 using Simulation.Modules.Management.Host.Proposed;
 using Simulation.Modules.Management.Host.WAshraf2017;
 using Simulation.DataCenter.Containers;
+using Simulation.DataCenter.Network;
 
-namespace Simulation.DataCenter
+namespace Simulation.DataCenter.Machines
 {
     public class HostMachine : Machine
     {
@@ -43,9 +44,16 @@ namespace Simulation.DataCenter
         private ILoadManager _loadManager;
         #endregion
 
-        public HostMachine(int id, Load maxLoad, NetworkSwitch networkSwitch, LoadPrediction currentLoadPrediction,Strategies strategy) : base(id, networkSwitch)
+        public HostMachine(int id, Load maxLoad, NetworkSwitch networkSwitch, LoadPrediction currentLoadPrediction,Strategies strategy, ContainersType containerType) : base(id, networkSwitch)
         {
-            _containerTable = new ContainerTable(id);
+           if(containerType == ContainersType.D)
+            {
+                _containerTable = new DockerContainerTable(id,new ImageManager(this.CommunicationModule));
+            }
+            else
+            {
+                _containerTable = new ContainerTable(id);
+            }
             _loadManager = new HostLoadManager(this.MachineId, maxLoad, currentLoadPrediction, this.CommunicationModule, _containerTable);
             switch (strategy)
             {
@@ -108,6 +116,11 @@ namespace Simulation.DataCenter
         public override void HandleMessage(Message message)
         {
             _handler.HandleMessage(message);
+        }
+
+        public override Message HandleRequestData(Message message)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -173,6 +186,7 @@ namespace Simulation.DataCenter
         {
             return _loadManager.GetPredictedHostLoadInfo();
         }
+        
 
         public double MinUtilization
         {
