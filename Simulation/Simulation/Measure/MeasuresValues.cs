@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Simulation.Loads;
 
-namespace Simulation.Accounting
+namespace Simulation.Measure
 {
     public class MeasuresValues
     {

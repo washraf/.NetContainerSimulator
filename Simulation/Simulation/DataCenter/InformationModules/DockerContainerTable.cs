@@ -13,9 +13,12 @@ namespace Simulation.DataCenter.InformationModules
         }
         public override void AddContainer(int containerId, Container container)
         {
-            var dockerCon = container as DockerContainer;
-            ImageManager.LoadImage(dockerCon.ImageId);
-            base.AddContainer(containerId, container);
+            lock (_lock)
+            {
+                var dockerCon = container as DockerContainer;
+                ImageManager.LoadImage(dockerCon.ImageId);
+                ContainersTable.Add(containerId, container);
+            }
         }
 
 

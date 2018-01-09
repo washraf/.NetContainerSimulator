@@ -273,15 +273,16 @@ namespace Simulation.Modules.LoadManagement
         #endregion
 
         public bool Started { get; set; }
-
+        int f = 0;
         public UtilizationStates CheckSystemState(bool act,double min,double max)
         {
             var loadInfo = GetPredictedHostLoadInfo();
             var hoststate = loadInfo.CalculateTotalUtilizationState(min,max);
-            if (act && hoststate != LastState)
+            if ((act && hoststate != LastState)|| f==0)
             {
                 ReportUtilizationStateChange(hoststate, loadInfo.CPUUtil);
                 LastState = hoststate;
+                f++;
             }
             return hoststate;
         }

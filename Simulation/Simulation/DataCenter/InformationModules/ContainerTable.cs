@@ -17,9 +17,9 @@ namespace Simulation.DataCenter.InformationModules
             MachineId = machineId;
         }
 
-        private object _lock = new object();
+        protected object _lock = new object();
         private Container MigratedContainer { get; set; }
-        private Dictionary<int, Container> ContainersTable { get; set; } = new Dictionary<int, Container>();
+        protected Dictionary<int, Container> ContainersTable { get; set; } = new Dictionary<int, Container>();
         public List<Container> GetAllContainers()
         {
             lock (_lock)
@@ -81,7 +81,7 @@ namespace Simulation.DataCenter.InformationModules
                 throw new NotImplementedException("Should Never be called");
             }
         }
-        HashSet<int> _hashSet = new HashSet<int>();  
+        private HashSet<int> _hashSet = new HashSet<int>();  
 
         /// <summary>
         /// Update to different conditions

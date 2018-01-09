@@ -56,6 +56,9 @@ namespace Simulation.Modules.Management.Host.Proposed
 
         public override void MachineAction()
         {
+            _hostState.CurrentAction = HostCurrentAction.None;
+            _hostState.EvacuationMode = false;
+            _hostState.AuctionId = 0;
             while (Started)
             {
                 //change to time based on backoff algorithm 
@@ -63,42 +66,41 @@ namespace Simulation.Modules.Management.Host.Proposed
                 Thread.Sleep(bft);
                 lock (_hostLock)
                 {
-                    if (_hostState.EvacuationMode && _hostState.CurrentAction == HostCurrentAction.None)
+                    var s = LoadManager.CheckSystemState(true, MinUtilization, MaxUtilization); //can this be up
+                    if (_hostState.CurrentAction == HostCurrentAction.None && !_hostState.EvacuationMode)
+                    {
+                        TryToChangeSystemState(s);
+
+                    }
+                    else if (_hostState.EvacuationMode && _hostState.CurrentAction == HostCurrentAction.None)
                     {
                         if (!SendPushRequest())
                         {
                             break;
                         }
                     }
-                    else if (_hostState.CurrentAction == HostCurrentAction.None && !_hostState.EvacuationMode)
-                    {
-                        var s = LoadManager.CheckSystemState(true, MinUtilization, MaxUtilization); //can this be up
-                        TryToChangeSystemState(s);
-                        if (_hostState.EvacuationMode)
-                        {
-
-                        }
-                    }
                 }
             }
-            lock (_hostLock)
-            {
+            var message = new EvacuationDone(0, this.MachineId);
+            CommunicationModule.SendMessage(message);
+
+            //lock (_hostLock)
+            //{
                 
-                if (Started)
-                {
-                    if (ContainerTable.GetContainersCount() > 0)
-                    {
+            //    if (Started)
+            //    {
+            //        if (ContainerTable.GetContainersCount() > 0)
+            //        {
 
-                    }
-                    var message = new EvacuationDone(0, this.MachineId);
-                    CommunicationModule.SendMessage(message);
-                }
-            }
+            //        }
+            //        var message = new EvacuationDone(0, this.MachineId);
+            //        CommunicationModule.SendMessage(message);
+            //    }
+            //}
         }
 
         protected override void TryToChangeSystemState(UtilizationStates hostState)
         {
-
             if (hostState == UtilizationStates.OverUtilization)
             {
                 SendPushRequest();
@@ -108,14 +110,12 @@ namespace Simulation.Modules.Management.Host.Proposed
                 SendPullRequest();
             }
         }
-
         protected override void SendPullRequest()
         {
             _hostState.CurrentAction = HostCurrentAction.Pulling;
             PullRequest pullRequest = new PullRequest(0, this.MachineId, LoadManager.GetPredictedHostLoadInfo());
             CommunicationModule.SendMessage(pullRequest);
         }
-
         protected override bool SendPushRequest()
         {
             var containerLoadInfo = GetToBeRemovedContainerLoadInfo();
@@ -133,6 +133,7 @@ namespace Simulation.Modules.Management.Host.Proposed
             }
         }
 
+        #region -- Communication --
         public override void HandleMessage(Message message)
         {
             lock (_hostLock)
@@ -170,13 +171,15 @@ namespace Simulation.Modules.Management.Host.Proposed
                 }
             }
         }
-
+        #endregion
         #region --Push Message Handlers--
         private void HandlePushLoadAvailabilityRequest(PushLoadAvailabilityRequest message)
         {
             
             Bid bid;
-            if (_hostState.CurrentAction==HostCurrentAction.None && LoadManager.CanITakeLoad(message.NewContainerLoadInfo))
+            if (_hostState.CurrentAction==HostCurrentAction.None 
+                && !_hostState.EvacuationMode 
+                && LoadManager.CanITakeLoad(message.NewContainerLoadInfo))
             {
 
                 var load = LoadManager.GetHostLoadInfoAfterContainer(message.NewContainerLoadInfo);
@@ -210,7 +213,7 @@ namespace Simulation.Modules.Management.Host.Proposed
         private void HandlePullLoadAvailabilityRequest(PullLoadAvailabilityRequest message)
         {
             Bid bid;
-            if (_hostState.CurrentAction == HostCurrentAction.None)
+            if (_hostState.CurrentAction == HostCurrentAction.None && !_hostState.EvacuationMode)
             {
                 ContainerLoadInfo selectedContainerload = GetToBeRemovedContainerLoadInfo();
                 if (selectedContainerload != null)
@@ -245,11 +248,76 @@ namespace Simulation.Modules.Management.Host.Proposed
 
             LoadAvailabilityResponce availabilityResponce =
                         new LoadAvailabilityResponce(message.SenderId, this.MachineId, message.AuctionId, bid);
-            // var responce = new GetHostLoadInfoResponce(this.HostId, load);
             CommunicationModule.SendMessage(availabilityResponce);
         }
         #endregion
+        private void HandleRejectRequest(RejectRequest message)
+        {
+            switch (_hostState.CurrentAction)
+            {
+                case HostCurrentAction.None:
+                    break;
+                case HostCurrentAction.Pulling:
+                    break;
+                case HostCurrentAction.Pushing:
+                    break;
+                case HostCurrentAction.Bidding:
+                    break;
+            }
+            switch (message.RejectAction)
+            {
+                case RejectActions.Nothing:
+                    if (_hostState.EvacuationMode)
+                    {
+                        throw new NotImplementedException("how come");
+                    }
+                    break;
+                case RejectActions.Busy:
+                    break;
+                case RejectActions.Evacuate:
+                    if (_hostState.EvacuationMode)
+                    {
+                        throw new NotImplementedException("how come");
+                    }
+                    _hostState.EvacuationMode = true;
+                    break;
+                case RejectActions.CancelEvacuation:
+                    if (!_hostState.EvacuationMode)
+                    {
+                        throw new NotImplementedException("how come");
+                    }
+                    _hostState.EvacuationMode = false;
+                    break;
+                case RejectActions.TestWalid:
+                    _hostState.EvacuationMode = false;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("How come");
+            }
+            IncreaseBackOffTime();
+            _hostState.CurrentAction = HostCurrentAction.None;
 
+        }
+
+        private void HandleBidCancellationRequest(BidCancellationRequest message)
+        {
+            //if (_hostState.CurrentAction != HostCurrentAction.Bidding)
+            //    throw new NotImplementedException("How come");
+            if (_hostState.AuctionId == message.AuctionId)
+            {
+                //Console.WriteLine($"I am Host #{HostId} I am not bidding any more for AuctionId{bidCancellationRequest.AuctionId}");
+                _hostState.CurrentAction = HostCurrentAction.None;
+                _hostState.AuctionId = 0;
+
+            }
+            else
+            {
+                //throw new NotImplementedException("How come");
+            }
+
+        }
+
+        #region -- Migration Management --
         private void HandleInitiateMigration(InitiateMigration message)
         {
             Task t = new Task(() =>
@@ -258,8 +326,8 @@ namespace Simulation.Modules.Management.Host.Proposed
                 ContainerTable.LockContainer(message.ContainerId);
                 container.Checkpoint(this.MachineId);
                 var size = (int)container.GetContainerNeededLoadInfo().CurrentLoad.MemorySize * 1024;
-                MigrateContainerRequest request = new MigrateContainerRequest(message.TargetHost, this.MachineId,
-                    container, size);
+                MigrateContainerRequest request = 
+                new MigrateContainerRequest(message.TargetHost, this.MachineId, container, size);
                 CommunicationModule.SendMessage(request);
                 ResetBackOff();
             });
@@ -295,61 +363,8 @@ namespace Simulation.Modules.Management.Host.Proposed
             //Release Lock
             _hostState.CurrentAction = HostCurrentAction.None;
         }
+        #endregion
 
-        private void HandleRejectRequest(RejectRequest message)
-        {
-            switch (message.RejectAction)
-            {
-                case RejectActions.Nothing:
-                    if (_hostState.EvacuationMode)
-                    {
-                        throw new NotImplementedException("how come");
-                    }
-                    break;
-                case RejectActions.Busy:
-                    break;
-                case RejectActions.Evacuate:
-                    if (_hostState.EvacuationMode)
-                    {
-                        throw new NotImplementedException("how come");
-                    }
-                    _hostState.EvacuationMode = true;
-                    break;
-                case RejectActions.CancelEvacuation:
-                    if (!_hostState.EvacuationMode)
-                    {
-                        throw new NotImplementedException("how come");
-                    }
-                    _hostState.EvacuationMode = false;
-                    break;
-                case RejectActions.TestWalid:
-                    _hostState.EvacuationMode = false;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("How come");
-            }
-            IncreaseBackOffTime();
-            _hostState.CurrentAction = HostCurrentAction.None;
-
-        }
-        private void HandleBidCancellationRequest(BidCancellationRequest message)
-        {
-            //if (_hostState.CurrentAction != HostCurrentAction.Bidding)
-            //    throw new NotImplementedException("How come");
-            if (_hostState.AuctionId == message.AuctionId)
-            {
-                //Console.WriteLine($"I am Host #{HostId} I am not bidding any more for AuctionId{bidCancellationRequest.AuctionId}");
-                _hostState.CurrentAction = HostCurrentAction.None;
-                _hostState.AuctionId = 0;
-
-            }
-            else
-            {
-                //throw new NotImplementedException("How come");
-            }
-
-        }
-       
 
         /// <summary>
         /// container selection by condition

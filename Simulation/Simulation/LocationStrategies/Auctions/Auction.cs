@@ -39,6 +39,7 @@ namespace Simulation.LocationStrategies.Auctions
 
         public abstract Bid GetWinnerBid();
 
+        
         //public abstract AuctionFailureAction GetAction();
 
     }

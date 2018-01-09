@@ -2,8 +2,8 @@ namespace Simulation.Configuration
 {
     public enum LoadChangeAction
     {
-        Drain = -50,
-        Burst = 50,
+        Drain = -25,
+        Burst = 25,
         Opposite
     }
 }

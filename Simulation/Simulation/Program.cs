@@ -11,10 +11,15 @@ using Simulation.Helpers;
 using Simulation.Loads;
 using Simulation.LocationStrategies;
 using Simulation.SimulationController;
+using Simulation.Measure;
+using Simulation.AccountingResults;
+
 namespace Simulation
 {
     public class Program
     {
+
+        static IAccountingResultsManager accountingResultsManager = new AccountingResultsFileManager();
         private static void Main(string[] args)
         {
             var predictors = new List<LoadPrediction>()
@@ -115,7 +120,7 @@ namespace Simulation
                                     //await Task.Delay(5000);
                                     if (Global.NoOfTrials > 1)
                                     {
-                                        controller.AccountingModuleObject.MeasureHolder.WriteDataToDisk(i);
+                                        accountingResultsManager.WriteDataToDisk(controller.AccountingModuleObject.MeasureHolder, i);
                                     }
                                     Thread.Sleep(5000);
 
@@ -132,7 +137,7 @@ namespace Simulation
                                     final = final + list;
                                 }
                                 final = final / Global.NoOfTrials;
-                                final.WriteDataToDisk(-1);
+                                accountingResultsManager.WriteDataToDisk(final, -1);
 
                                 #endregion
                             }

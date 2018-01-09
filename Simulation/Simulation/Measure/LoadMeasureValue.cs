@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Simulation.Helpers;
 using Simulation.Loads;
 
-namespace Simulation.Accounting
+namespace Simulation.Measure
 {
     public class LoadMeasureValue
     {

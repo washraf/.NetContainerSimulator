@@ -43,8 +43,6 @@ namespace Simulation.Configuration
             switch (SimulationSize)
             {
                 case SimulationSize.Five:
-                    Second = 100;
-                    break;
                 case SimulationSize.Ten:
                     Second = 2;
                     break;

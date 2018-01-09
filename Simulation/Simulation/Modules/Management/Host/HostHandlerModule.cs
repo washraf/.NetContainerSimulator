@@ -56,7 +56,7 @@ namespace Simulation.Modules.Management.Host
         protected void IncreaseBackOffTime()
         {
             FailuresCount++;
-            if (FailuresCount >= 8)
+            if (FailuresCount >= 10)
             {
                 FailuresCount = 0;
             }

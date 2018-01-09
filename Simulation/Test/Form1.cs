@@ -17,6 +17,10 @@ using Simulation.Loads;
 using Simulation.LocationStrategies;
 using Simulation.SimulationController;
 using ZedGraph;
+using Simulation.Measure;
+using Simulation.AccountingResults;
+using Test.Charting;
+
 namespace Test
 {
     public partial class Form1 : Form
@@ -37,7 +41,7 @@ namespace Test
             cb_StartUtil.DataSource = Enum.GetValues(typeof(StartUtilizationPercent)).Cast<StartUtilizationPercent>();
             cb_StartUtil.SelectedIndex = 0;
 
-            cb_GraphItem.DataSource = Enum.GetValues(typeof(GraphItems)).Cast<GraphItems>();
+            cb_GraphItem.DataSource = Enum.GetValues(typeof(BasicItems)).Cast<BasicItems>();
             cb_GraphItem.SelectedIndex = 0;
 
             cb_HostsCount.DataSource = Enum.GetValues(typeof(SimulationSize)).Cast<SimulationSize>();
@@ -50,6 +54,7 @@ namespace Test
         }
         List<MeasureValueHolder> _measuredValueListsTrials = new List<MeasureValueHolder>();
         //AccountingModule _accountingModule = AccountingModule.GetAccountingModule();
+        static IAccountingResultsManager accountingResultsManager = new AccountingResultsFileManager();
 
         private void btn_Start_Click(object sender, EventArgs e)
         {
@@ -86,7 +91,7 @@ namespace Test
                     var algorithms = new List<Strategies>()
                     {
                        Strategies.Proposed2018,
-                       //Strategies.WAshraf2017,
+                       Strategies.WAshraf2017,
                         //Strategies.Zhao,
                         //Strategies.ForsmanPush,
                         //Strategies.ForsmanPull,
@@ -96,7 +101,7 @@ namespace Test
                     {
                         LoadChangeAction.Burst,
                         LoadChangeAction.Drain,
-                        //LoadChangeAction.VreyHighOpposite
+                        LoadChangeAction.Opposite
                     };
                     var testingRange = new List<TestedHosts>()
                     {
@@ -125,7 +130,8 @@ namespace Test
                                     {
                                         Global.TestedItems = testing;
                                         #region --ALL--
-
+                                        if (alg == Strategies.WAshraf2017 && testing != TestedHosts.One)
+                                            continue;
                                         btn_Start.Invoke(new Action(() => { btn_Start.Enabled = false; }));
                                         List<MeasureValueHolder> internalValueListsTrials =
                                             new List<MeasureValueHolder>();
@@ -152,7 +158,7 @@ namespace Test
                                             //await Task.Delay(5000);
                                             if (Global.NoOfTrials > 1)
                                             {
-                                                controller.AccountingModuleObject.MeasureHolder.WriteDataToDisk(i);
+                                                accountingResultsManager.WriteDataToDisk(controller.AccountingModuleObject.MeasureHolder, i);
                                             }
                                             Thread.Sleep(5000);
 
@@ -169,7 +175,8 @@ namespace Test
                                             final = final + list;
                                         }
                                         final = final / Global.NoOfTrials;
-                                        final.WriteDataToDisk(-1);
+                                        accountingResultsManager.WriteDataToDisk(final, -1);
+
                                         btn_Start.Invoke(new Action(() =>
                                         {
                                             btn_Start.Enabled = true;
@@ -190,7 +197,8 @@ namespace Test
 
         private void AddDataHolder(MeasureValueHolder holder)
         {
-            DbHelper.SaveToDb(holder);
+            var dbHelper = new DatabaseTrialResultManagement();
+            dbHelper.Save(holder);
             _measuredValueListsTrials.Add(holder);
             var btn = new Button()
             {
@@ -199,7 +207,7 @@ namespace Test
             };
             btn.Click += Btn_Click;
             flowLayoutPanel1.Controls.Add(btn);
-            CreateGraph(zedGraphControl1, cb_GraphItem.Text, (GraphItems)cb_GraphItem.SelectedValue);
+            CreateGraph(zedGraphControl1, cb_GraphItem.Text, (BasicItems)cb_GraphItem.SelectedValue);
         }
 
         private void Btn_Click(object sender, EventArgs e)
@@ -215,11 +223,11 @@ namespace Test
                     break;
                 }
             }
-            CreateGraph(zedGraphControl1, cb_GraphItem.Text, (GraphItems)cb_GraphItem.SelectedValue);
+            CreateGraph(zedGraphControl1, cb_GraphItem.Text, (BasicItems)cb_GraphItem.SelectedValue);
 
         }
         // Build the Chart
-        private void CreateGraph(ZedGraphControl zgc, string title, GraphItems yAxis)
+        private void CreateGraph(ZedGraphControl zgc, string title, BasicItems yAxis)
         {
             // get a reference to the GraphPane
             GraphPane myPane = zgc.GraphPane;
@@ -244,7 +252,7 @@ namespace Test
                 myLabel.BackColor = GetColor(t);
                 switch (yAxis)
                 {
-                    case GraphItems.Entropy:
+                    case BasicItems.Entropy:
 
                         if (cb_DrawExtra.Checked)
                         {
@@ -262,12 +270,12 @@ namespace Test
                         }
                         myLabel.Text = $"Avegare entropy in All the trial = {_measuredValueListsTrials[t].AverageEntropy}";
                         break;
-                    case GraphItems.PowerConsumption:
+                    case BasicItems.PowerConsumption:
                         list[0].Add(0, _measuredValueListsTrials[t].PowerConsumption);
                         myLabel.Text = $"Power Consumption in All the trial = {_measuredValueListsTrials[t].PowerConsumption} Watts";
 
                         break;
-                    case GraphItems.AverageNeededVolume:
+                    case BasicItems.AverageNeededVolume:
                         if (cb_DrawExtra.Checked)
                         {
                             list.Add(new PointPairList());
@@ -291,14 +299,14 @@ namespace Test
 
                         break;
 
-                    case GraphItems.NeededLoadStandardDeviation:
+                    case BasicItems.NeededLoadStandardDeviation:
                         for (int i = 0; i < _measuredValueListsTrials[t].LoadMeasureValueList.Count; i++)
                         {
                             list[0].Add(i * unit, _measuredValueListsTrials[t].LoadMeasureValueList[i].StandardDeviation);
                         }
                         myLabel.Text = $"Average Standard Deviation {_measuredValueListsTrials[t].AverageStdDeviation}";
                         break;
-                    case GraphItems.NoHosts:
+                    case BasicItems.NoHosts:
                         if (cb_DrawExtra.Checked)
                         {
                             list.Add(new PointPairList());
@@ -315,7 +323,7 @@ namespace Test
                         myLabel.Text = $"Average No of Hosts {_measuredValueListsTrials[t].AverageHosts}";
 
                         break;
-                    case GraphItems.HostsStates:
+                    case BasicItems.HostsStates:
                         //list.Clear()
                         list.Add(new PointPairList());
                         list.Add(new PointPairList());
@@ -339,7 +347,7 @@ namespace Test
                             $"Evacuating:{_measuredValueListsTrials[t].FinalEvacuatingUtilized} ";
 
                         break;
-                    case GraphItems.TotalMessages:
+                    case BasicItems.TotalMessages:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].TotalMessages);
@@ -347,7 +355,7 @@ namespace Test
                         myLabel.Text = $"Total Messages in All the trial = {_measuredValueListsTrials[t].TotalMessages}";
 
                         break;
-                    case GraphItems.PushRequests:
+                    case BasicItems.PushRequests:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].PushRequests);
@@ -355,7 +363,7 @@ namespace Test
                         myLabel.Text = $"Total Push Requests in All the trial = {_measuredValueListsTrials[t].TotalPushRequests}";
 
                         break;
-                    case GraphItems.PullRequests:
+                    case BasicItems.PullRequests:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].PullRequests);
@@ -364,7 +372,7 @@ namespace Test
 
                         break;
 
-                    case GraphItems.Migrations:
+                    case BasicItems.Migrations:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].Migrations);
@@ -373,7 +381,7 @@ namespace Test
                         myLabel.Text = $"Total Migrations in All the trial = {_measuredValueListsTrials[t].TotalMigrations}";
 
                         break;
-                    case GraphItems.MigrationCount:
+                    case BasicItems.MigrationCount:
                         foreach (var item in _measuredValueListsTrials[t].ContainerMigrationCount)
                         {
                             list[0].Add(item.Key, item.Value.MigrationCount);
@@ -381,7 +389,7 @@ namespace Test
                         myLabel.Text = $"Avarage Migration per container in All the trial = {_measuredValueListsTrials[t].AvgMigrations}";
 
                         break;
-                    case GraphItems.PushLoadAvailabilityRequest:
+                    case BasicItems.PushLoadAvailabilityRequest:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit,
@@ -390,7 +398,7 @@ namespace Test
                         myLabel.Text = $"Total Push Availability Requests in All the trial = {_measuredValueListsTrials[t].TotalPushAvailabilityRequests}";
 
                         break;
-                    case GraphItems.PullLoadAvailabilityRequest:
+                    case BasicItems.PullLoadAvailabilityRequest:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit,
@@ -399,7 +407,7 @@ namespace Test
                         myLabel.Text = $"Total Pull Availability Requests in All the trial = {_measuredValueListsTrials[t].TotalPullAvailabilityRequests}";
 
                         break;
-                    case GraphItems.UtilizationSlaViolations:
+                    case BasicItems.UtilizationSlaViolations:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit,
@@ -408,7 +416,7 @@ namespace Test
                         myLabel.Text = $"Total SLA Violations the trial = {_measuredValueListsTrials[t].TotalSlaViolations}";
 
                         break;
-                    case GraphItems.ContainerDownTime:
+                    case BasicItems.ContainerDownTime:
                         foreach (var item in _measuredValueListsTrials[t].ContainerMigrationCount)
                         {
                             list[0].Add(item.Key, item.Value.Downtime);
@@ -417,7 +425,7 @@ namespace Test
 
                         break;
 
-                    case GraphItems.ImagePulls:
+                    case BasicItems.ImagePulls:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit,
@@ -425,12 +433,16 @@ namespace Test
                         }
                         myLabel.Text = $"Total ImagePulls of trial = {_measuredValueListsTrials[t].ImagePulls}";
                         break;
+                    case BasicItems.ImagePullsRatio:
+                        list[0].Add(0, _measuredValueListsTrials[t].AveragePullPerImage);
+                        myLabel.Text = $"Image Pull Ratio in All the trial = {_measuredValueListsTrials[t].AveragePullPerImage}";
+                        break;
                     default:
                         throw new NotImplementedException();
                 }
                 // Generate a red curve with diamond
                 // symbols, and "Porsche" in the legend
-                if (yAxis == GraphItems.MigrationCount || yAxis == GraphItems.ContainerDownTime || yAxis == GraphItems.PowerConsumption)// || yAxis == GraphItems.OutOfBoundHosts)
+                if (yAxis == BasicItems.MigrationCount || yAxis == BasicItems.ContainerDownTime || yAxis == BasicItems.PowerConsumption || yAxis == BasicItems.ImagePullsRatio)// || yAxis == BasicItems.OutOfBoundHosts)
                 {
                     for (int i = 0; i < list.Count; i++)
                     {
@@ -531,7 +543,7 @@ namespace Test
 
         private void cb_GraphItem_SelectedIndexChanged(object sender, EventArgs e)
         {
-            CreateGraph(zedGraphControl1, cb_GraphItem.Text, (GraphItems)cb_GraphItem.SelectedValue);
+            CreateGraph(zedGraphControl1, cb_GraphItem.Text, (BasicItems)cb_GraphItem.SelectedValue);
         }
 
         private void cb_HostsCount_SelectedIndexChanged(object sender, EventArgs e)
@@ -555,117 +567,7 @@ namespace Test
             var result = f.ShowDialog();
             if (result == DialogResult.OK)
             {
-                var stream = f.OpenFile();
-                var config = f.FileName.Split('\\');
-                //string folder = @"D:\Simulations\Results\" +
-                //          CurrentStrategy + "\\" + (int)CurrentSimulationSize + "\\" +
-                //          UtilizationPercent + "_" + ChangeAction + "\\" +
-                //          CurrentPrediction + "\\" + DateTime.Now.ToShortDateString() + "\\";
-                SimulationSize simulationSize = (SimulationSize)Convert.ToInt32(config[3]);
-                StartUtilizationPercent precent =
-                   (StartUtilizationPercent)Enum.Parse(typeof(StartUtilizationPercent), config[4].Split('_')[0]);
-                LoadChangeAction changeAction =
-                    (LoadChangeAction)Enum.Parse(typeof(LoadChangeAction), config[4].Split('_')[1]);
-
-                LoadPrediction loadPrediction = (LoadPrediction)Enum.Parse(typeof(LoadPrediction), config[5]);
-                Strategies strategy = (Strategies)Enum.Parse(typeof(Strategies), config[7].Split('_')[0]);
-                ContainersType containerType = ContainersType.N;
-                if(strategy == Strategies.Proposed2018 && config[7].Split('_').Count()>1)
-                {
-                    containerType = (ContainersType)Enum.Parse(typeof(ContainersType), config[7].Split('_')[1]);
-
-                }
-                TestedHosts testedHosts = (TestedHosts)Enum.Parse(typeof(TestedHosts), config[8]);
-                MeasureValueHolder holder =
-                    new MeasureValueHolder(strategy, simulationSize, precent, changeAction, loadPrediction,testedHosts,containerType);
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    reader.ReadLine();
-                    while (!reader.EndOfStream)
-                    {
-                        var line = reader.ReadLine().Split(',');
-                        int i = Convert.ToInt32(line[0]);
-                        double entropy = Convert.ToDouble(line[1]);
-                        double predictedEntropy = Convert.ToDouble(line[2]);
-                        double avgRealVolume = Convert.ToDouble(line[3]);
-                        double avgPredictedVolume = Convert.ToDouble(line[4]);
-                        double idealHostCount = Convert.ToDouble(line[5]);
-                        double noHosts = Convert.ToDouble(line[6]);
-                        double underHosts = Convert.ToDouble(line[7]);
-                        double overHosts = Convert.ToDouble(line[8]);
-                        double normalHosts = Convert.ToDouble(line[9]);
-                        double evacuatingHosts = Convert.ToDouble(line[10]);
-                        double migrations = Convert.ToDouble(line[11]);
-                        double pushRequests = Convert.ToDouble(line[12]);
-                        double pushLoadAvailabilityRequest = Convert.ToDouble(line[13]);
-                        double pullRequests = Convert.ToDouble(line[14]);
-                        double pullLoadAvailabilityRequest = Convert.ToDouble(line[15]);
-                        double totalMessages = Convert.ToDouble(line[16]);
-                        double slaViolations = Convert.ToDouble(line[17]);
-                        double minNeeded = Convert.ToDouble(line[18]);
-                        double maxNeeded = Convert.ToDouble(line[19]);
-                        double power = Convert.ToDouble(line[20]);
-                        double stdDev = Convert.ToDouble(line[21]);
-                        double imagePulls = Convert.ToDouble(line[22]);
-                        MeasuresValues m = new MeasuresValues(pushRequests, pullRequests, idealHostCount, noHosts,
-                            migrations,
-                            totalMessages, entropy, predictedEntropy, pushLoadAvailabilityRequest,
-                            pullLoadAvailabilityRequest,
-                            avgRealVolume, avgPredictedVolume, minNeeded, maxNeeded,
-                            underHosts, overHosts,normalHosts,evacuatingHosts,
-                            slaViolations,
-                            power, stdDev,imagePulls);
-                        holder.MeasuredValuesList.Add(m);
-                    }
-                }
-                var nfile = f.FileName.Replace("All", "ConMig");
-                using (StreamReader reader = new StreamReader(new FileStream(nfile, FileMode.Open)))
-                {
-                    reader.ReadLine();
-                    while (!reader.EndOfStream)
-                    {
-                        var line = reader.ReadLine().Split(',');
-                        int conId = Convert.ToInt32(line[0]);
-                        double count = Convert.ToDouble(line[1]);
-                        double time = Convert.ToDouble(line[2]);
-                        holder.ContainerMigrationCount.Add(conId, new ContainerMeasureValue(conId, count, time));
-                    }
-                }
-
-                nfile = f.FileName.Replace("All", "Hosts");
-                using (StreamReader reader = new StreamReader(new FileStream(nfile, FileMode.Open)))
-                {
-                    List<HostLoadInfo> list = new List<HostLoadInfo>();
-                    int current = 0;
-                    reader.ReadLine();
-                    while (!reader.EndOfStream)
-                    {
-                        //iteration,Id,cpu,mem,io,concount,cpuutil,memutil,ioutil,
-                        var line = reader.ReadLine().Split(',');
-                        int it = Convert.ToInt32(line[0]);
-                        int hostId = Convert.ToInt32(line[1]);
-                        double cpu = Convert.ToDouble(line[2]);
-                        double mem = Convert.ToDouble(line[3]);
-                        double io = Convert.ToDouble(line[4]);
-                        int concount = Convert.ToInt32(line[5]);
-                        double cpuutil = Convert.ToDouble(line[6]);
-                        double memutil = Convert.ToDouble(line[7]);
-                        double ioutil = Convert.ToDouble(line[8]);
-                        var linfo = new HostLoadInfo(hostId, new Load(cpu, mem, io), concount, cpuutil, memutil, ioutil);
-                        if (it == current)
-                        {
-                            list.Add(linfo);
-                        }
-                        else
-                        {
-                            holder.LoadMeasureValueList.Add(new LoadMeasureValue(list));
-                            list.Clear();
-                            list.Add(linfo);
-                            current++;
-                        }
-                    }
-                }
-
+                var holder = accountingResultsManager.ReadDataFromDisk(f.FileName);
                 AddDataHolder(holder);
             }
         }

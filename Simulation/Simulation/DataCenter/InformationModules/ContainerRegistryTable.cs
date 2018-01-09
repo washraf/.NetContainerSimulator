@@ -10,28 +10,28 @@ namespace Simulation.DataCenter.InformationModules
 {
     public class RegistryTable
     {
-        public Dictionary<int, Image> dictionary;
-
+        public readonly Dictionary<int, Image> dictionary;
+        public readonly Dictionary<int, int> pullsPerImage;
         public static Dictionary<int,Image> FillContainerRegistry(SimulationSize simulationSize)
         {
             var dic =  new Dictionary<int, Image>();
-
-            for (int i = 0; i < (int)simulationSize; i++)
+            int size = (int)simulationSize;
+            for (int i = 0; i < size; i++)
             {
                 dic.Add(i, new Image(i, $"Base {i}"));
 
             }
             Random random = new Random(Guid.NewGuid().GetHashCode());
-            for (int i = 0; i < 2* (int)simulationSize; i++)
+            for (int i = 0; i < 2* size; i++)
             {
-                var id = i+ 20;
+                var id = i+ size;
                 var bimg = random.Next(0, 20);
                 dic.Add(id, new Image(id, $"Level {id}",bimg));
 
             }
             for (int i = 0; i < 3 * (int)simulationSize; i++)
             {
-                var id = i + 60;
+                var id = i + 3*size;
                 var bimg = random.Next(20, 60);
                 dic.Add(id, new Image(id, $"Final {id}", bimg));
 
@@ -42,6 +42,11 @@ namespace Simulation.DataCenter.InformationModules
         public RegistryTable(SimulationSize simulationSize)
         {
             dictionary = FillContainerRegistry(simulationSize);
+            pullsPerImage = new Dictionary<int, int>();
+            foreach (var item in dictionary)
+            {
+                pullsPerImage.Add(item.Key, 0);
+            }
         }
 
         public List<int> GetImageTree(int imageId)
@@ -63,10 +68,16 @@ namespace Simulation.DataCenter.InformationModules
         {
             if (dictionary.ContainsKey(imageId))
             {
+                pullsPerImage[imageId]++;
                 return dictionary[imageId];
             }
             else
                 return null;
+        }
+
+        public Dictionary<int, int> GetPullsPerImage()
+        {
+            return pullsPerImage;
         }
     }
 }

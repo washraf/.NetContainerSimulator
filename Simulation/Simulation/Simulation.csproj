@@ -22,7 +22,7 @@
     </SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -30,6 +30,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -72,15 +73,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Accounting\ContainerMeasureValue.cs" />
+    <Compile Include="MeasureResults\AccountingResultsFileManager.cs" />
+    <Compile Include="MeasureResults\IAccountingResultsManager.cs" />
+    <Compile Include="MeasureResults\ITrialResultManagement.cs" />
+    <Compile Include="Measure\ContainerMeasureValue.cs" />
     <Compile Include="Accounting\IAccountingModule.cs" />
-    <Compile Include="Accounting\LoadMeasureValue.cs" />
-    <Compile Include="Accounting\MeasureValueHolder.cs" />
-    <Compile Include="Accounting\MeasuresValues.cs" />
+    <Compile Include="Measure\LoadMeasureValue.cs" />
+    <Compile Include="Measure\MeasureValueHolder.cs" />
+    <Compile Include="Measure\MeasuresValues.cs" />
     <Compile Include="Configuration\ContainerTypes.cs" />
     <Compile Include="Configuration\LoadChangeAction.cs" />
     <Compile Include="Configuration\StartUtilizationPercent.cs" />
-    <Compile Include="Accounting\GraphItems.cs" />
     <Compile Include="Configuration\LoadChangeStrategy.cs" />
     <Compile Include="Configuration\LoadCreationStrategy.cs" />
     <Compile Include="Configuration\LoadPrediction.cs" />
@@ -105,6 +108,7 @@
     <Compile Include="LocationStrategies\Forsman2015\ForsmanAuction.cs" />
     <Compile Include="LocationStrategies\Forsman2015\ForsmanPullAuction.cs" />
     <Compile Include="LocationStrategies\Forsman2015\PushAuction2015.cs" />
+    <Compile Include="Measure\TrialResult.cs" />
     <Compile Include="Messages\BidCancellationRequest.cs" />
     <Compile Include="Messages\CancelEvacuation.cs" />
     <Compile Include="Messages\EvacuationDone.cs" />

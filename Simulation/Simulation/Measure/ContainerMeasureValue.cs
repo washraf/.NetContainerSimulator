@@ -1,7 +1,7 @@
 using System;
 using System.Xml;
 
-namespace Simulation.Accounting
+namespace Simulation.Measure
 {
     public class ContainerMeasureValue
     {

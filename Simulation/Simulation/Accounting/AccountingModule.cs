@@ -12,6 +12,7 @@ using Simulation.Helpers;
 using Simulation.Loads;
 using Simulation.Messages;
 using Simulation.DataCenter.Machines;
+using Simulation.Measure;
 
 namespace Simulation.Accounting
 {
@@ -31,10 +32,7 @@ namespace Simulation.Accounting
         }
         private object _lock = new object();
 
-        //private Thread myThread = null;
-
         Dictionary<MessageTypes, int> _currentRequests = new Dictionary<MessageTypes, int>();
-        //Dictionary<int, int> _imagePulls = new Dictionary<int, int>();
 
         public MeasureValueHolder MeasureHolder { get;} 
        
@@ -44,6 +42,7 @@ namespace Simulation.Accounting
         public void StopCounting()
         {
             CollectMigrationCounts();
+            CollectImagePull();
         }
 
         public void ReadCurrentState()
@@ -100,19 +99,6 @@ namespace Simulation.Accounting
                 _currentRequests[type]++;
             }
         }
-        //public void ImagePulled(int imageId)
-        //{
-        //    lock (_lock)
-        //    {
-        //        if(_imagePulls.ContainsKey(imageId))
-        //        _imagePulls[imageId]++;
-        //        else
-        //        {
-        //            _imagePulls.Add(imageId, 1);
-        //        }
-        //    }
-        //}
-
 
         private double CalculateNeededVolumeMax(List<HostLoadInfo> loads)
         {
@@ -159,13 +145,9 @@ namespace Simulation.Accounting
                 {
                     _currentRequests[t] = 0;
                 }
-                //_imagePulls.Clear();
             }
             
         }
-
-       
-        
 
         private double CalculateVolumeAverage(List<HostLoadInfo> loads )
         {
@@ -204,30 +186,41 @@ namespace Simulation.Accounting
         }
         private void CalculateOutOfBoundHosts(out int u,out int o,out int n, out int e)
         {
-            //int under = 0,over = 0;
-            //foreach (var l in _machineTable.GetAllMachines().Skip(1).Where(x => x.MachineId < int.MaxValue))
-            //{
-            //    var host = l as HostMachine;
-            //    if (host.GetNeededHostLoadInfo().Volume < host.MinUtilization)
-            //    {
-            //        under++;
-            //    }
-            //    else if (host.GetNeededHostLoadInfo().Volume > host.MaxUtilization)
-            //    {
-            //        over++;
-            //    }
-            //}
-            u = _utilizationTable.GetCandidateHosts(UtilizationStates.UnderUtilization,0).Count;
-            o = _utilizationTable.GetCandidateHosts(UtilizationStates.OverUtilization, 0).Count;
+            u = 0;
+            o = 0;
+            n = 0;
+            foreach (var l in _machineTable.GetAllMachines().Skip(1).Where(x => x.MachineId < int.MaxValue))
+            {
+                var host = l as HostMachine;
+                var masterUtil = _utilizationTable.GetUtilization(host.MachineId);
+                var Volume = host.GetNeededHostLoadInfo().Volume;
+                if (Volume < host.MinUtilization)
+                {
+                    u++;
+                }
+                else if (Volume > host.MaxUtilization)
+                {
+                    o++;
+                }
+                else
+                {
+                    n++;
+                }
+            }
+            //int MU = _utilizationTable.GetCandidateHosts(UtilizationStates.UnderUtilization,0).Count;
+            //int MO = _utilizationTable.GetCandidateHosts(UtilizationStates.OverUtilization, 0).Count;
             e = _utilizationTable.GetCandidateHosts(UtilizationStates.Evacuating, 0).Count;
-            n = _utilizationTable.GetCandidateHosts(UtilizationStates.Normal, 0).Count;
+            //int RN = _utilizationTable.GetCandidateHosts(UtilizationStates.Normal, 0).Count;
+
+            //int f = 0;
         }
 
         private void CollectMigrationCounts()
         {
             lock (_lock)
             {
-                Dictionary<int, ContainerMeasureValue> finalDictionary = new Dictionary<int, ContainerMeasureValue>();
+                Dictionary<int, ContainerMeasureValue> finalDictionary 
+                    = new Dictionary<int, ContainerMeasureValue>();
                 foreach (var machine in _machineTable.GetAllMachines().Skip(1).Where(x => x.MachineId < int.MaxValue))
                 {
                     var host = machine as HostMachine;
@@ -245,5 +238,19 @@ namespace Simulation.Accounting
                 MeasureHolder.ContainerMigrationCount = finalDictionary;
             }
         }
+
+        private void CollectImagePull()
+        {
+            lock (_lock)
+            {
+                if(MeasureHolder.ContainerType == ContainersType.D) {
+                    var dockerRegistry = 
+                        _machineTable.GetMachineById(int.MaxValue) as DockerRegistryMachine;
+                    MeasureHolder.PullsPerImage = dockerRegistry.GetPullsPerImage();
+                }
+                
+            }
+        }
     }
+
 }

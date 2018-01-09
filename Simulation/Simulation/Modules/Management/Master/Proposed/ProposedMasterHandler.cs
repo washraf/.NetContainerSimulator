@@ -15,19 +15,21 @@ using Simulation.DataCenter.Machines;
 
 namespace Simulation.Modules.Management.Master.Proposed
 {
-    public enum MasterCurrentAction
-    {
-        None,
-        PullAuction,
-        PushAuction
-    }
+    //public enum MasterCurrentAction
+    //{
+    //    None,
+    //    PullAuction,
+    //    PushAuction
+    //}
+
     public class MasterState
     {
-        public MasterCurrentAction CurrentAction { get; set; } = MasterCurrentAction.None;
+        //public MasterCurrentAction CurrentAction { get; set; } = MasterCurrentAction.None;
         public int CurrentHost { get; set; } = 0;
         public Auction Auction { get; set; } = null;
 
     }
+
     public class ProposedMasterHandler:MasterHandlerModule
     {
         protected IMachinePowerController PowerController { get; set; }
@@ -45,11 +47,8 @@ namespace Simulation.Modules.Management.Master.Proposed
         {
             if (message.MessageType == MessageTypes.UtilizationStateChange)
             {
-                lock (MasterLock)
-                {
-                    HandleUtilizationStateChange(message as HostStateChange);
-                    return;
-                }
+                HandleUtilizationStateChange(message as HostStateChange);
+                return;
             }
             
             lock (MasterLock)
@@ -94,7 +93,7 @@ namespace Simulation.Modules.Management.Master.Proposed
 
         private void HandleRequest(Request message)
         {
-            if (_masterState.CurrentAction == MasterCurrentAction.None)
+            if (_masterState.CurrentHost == 0)
             {
                 if (message.MessageType == MessageTypes.PushRequest)
                 {
@@ -141,30 +140,8 @@ namespace Simulation.Modules.Management.Master.Proposed
                 HandlePushRequest(message, candidates);
             }
         }
-        private void HandlePullRequest(PullRequest message)
-        {
-            var candidates = DataHolder.GetCandidateHosts(UtilizationStates.OverUtilization, message.SenderId);
 
-            //if (!candidates.Any())
-            //{
-            //    candidates = DataHolder.GetCandidateHosts(UtilizationStates.UnderUtilization, message.SenderId);
-            //}
-
-            //if (!candidates.Any())
-            //{
-            //    candidates = DataHolder.GetCandidateHosts(UtilizationStates.Normal, message.SenderId);
-            //}
-            if (!candidates.Any())
-            {
-                InitiateRejectAction(message.SenderId, StrategyActionType.PullAction);
-            }
-            else
-            {
-                HandlePullRequest(message, candidates);
-            }
-        }
-
-        protected void HandlePushRequest(PushRequest message, List<int> candidates)
+        private void HandlePushRequest(PushRequest message, List<int> candidates)
         {
             var ncandidates = candidates.Take((int)TestedHostsCount).ToList();
             int instanceId = Helpers.RandomNumberGenerator.GetInstanceRandomNumber();
@@ -182,12 +159,35 @@ namespace Simulation.Modules.Management.Master.Proposed
             if (_masterState.Auction != null)
                 throw new NotImplementedException();
             //Auctions.Add(pushAuction);
-            _masterState.CurrentAction = MasterCurrentAction.PushAuction;
+            //_masterState.CurrentAction = MasterCurrentAction.PushAuction;
             _masterState.CurrentHost = message.SenderId;
             _masterState.Auction = pushAuction;
         }
 
-        protected void HandlePullRequest(PullRequest message, List<int> candidates)
+        private void HandlePullRequest(PullRequest message)
+        {
+            var candidates = DataHolder.GetCandidateHosts(UtilizationStates.OverUtilization, message.SenderId);
+
+            //if (!candidates.Any())
+            //{
+            //    candidates = DataHolder.GetCandidateHosts(UtilizationStates.UnderUtilization, message.SenderId);
+            //}
+
+            if (!candidates.Any())
+            {
+                candidates = DataHolder.GetCandidateHosts(UtilizationStates.Normal, message.SenderId);
+            }
+            if (!candidates.Any())
+            {
+                InitiateRejectAction(message.SenderId, StrategyActionType.PullAction);
+            }
+            else
+            {
+                HandlePullRequest(message, candidates);
+            }
+        }
+
+        private void HandlePullRequest(PullRequest message, List<int> candidates)
         {
             var ncandidates = candidates.Take((int)TestedHostsCount).ToList();
 
@@ -209,7 +209,7 @@ namespace Simulation.Modules.Management.Master.Proposed
                 throw new NotImplementedException();
             }
             //Auctions.Add(pushAuction);
-            _masterState.CurrentAction = MasterCurrentAction.PullAuction;
+            //_masterState.CurrentAction = MasterCurrentAction.PullAuction;
             _masterState.CurrentHost = message.SenderId;
             _masterState.Auction = pullAuction;
         }
@@ -227,19 +227,6 @@ namespace Simulation.Modules.Management.Master.Proposed
                 }
                 else
                 {
-                    if (winner.Reason == BidReasons.ValidBid)
-                    {
-
-                    }
-                    //else if (winner.Reason == BidReasons.Evacuate)
-                    //{
-                    //    //EvacuatingHost = message.SenderId;
-                    //   // EvacuatingHosts.Add(message.SenderId);
-                    //   // DataHolder.SetUtilization(message.SenderId, UtilizationStates.Evacuating);
-                    //}
-                    else
-                        throw new NotImplementedException("from auction");
-
                     //Here The Difference Exist
                     if (_masterState.Auction.ActionType == StrategyActionType.PushAction)
                     {
@@ -259,13 +246,16 @@ namespace Simulation.Modules.Management.Master.Proposed
                         CommunicationModule.SendMessage(request);
                     }
                 }
-               
 
-                //Auctions.Remove(currentAuction);
-                _masterState.CurrentAction = MasterCurrentAction.None;
+                //_masterState.CurrentAction = MasterCurrentAction.None;
                 _masterState.Auction = null;
+                if (_masterState.CurrentHost == 0)
+                {
+                    throw new Exception("How come");
+                }
                 _masterState.CurrentHost = 0;
             }
+            
         }
 
         /// <summary>
@@ -298,13 +288,13 @@ namespace Simulation.Modules.Management.Master.Proposed
                     }
                     else
                     {
-
+                        //Should I cancell all evacuations
                     }
                     break;
                 case StrategyActionType.PullAction:
                     //Evacuate Host
 
-                    if (!DataHolder.GetCandidateHosts(UtilizationStates.OverUtilization, hostId).Any())
+                    if (DataHolder.GetCandidateHosts(UtilizationStates.OverUtilization, hostId).Count==0)
                     {
                         action = RejectActions.Evacuate;
                         //UpdateSate(hostId, UtilizationStates.Evacuating, "Master");
@@ -327,7 +317,11 @@ namespace Simulation.Modules.Management.Master.Proposed
         private void HandleEvacuationDone(EvacuationDone message)
         {
             if (DataHolder.GetUtilization(message.SenderId) != UtilizationStates.Evacuating)
-                throw new NotImplementedException("Home come");
+            {
+                //throw new NotImplementedException("Home come");
+
+            }
+
             PowerController.PowerOffHost(message.SenderId);
             
             //EvacuatingHost = 0;

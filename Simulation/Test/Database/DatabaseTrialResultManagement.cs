@@ -5,18 +5,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Simulation.Accounting;
+using Simulation.Measure;
+using Simulation.MeasureResults;
+using Test.Database;
 
 namespace Test
 {
-    public class DbHelper
+    public class DatabaseTrialResultManagement : ITrialResultManagement
     {
-        public static void SaveToDb(MeasureValueHolder holder)
+        public void Save(MeasureValueHolder holder)
         {
-            SimulationEntities context = new SimulationEntities();
-            Trial t = context.Trials.FirstOrDefault(x => x.Size == ((int)holder.SimulationSize)
-                                                         && x.StartUtil == holder.StartUtilization.ToString()
-                                                         && x.Change == holder.ChangeAction.ToString()
-                                                         && x.Algorithm == holder.Strategy.ToString()) ?? new Trial();
+            SimulationContext context = new SimulationContext();
+            Func<TrialResult, bool> selecTionFunction = x => x.Size == ((int)holder.SimulationSize)
+                                                             && x.StartUtil == holder.StartUtilization.ToString()
+                                                             && x.Change == holder.ChangeAction.ToString()
+                                                             && x.Algorithm == holder.Strategy.ToString();
+            TrialResult t = context.TrialResults.FirstOrDefault(selecTionFunction)??new TrialResult();
             t.Size = ((int)holder.SimulationSize);
             t.StartUtil = holder.StartUtilization.ToString();
             t.Change = holder.ChangeAction.ToString();
@@ -29,7 +33,7 @@ namespace Test
             t.TotalMessages = holder.TotalMessages;
             t.Migrations = holder.TotalMigrations;
             t.SlaViolations = holder.TotalSlaViolations;
-            context.Trials.AddOrUpdate(t);
+            context.TrialResults.AddOrUpdate(t);
             context.SaveChanges();
         }
     }

@@ -43,9 +43,9 @@ namespace Simulation.Modules.Management.Host.WAshraf2017
                 Thread.Sleep(bft);
                 lock (_hostLock)
                 {
+                    var s = LoadManager.CheckSystemState(true, MinUtilization, MaxUtilization); //can this be up
                     if (BidLock == -1 && !EvacuateMode)
                     {
-                        var s = LoadManager.CheckSystemState(true, MinUtilization, MaxUtilization); //can this be up
                         TryToChangeSystemState(s);
                     }
                     else if (EvacuateMode && BidLock == -1)
@@ -71,7 +71,6 @@ namespace Simulation.Modules.Management.Host.WAshraf2017
         /// <param name="hostState"></param>
         protected override void TryToChangeSystemState(UtilizationStates hostState)
         {
-
             if (hostState == UtilizationStates.OverUtilization)
             {
                 SendPushRequest();
@@ -80,24 +79,7 @@ namespace Simulation.Modules.Management.Host.WAshraf2017
             {
                 SendPullRequest();
             }
-
         }
-
-        /// <summary>
-        /// container selection by condition
-        /// </summary>
-        /// <returns></returns>
-        protected ContainerLoadInfo GetToBeRemovedContainerLoadInfo()
-        {
-            var r = ContainerTable.SelectContainerByCondition();
-            if (r == null)
-                return null;
-            else
-            {
-                return r.GetContainerPredictedLoadInfo();
-            }
-        }
-
         protected override void SendPullRequest()
         {
             Console.WriteLine($"I'm Host #{MachineId} and I am pulling a container and I have {ContainerTable.GetContainersCount()} contatiners");
@@ -165,6 +147,106 @@ namespace Simulation.Modules.Management.Host.WAshraf2017
                         throw new ArgumentOutOfRangeException();
                 }
             }
+        }
+        #endregion
+
+        #region --Push Message Handlers--
+        private void HandlePushLoadAvailabilityRequest(PushLoadAvailabilityRequest message)
+        {
+            Console.WriteLine($"Push : I'm Host #{MachineId}: I've got message from # {message.SenderId}" +
+                              $" for auction # {message.AuctionId}");
+            Bid bid;
+            if (BidLock == -1 
+                && !EvacuateMode 
+                && LoadManager.CanITakeLoad(message.NewContainerLoadInfo))
+            {
+
+                var load = LoadManager.GetHostLoadInfoAfterContainer(message.NewContainerLoadInfo);
+
+                var newState = load.CalculateTotalUtilizationState(MinUtilization, MaxUtilization);
+                if (newState == UtilizationStates.OverUtilization)
+                {
+
+                    bid = new Bid(MachineId, false, load, message.AuctionId,
+                        message.NewContainerLoadInfo.ContainerId, BidReasons.FullLoad);
+                }
+                else
+                {
+                    bid = new Bid(MachineId, true, load, message.AuctionId, message.NewContainerLoadInfo.ContainerId,
+                        BidReasons.ValidBid);
+                    BidLock = bid.AuctionId;
+                }
+                Console.WriteLine($"I am Host #{MachineId} I am bidding for AuctionId {bid.AuctionId}");
+            }
+            else
+            {
+                Console.WriteLine($"I am Host #{MachineId} I am Not I'm not Bidlocked {BidLock}");
+                bid = new Bid(MachineId, false, null, message.AuctionId, message.NewContainerLoadInfo.ContainerId,
+                    BidReasons.CantBid);
+            }
+
+            //Console.WriteLine($"I am Host #{HostId} bidding Push Auction {message.AuctionId} with {bid.Valid}");
+
+            LoadAvailabilityResponce availabilityResponce =
+                        new LoadAvailabilityResponce(message.SenderId, this.MachineId, message.AuctionId, bid);
+            // var responce = new GetHostLoadInfoResponce(this.HostId, load);
+            CommunicationModule.SendMessage(availabilityResponce);
+        }
+        #endregion
+        #region --Pull Message Handlers
+        private void HandlePullLoadAvailabilityRequest(PullLoadAvailabilityRequest message)
+        {
+            Console.WriteLine($"Pull : I'm Host #{MachineId}: I've got message from # {message.SenderId}" +
+                             $" for auction # {message.AuctionId}");
+
+            Bid bid;
+            if (BidLock == -1 && !EvacuateMode)
+            {
+                ContainerLoadInfo selectedContainerload = GetToBeRemovedContainerLoadInfo();
+                if (selectedContainerload != null)
+                {
+                    var oldstate = LoadManager.GetPredictedHostLoadInfo().CalculateTotalUtilizationState(MinUtilization, MaxUtilization);
+                    var load = LoadManager.GetHostLoadInfoAWithoutContainer(selectedContainerload);
+                    var newState = load.CalculateTotalUtilizationState(MinUtilization, MaxUtilization);
+                    if (oldstate == UtilizationStates.Normal && newState == UtilizationStates.UnderUtilization)
+                    {
+                        bid = new Bid(MachineId, false, load, message.AuctionId, selectedContainerload.ContainerId, BidReasons.MinimumLoad);
+                    }
+                    else
+                    {
+                        var breason = BidReasons.ValidBid;
+                        if (oldstate == UtilizationStates.UnderUtilization)
+                        {
+                            EvacuateMode = true;
+                            breason = BidReasons.Evacuate;
+                        }
+
+                        bid = new Bid(MachineId, true, load, message.AuctionId, selectedContainerload.ContainerId, breason);
+                        BidLock = bid.AuctionId;
+
+                    }
+
+                    Console.WriteLine($"I am Host #{MachineId} I am bidding for AuctionId {bid.AuctionId}");
+                }
+                else
+                {
+                    bid = new Bid(MachineId, false, null, message.AuctionId, -1, BidReasons.Empty);
+                }
+
+            }
+            else
+            {
+                Console.WriteLine($"I am Host #{MachineId} I am Not I'm not Bidlocked {BidLock}");
+
+                bid = new Bid(MachineId, false, null, message.AuctionId, -1, BidReasons.CantBid);
+            }
+
+            Console.WriteLine($"I am Host #{MachineId} for Pull Auction {message.AuctionId} with {bid.Valid}");
+
+            LoadAvailabilityResponce availabilityResponce =
+                        new LoadAvailabilityResponce(message.SenderId, this.MachineId, message.AuctionId, bid);
+            // var responce = new GetHostLoadInfoResponce(this.HostId, load);
+            CommunicationModule.SendMessage(availabilityResponce);
         }
         #endregion
 
@@ -265,104 +347,7 @@ namespace Simulation.Modules.Management.Host.WAshraf2017
             BidLock = -1;
         }
 
-        #region --Push Message Handlers--
-        private void HandlePushLoadAvailabilityRequest(PushLoadAvailabilityRequest message)
-        {
-            Console.WriteLine($"Push : I'm Host #{MachineId}: I've got message from # {message.SenderId}" +
-                              $" for auction # {message.AuctionId}");
-            Bid bid;
-            if (BidLock == -1 && !EvacuateMode && LoadManager.CanITakeLoad(message.NewContainerLoadInfo))
-            {
-
-                var load = LoadManager.GetHostLoadInfoAfterContainer(message.NewContainerLoadInfo);
-
-                var newState = load.CalculateTotalUtilizationState(MinUtilization,MaxUtilization);
-                if (newState == UtilizationStates.OverUtilization)
-                {
-
-                    bid = new Bid(MachineId, false, load, message.AuctionId,
-                        message.NewContainerLoadInfo.ContainerId, BidReasons.FullLoad);
-                }
-                else
-                {
-                    bid = new Bid(MachineId, true, load, message.AuctionId, message.NewContainerLoadInfo.ContainerId,
-                        BidReasons.ValidBid);
-                    BidLock = bid.AuctionId;
-                }
-                Console.WriteLine($"I am Host #{MachineId} I am bidding for AuctionId {bid.AuctionId}");
-            }
-            else
-            {
-                Console.WriteLine($"I am Host #{MachineId} I am Not I'm not Bidlocked {BidLock}");
-                bid = new Bid(MachineId, false, null, message.AuctionId, message.NewContainerLoadInfo.ContainerId,
-                    BidReasons.CantBid);
-            }
-
-            //Console.WriteLine($"I am Host #{HostId} bidding Push Auction {message.AuctionId} with {bid.Valid}");
-
-            LoadAvailabilityResponce availabilityResponce =
-                        new LoadAvailabilityResponce(message.SenderId, this.MachineId, message.AuctionId, bid);
-            // var responce = new GetHostLoadInfoResponce(this.HostId, load);
-            CommunicationModule.SendMessage(availabilityResponce);
-        }
-        #endregion
-
-        #region --Pull Message Handlers
-        private void HandlePullLoadAvailabilityRequest(PullLoadAvailabilityRequest message)
-        {
-            Console.WriteLine($"Pull : I'm Host #{MachineId}: I've got message from # {message.SenderId}" +
-                             $" for auction # {message.AuctionId}");
-
-            Bid bid;
-            if (BidLock == -1 && !EvacuateMode)
-            {
-                ContainerLoadInfo selectedContainerload = GetToBeRemovedContainerLoadInfo();
-                if (selectedContainerload != null)
-                {
-                    var oldstate = LoadManager.GetPredictedHostLoadInfo().CalculateTotalUtilizationState(MinUtilization,MaxUtilization);
-                    var load = LoadManager.GetHostLoadInfoAWithoutContainer(selectedContainerload);
-                    var newState = load.CalculateTotalUtilizationState(MinUtilization, MaxUtilization);
-                    if (oldstate == UtilizationStates.Normal && newState == UtilizationStates.UnderUtilization)
-                    {
-                        bid = new Bid(MachineId, false, load, message.AuctionId, selectedContainerload.ContainerId, BidReasons.MinimumLoad);
-                    }
-                    else
-                    {
-                        var breason = BidReasons.ValidBid;
-                        if (oldstate == UtilizationStates.UnderUtilization)
-                        {
-                            EvacuateMode = true;
-                            breason = BidReasons.Evacuate;
-                        }
-
-                        bid = new Bid(MachineId, true, load, message.AuctionId, selectedContainerload.ContainerId, breason);
-                        BidLock = bid.AuctionId;
-
-                    }
-
-                    Console.WriteLine($"I am Host #{MachineId} I am bidding for AuctionId {bid.AuctionId}");
-                }
-                else
-                {
-                    bid = new Bid(MachineId, false, null, message.AuctionId, -1, BidReasons.Empty);
-                }
-
-            }
-            else
-            {
-                Console.WriteLine($"I am Host #{MachineId} I am Not I'm not Bidlocked {BidLock}");
-
-                bid = new Bid(MachineId, false, null, message.AuctionId, -1, BidReasons.CantBid);
-            }
-
-            Console.WriteLine($"I am Host #{MachineId} for Pull Auction {message.AuctionId} with {bid.Valid}");
-
-            LoadAvailabilityResponce availabilityResponce =
-                        new LoadAvailabilityResponce(message.SenderId, this.MachineId, message.AuctionId, bid);
-            // var responce = new GetHostLoadInfoResponce(this.HostId, load);
-            CommunicationModule.SendMessage(availabilityResponce);
-        }
-        #endregion
+        
 
         private void HandleCancelEvacuation(CancelEvacuation message)
         {
@@ -375,5 +360,19 @@ namespace Simulation.Modules.Management.Host.WAshraf2017
             EvacuateMode = true;
         }
 
+        /// <summary>
+        /// container selection by condition
+        /// </summary>
+        /// <returns></returns>
+        protected ContainerLoadInfo GetToBeRemovedContainerLoadInfo()
+        {
+            var r = ContainerTable.SelectContainerByCondition();
+            if (r == null)
+                return null;
+            else
+            {
+                return r.GetContainerPredictedLoadInfo();
+            }
+        }
     }
 }

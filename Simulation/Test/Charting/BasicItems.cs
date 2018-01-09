@@ -1,11 +1,12 @@
-namespace Simulation.Accounting
+namespace Test.Charting
 {
-    public enum GraphItems
+    public enum BasicItems
     {
         Entropy,
         PowerConsumption,
         NoHosts,
         ImagePulls,
+        ImagePullsRatio,
         MigrationCount,
         UtilizationSlaViolations,
         AverageNeededVolume,

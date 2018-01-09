@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Test
+namespace Test.Charting
 {
-    enum DrawItems
+    enum FinalItems
     {
         Hosts,
         Power,

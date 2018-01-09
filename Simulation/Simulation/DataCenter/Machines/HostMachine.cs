@@ -20,6 +20,7 @@ using Simulation.Modules.Management.Host.Proposed;
 using Simulation.Modules.Management.Host.WAshraf2017;
 using Simulation.DataCenter.Containers;
 using Simulation.DataCenter.Network;
+using Simulation.Measure;
 
 namespace Simulation.DataCenter.Machines
 {

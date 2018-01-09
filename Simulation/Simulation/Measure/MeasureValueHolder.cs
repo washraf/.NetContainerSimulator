@@ -5,7 +5,7 @@ using System.Linq;
 using Simulation.Configuration;
 using Simulation.LocationStrategies;
 
-namespace Simulation.Accounting
+namespace Simulation.Measure
 {
     public class MeasureValueHolder
     {
@@ -48,6 +48,9 @@ namespace Simulation.Accounting
 
         public Dictionary<int, ContainerMeasureValue> ContainerMigrationCount { get; set; } =
             new Dictionary<int, ContainerMeasureValue>();
+        public Dictionary<int, int> PullsPerImage { get; set; } = 
+            new Dictionary<int, int>();
+
         #region --Operations --
         public static MeasureValueHolder operator +(MeasureValueHolder first, MeasureValueHolder second)
         {
@@ -62,15 +65,25 @@ namespace Simulation.Accounting
             {
                 final.MeasuredValuesList.Add(new MeasuresValues(listItem));
             }
-            foreach (var item in first.ContainerMigrationCount)
-            {
-                final.ContainerMigrationCount.Add(item.Key, item.Value);
-            }
-
+            //Hosts
             foreach (var item in first.LoadMeasureValueList)
             {
                 final.LoadMeasureValueList.Add(new LoadMeasureValue(item));
             }
+
+            //Container Migrations
+            foreach (var item in first.ContainerMigrationCount)
+            {
+                final.ContainerMigrationCount.Add(item.Key, item.Value);
+            }
+            //Images
+            foreach (var item in first.PullsPerImage)
+            {
+                final.PullsPerImage.Add(item.Key, item.Value);
+            }
+
+
+
 
 
             //prepare of second
@@ -83,7 +96,17 @@ namespace Simulation.Accounting
                     final.MeasuredValuesList.Add(new MeasuresValues(second.MeasuredValuesList[i]));
                 }
             }
-
+            //hosts
+            for (int i = 0; i < second.LoadMeasureValueList.Count; i++)
+            {
+                if (i < final.LoadMeasureValueList.Count)
+                    final.LoadMeasureValueList[i] += second.LoadMeasureValueList[i];
+                else
+                {
+                    final.LoadMeasureValueList.Add(new LoadMeasureValue(second.LoadMeasureValueList[i]));
+                }
+            }
+            //contianers
             foreach (var item in second.ContainerMigrationCount)
             {
                 if (final.ContainerMigrationCount.ContainsKey(item.Key))
@@ -94,15 +117,15 @@ namespace Simulation.Accounting
                 }
             }
 
-            for (int i = 0; i < second.LoadMeasureValueList.Count; i++)
+            //Images
+            foreach (var item in second.PullsPerImage)
             {
-                if (i < final.LoadMeasureValueList.Count)
-                    final.LoadMeasureValueList[i] += second.LoadMeasureValueList[i];
+                if (final.PullsPerImage.ContainsKey(item.Key))
+                    final.PullsPerImage[item.Key] += item.Value;
                 else
-                {
-                    final.LoadMeasureValueList.Add(new LoadMeasureValue(second.LoadMeasureValueList[i]));
-                }
+                    final.PullsPerImage.Add(item.Key, item.Value);
             }
+
 
             return final;
         }
@@ -123,6 +146,11 @@ namespace Simulation.Accounting
             {
                 final.LoadMeasureValueList.Add(item/c);
             }
+            foreach (var item in first.PullsPerImage)
+            {
+                final.PullsPerImage.Add(item.Key, item.Value / c);
+            }
+
             return final;
         }
         #endregion
@@ -220,128 +248,13 @@ namespace Simulation.Accounting
         {
             get { return MeasuredValuesList.Sum(x => x.ImagePulls); }
         }
-        #endregion
 
-        #region --Write To Disk--
-        public void WriteDataToDisk(int trialno)
+        public double AveragePullPerImage
         {
-            string folder = @"D:\Simulations\Results\" +
-                            (int) this.SimulationSize + "\\" +
-                            this.StartUtilization + "_" + ChangeAction + "\\" +
-                            Prediction + "\\" + DateTime.Now.ToShortDateString() + "\\" +
-                            Strategy+"_"+ContainerType + "\\"+Tested+"\\";
-                    if(trialno!=-1)
-                           folder+=trialno + "\\";
-            try
-            {
-                using (
-                    StreamWriter writer =
-                        new StreamWriter(folder + "All.txt", false))
-                {
-                    writer.WriteLine("i," +
-                                     "Entropy," +
-                                     "PrediectedEntropy," +
-                                     "AvgNeededVolume," +
-                                     "AvgPredictedVolume," +
-                                     "IdealHostsCount," +
-                                     "NoHosts," +
-                                     "UnderHosts," +
-                                     "OverHosts," +
-                                     "NormalHosts," +
-                                     "EvacuatingHosts," +
-                                     "Migrations," +
-                                     "PushRequests," +
-                                     "PushLoadAvailabilityRequest," +
-                                     "PullRequests," +
-                                     "PullLoadAvailabilityRequest," +
-                                     "TotalMessages," +
-                                     "SlaViolations," +
-                                     "MinNeeded," +
-                                     "MaxNeeded," +
-                                     "Power," +
-                                     "stdDev,",
-                                     "ImagePulls");
-
-                    for (int i = 0; i < this.MeasuredValuesList.Count; i++)
-                    {
-                        var value = this.MeasuredValuesList[i];
-                        writer.WriteLine($"{i}," +
-                                         $"{value.Entropy}," +
-                                         $"{value.PredictedEntropy}," +
-                                         $"{value.AvgNeededVolume}," +
-                                         $"{value.AvgPredictedVolume}," +
-                                         $"{value.IdealHostsCount}," +
-                                         $"{value.NoHosts}," +
-                                         $"{value.UnderHosts}," +
-                                         $"{value.OverHosts}," +
-                                         $"{value.NormalHosts}," +
-                                         $"{value.EvacuatingHosts}," +
-                                         $"{value.Migrations}," +
-                                         $"{value.PushRequests}," +
-                                         $"{value.PushLoadAvailabilityRequest}," +
-                                         $"{value.PullRequests}," +
-                                         $"{value.PullLoadAvailabilityRequest}," +
-                                         $"{value.TotalMessages}," +
-                                         $"{value.SlaViolations}," +
-                                         $"{value.MinNeeded}," +
-                                         $"{value.MaxNeeded}," +
-                                         $"{value.Power}," +
-                                         $"{value.StdDev},"+
-                                         $"{value.ImagePulls}");
-
-                    }
-                    writer.Flush();
-                }
-
-                using (
-                    StreamWriter writer =
-                        new StreamWriter(folder + "ConMig.txt", false))
-                {
-                    writer.WriteLine("id," +
-                                     "Migrations" +
-                                     "DTime");
-                    foreach (var item in this.ContainerMigrationCount)
-                    {
-                        writer.WriteLine($"{item.Key}," +
-                                         $"{item.Value.MigrationCount}," +
-                                         $"{item.Value.Downtime}");
-                    }
-                }
-
-                using (
-                    StreamWriter writer =
-                        new StreamWriter(folder + "Hosts.txt", false))
-                {
-                    writer.WriteLine("iteration," +
-                                     "Id," +
-                                     "cpu," +
-                                     "mem," +
-                                     "io," +
-                                     "concount," +
-                                     "cpuutil," +
-                                     "memutil," +
-                                     "ioutil,"
-                                     );
-                    //public HostLoadInfo(int hostId, Load currentLoad, int containersCount, double cpu, double mem, double io)
-
-                    for (int i = 0; i < this.LoadMeasureValueList.Count; i++)
-                    {
-                        foreach (
-                            var item in this.LoadMeasureValueList[i].CurrentValues)
-                        {
-                            writer.WriteLine($"{i}," +
-                                             $"{item.Value}");
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                //MessageBox.Show("Will create Directory");
-                Directory.CreateDirectory(folder);
-                this.WriteDataToDisk(trialno);
-            }
+            get { return PullsPerImage.Select(x => x.Value).Average(); }
         }
+
         #endregion
+       
     }
 }

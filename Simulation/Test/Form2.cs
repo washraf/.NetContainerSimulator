@@ -12,6 +12,9 @@ using Simulation.Accounting;
 using Simulation.Configuration;
 using Simulation.LocationStrategies;
 using ZedGraph;
+using Simulation.Measure;
+using Test.Charting;
+using Test.Database;
 
 namespace Test
 {
@@ -28,7 +31,7 @@ namespace Test
             cb_Change.SelectedIndex = 0;
             cb_StartUtil.DataSource = Enum.GetValues(typeof(StartUtilizationPercent)).Cast<StartUtilizationPercent>();
             cb_StartUtil.SelectedIndex = 0;
-            cb_Item.DataSource = Enum.GetValues(typeof(DrawItems)).Cast<DrawItems>();
+            cb_Item.DataSource = Enum.GetValues(typeof(FinalItems)).Cast<FinalItems>();
             cb_Item.SelectedIndex = 0;
             Done = true;
             DrawNewItemsFromDataBase();
@@ -45,12 +48,12 @@ namespace Test
         private void DrawNewItemsFromDataBase()
         {
             var trials = GetValue();
-            var y = (DrawItems)Enum.Parse(typeof(DrawItems), cb_Item.SelectedValue.ToString());
+            var y = (FinalItems)Enum.Parse(typeof(FinalItems), cb_Item.SelectedValue.ToString());
 
             CreateGraph(zedGraphControl1, y, trials);
         }
 
-        private void CreateGraph(ZedGraphControl zgc, DrawItems yAxis, List<Trial> trials)
+        private void CreateGraph(ZedGraphControl zgc, FinalItems yAxis, List<TrialResult> trials)
         {
             // get a reference to the GraphPane
             GraphPane myPane = zgc.GraphPane;
@@ -78,12 +81,12 @@ namespace Test
 
                 switch (yAxis)
                 {
-                    case DrawItems.AverageEntropy:
+                    case FinalItems.AverageEntropy:
                         all[st].Add(trial.Size, trial.Entropy);
                         myPane.YAxis.Scale.Min = 0.99;
                         myPane.YAxis.Scale.Max = 1.01;
                         break;
-                    case DrawItems.Power:
+                    case FinalItems.Power:
                         var val = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.Power);
                         var mtrial = trials.Single(x => x.Size == trial.Size && x.Change == trial.Change && x.Power == val);
                         all[st].Add(trial.Size, trial.Power / mtrial.Power);
@@ -92,21 +95,21 @@ namespace Test
                     //case DrawItems.StdDev:
                     //    all[st].Add(trial.Size, trial.StdDev);
                     //    break;
-                    case DrawItems.Hosts:
+                    case FinalItems.Hosts:
                         all[st].Add(trial.Size, trial.Hosts);
                         myPane.YAxis.Title.Text = "Number Of Used Hosts";
                         break;
-                    case DrawItems.Migrations:
+                    case FinalItems.Migrations:
                         val = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.Migrations);
                         mtrial = trials.Single(x => x.Size == trial.Size && x.Change == trial.Change && x.Migrations == val);
 
                         all[st].Add(trial.Size, trial.Migrations / mtrial.Migrations);
                         myPane.YAxis.Title.Text = "Migrations Count Ratio";
                         break;
-                    case DrawItems.SlaViolations:
+                    case FinalItems.SlaViolations:
                         all[st].Add(trial.Size, trial.SlaViolations);
                         break;
-                    case DrawItems.Messages:
+                    case FinalItems.Messages:
                         val = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.TotalMessages);
 
                         mtrial = trials.Single(x => x.Size == trial.Size && x.Change == trial.Change && x.TotalMessages == val);
@@ -138,7 +141,7 @@ namespace Test
             //myPane.Chart.Fill = new Fill(Color.White, Color.LightCyan, 360.0f);
 
             
-            if (yAxis== DrawItems.Messages || yAxis == DrawItems.Power || yAxis == DrawItems.Migrations)
+            if (yAxis== FinalItems.Messages || yAxis == FinalItems.Power || yAxis == FinalItems.Migrations)
                 myPane.YAxis.Scale.Format = "# %";
             else
             {
@@ -185,10 +188,13 @@ namespace Test
             }
         }
 
-        private List<Trial> GetValue()
+        private List<TrialResult> GetValue()
         {
-            SimulationEntities context = new SimulationEntities();
-            var trials = context.Trials.Where(x => x.StartUtil == cb_StartUtil.Text && x.Change == cb_Change.Text).OrderBy(y => y.Size).ToList();
+            SimulationContext context = new SimulationContext();
+            var trials = context.TrialResults
+                .Where(x => x.StartUtil == cb_StartUtil.Text 
+                && x.Change == cb_Change.Text)
+                .OrderBy(y => y.Size).ToList();
             return trials;
         }
 

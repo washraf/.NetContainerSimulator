@@ -26,7 +26,10 @@ namespace Simulation.DataCenter.Machines
                 CommunicationModule.Started = value;
             }
         }
-        public DockerRegistryMachine(int machineId, NetworkSwitch networkSwitch, SimulationSize simulationSize) : base(machineId, networkSwitch)
+
+        public DockerRegistryMachine(int machineId,
+            NetworkSwitch networkSwitch,
+            SimulationSize simulationSize) : base(machineId, networkSwitch)
         {
             _registryTable = new RegistryTable(simulationSize);
             //StartMachine();
@@ -74,6 +77,11 @@ namespace Simulation.DataCenter.Machines
                     throw new ArgumentOutOfRangeException("");
                    
             }
+        }
+
+        public Dictionary<int, int> GetPullsPerImage()
+        {
+            return _registryTable.GetPullsPerImage();
         }
         #endregion
     }

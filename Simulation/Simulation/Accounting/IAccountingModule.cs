@@ -1,3 +1,4 @@
+using Simulation.Measure;
 using Simulation.Messages;
 
 namespace Simulation.Accounting
@@ -9,5 +10,6 @@ namespace Simulation.Accounting
         void ReadCurrentState();
         void RequestCreated(MessageTypes messageType);
         MeasureValueHolder MeasureHolder { get; }
+        
     }
 }
