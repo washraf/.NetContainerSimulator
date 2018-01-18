@@ -17,7 +17,7 @@ namespace Test.Database
         public DbSet<TrialResult> TrialResults { get; set; }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<TrialResult>().HasKey(t => new { t.Size,t.StartUtil,t.Change,t.Algorithm});
+            modelBuilder.Entity<TrialResult>().HasKey(t => new { t.Size,t.StartUtil,t.Change,t.Algorithm,t.Tested});
             base.OnModelCreating(modelBuilder);
         }
     }

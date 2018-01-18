@@ -52,7 +52,20 @@ namespace Test
 
             CreateGraph(zedGraphControl1, y, trials);
         }
-
+        struct TrialStruct
+        {
+            public TrialStruct(Strategies strategies, int tested)
+            {
+                Strategies = strategies;
+                this.Tested = tested;
+            }
+            public Strategies Strategies { get; }
+            public int Tested { get; }
+            public override string ToString()
+            {
+                return Strategies.ToString() + "_" + Tested;
+            }
+        }
         private void CreateGraph(ZedGraphControl zgc, FinalItems yAxis, List<TrialResult> trials)
         {
             // get a reference to the GraphPane
@@ -65,49 +78,58 @@ namespace Test
             myPane.Title.Text = yAxis.ToString();
             myPane.XAxis.Title.Text = $"Number of Availble Hosts (N)";
             myPane.YAxis.Title.Text = yAxis.ToString();
-            Dictionary<Strategies, PointPairList> all = new Dictionary<Strategies, PointPairList>();
-            all.Add(Strategies.WAshraf2017,new PointPairList());
-            all.Add(Strategies.Zhao, new PointPairList());
-            all.Add(Strategies.ForsmanPush, new PointPairList());
-            all.Add(Strategies.ForsmanPull, new PointPairList());
+            Dictionary<string, PointPairList> all = new Dictionary<string, PointPairList>();
+            all.Add(Strategies.Proposed2018+"_"+1, new PointPairList());
+            all.Add(Strategies.Proposed2018 + "_" + 5, new PointPairList());
+            all.Add(Strategies.Proposed2018 + "_" + 10, new PointPairList());
+            all.Add(Strategies.Proposed2018 + "_" + 20, new PointPairList());
+            all.Add(Strategies.WAshraf2017.ToString(),new PointPairList());
+            all.Add(Strategies.Zhao.ToString(), new PointPairList());
+            all.Add(Strategies.ForsmanPush.ToString(), new PointPairList());
+            all.Add(Strategies.ForsmanPull.ToString(), new PointPairList());
 
             foreach (var trial in trials)
             {
                 var st = (Strategies) Enum.Parse(typeof (Strategies), trial.Algorithm);
-                
-                
-                            //trials.Single(
-                            //    x => x.Size == trial.Size && x.Algorithm == Strategies.InOrderProping.ToString());
 
+
+                //trials.Single(
+                //    x => x.Size == trial.Size && x.Algorithm == Strategies.InOrderProping.ToString());
+                var k = st == Strategies.Proposed2018 ? Strategies.Proposed2018 + "_" + trial.Tested : st.ToString();
                 switch (yAxis)
                 {
                     case FinalItems.AverageEntropy:
-                        all[st].Add(trial.Size, trial.Entropy);
+                        all[k].Add(trial.Size, trial.AverageEntropy);
+                        myPane.YAxis.Scale.Min = 0.99;
+                        myPane.YAxis.Scale.Max = 1.01;
+                        break;
+                    case FinalItems.FinalEntropy:
+                        all[k].Add(trial.Size, trial.FinalEntropy);
                         myPane.YAxis.Scale.Min = 0.99;
                         myPane.YAxis.Scale.Max = 1.01;
                         break;
                     case FinalItems.Power:
                         var val = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.Power);
                         var mtrial = trials.Single(x => x.Size == trial.Size && x.Change == trial.Change && x.Power == val);
-                        all[st].Add(trial.Size, trial.Power / mtrial.Power);
+                        all[k].Add(trial.Size, trial.Power / mtrial.Power);
                         myPane.YAxis.Title.Text = "Power Consumption Ratio";
                         break;
                     //case DrawItems.StdDev:
                     //    all[st].Add(trial.Size, trial.StdDev);
                     //    break;
                     case FinalItems.Hosts:
-                        all[st].Add(trial.Size, trial.Hosts);
+                        all[k].Add(trial.Size, trial.Hosts);
                         myPane.YAxis.Title.Text = "Number Of Used Hosts";
                         break;
                     case FinalItems.Migrations:
                         val = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.Migrations);
-                        mtrial = trials.Single(x => x.Size == trial.Size && x.Change == trial.Change && x.Migrations == val);
+                        mtrial = trials.First(x => x.Size == trial.Size && x.Change == trial.Change && x.Migrations == val);
 
-                        all[st].Add(trial.Size, trial.Migrations / mtrial.Migrations);
+                        all[k].Add(trial.Size, trial.Migrations / mtrial.Migrations);
                         myPane.YAxis.Title.Text = "Migrations Count Ratio";
                         break;
                     case FinalItems.SlaViolations:
-                        all[st].Add(trial.Size, trial.SlaViolations);
+                        all[k].Add(trial.Size, trial.SlaViolations);
                         break;
                     case FinalItems.Messages:
                         val = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.TotalMessages);
@@ -115,7 +137,15 @@ namespace Test
                         mtrial = trials.Single(x => x.Size == trial.Size && x.Change == trial.Change && x.TotalMessages == val);
 
                         myPane.YAxis.Title.Text = "Message Count Ratio";
-                        all[st].Add(trial.Size, trial.TotalMessages/mtrial.TotalMessages);
+                        all[k].Add(trial.Size, trial.TotalMessages / mtrial.TotalMessages);
+                        break;
+                    case FinalItems.TotalImagePulls:
+                        all[k].Add(trial.Size, trial.ImagePullsTotal);
+                        myPane.YAxis.Title.Text = "TotalImagePulls";
+                        break;
+                    case FinalItems.AveragePullsPerImage:
+                        all[k].Add(trial.Size, trial.ImagePullsRatio);
+                        myPane.YAxis.Title.Text = "AveragePullsPerImage";
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(yAxis), yAxis, null);
@@ -124,12 +154,16 @@ namespace Test
             float d = 0;
             foreach (var a in all)
             {
+                var st = (Strategies) Enum.Parse(typeof(Strategies), a.Key.Split('_')[0]);
+                int t = 0;
+                if (st == Strategies.Proposed2018)
+                    t = int.Parse(a.Key.Split('_')[1]);
                 LineItem l = new LineItem
-                    (a.Key==Strategies.WAshraf2017?"Proposed Algorithm":a.Key.ToString(),
-                    a.Value, GetColor(a.Key), SymbolType.Square,3);
+                    (a.Key,
+                    a.Value, GetColor(st,t), SymbolType.Square,3);
                 l.Symbol.Size = 5;
-                l.Symbol.Fill = new Fill(GetColor(a.Key));
-                l.Line.Style = GetDash(a.Key);
+                l.Symbol.Fill = new Fill(GetColor(st,t));
+                l.Line.Style = GetDash(st,t);
                 //l.Line.DashOn = d;
                 //l.Line.DashOff = d*2;
 
@@ -151,13 +185,15 @@ namespace Test
             // axes since the data have changed
             zgc.AxisChange();
             zgc.Refresh();
-            
+
         }
 
-        private DashStyle GetDash(Strategies key)
+        private DashStyle GetDash(Strategies key, int tested)
         {
             switch (key)
             {
+                case Strategies.Proposed2018:
+                    return DashStyle.Solid;
                 case Strategies.WAshraf2017:
                     return DashStyle.Solid;
                 case Strategies.Zhao:
@@ -171,12 +207,26 @@ namespace Test
             }
         }
 
-        private Color GetColor(Strategies key)
+        private Color GetColor(Strategies key, int tested)
         {
             switch (key)
             {
+                case Strategies.Proposed2018:
+                    switch (tested)
+                    {
+                        case 1:
+                            return Color.Indigo;
+                        case 5:
+                            return Color.CadetBlue;
+                        case 10:
+                            return Color.DarkViolet;
+                        case 20:
+                            return Color.Red;
+                        default:
+                            throw new NotImplementedException();
+                    }
                 case Strategies.WAshraf2017:
-                    return Color.Red;
+                    return Color.YellowGreen;
                 case Strategies.Zhao:
                     return Color.Blue;
                 case Strategies.ForsmanPush:

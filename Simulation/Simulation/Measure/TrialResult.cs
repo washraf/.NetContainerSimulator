@@ -8,11 +8,16 @@ namespace Simulation.Measure
 {
     public partial class TrialResult
     {
+        //Keys
         public int Size { get; set; }
         public string StartUtil { get; set; }
         public string Change { get; set; }
         public string Algorithm { get; set; }
-        public double Entropy { get; set; }
+        public int Tested { get; set; }
+        //Results
+        public double AverageEntropy { get; set; }
+        public double FinalEntropy { get; set; }
+
         public double Power { get; set; }
         public double StdDev { get; set; }
         public double Hosts { get; set; }
@@ -20,5 +25,7 @@ namespace Simulation.Measure
         public double SlaViolations { get; set; }
         public double TotalMessages { get; set; }
         public string PredictionAlg { get; set; }
+        public double ImagePullsTotal { get; set; }
+        public double ImagePullsRatio { get; set; }
     }
 }

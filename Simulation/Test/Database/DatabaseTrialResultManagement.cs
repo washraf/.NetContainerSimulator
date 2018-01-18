@@ -19,20 +19,25 @@ namespace Test
             Func<TrialResult, bool> selecTionFunction = x => x.Size == ((int)holder.SimulationSize)
                                                              && x.StartUtil == holder.StartUtilization.ToString()
                                                              && x.Change == holder.ChangeAction.ToString()
-                                                             && x.Algorithm == holder.Strategy.ToString();
-            TrialResult t = context.TrialResults.FirstOrDefault(selecTionFunction)??new TrialResult();
+                                                             && x.Algorithm == holder.Strategy.ToString()
+                                                             && x.Tested == ((int)holder.Tested);
+            TrialResult t = context.TrialResults.SingleOrDefault(selecTionFunction)??new TrialResult();
             t.Size = ((int)holder.SimulationSize);
             t.StartUtil = holder.StartUtilization.ToString();
             t.Change = holder.ChangeAction.ToString();
             t.Algorithm = holder.Strategy.ToString();
+            t.Tested = (int)holder.Tested;
             t.PredictionAlg = holder.Prediction.ToString();
-            t.Entropy = holder.AverageEntropy;
+            t.AverageEntropy = holder.AverageEntropy;
             t.Power = holder.PowerConsumption;
             t.StdDev = holder.AverageStdDeviation;
             t.Hosts = holder.AverageHosts;
             t.TotalMessages = holder.TotalMessages;
             t.Migrations = holder.TotalMigrations;
             t.SlaViolations = holder.TotalSlaViolations;
+            t.ImagePullsTotal = holder.ImagePulls;
+            t.ImagePullsRatio = holder.AveragePullPerImage;
+            t.FinalEntropy = holder.FinalEntropy;
             context.TrialResults.AddOrUpdate(t);
             context.SaveChanges();
         }

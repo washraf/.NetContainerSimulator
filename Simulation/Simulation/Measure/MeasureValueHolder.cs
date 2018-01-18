@@ -174,6 +174,11 @@ namespace Simulation.Measure
         {
             get { return MeasuredValuesList.Select(x => x.Entropy).Average(); }
         }
+        public double FinalEntropy
+        {
+            get { return MeasuredValuesList.Select(x => x.Entropy).Last(); }
+        }
+
 
         public double FinalUnderUtilized
         {

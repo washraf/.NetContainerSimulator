@@ -14,6 +14,9 @@ namespace Test.Charting
         Migrations,
         Messages,
         AverageEntropy,
+        FinalEntropy,
         SlaViolations,
+        TotalImagePulls,
+        AveragePullsPerImage
     }
 }
