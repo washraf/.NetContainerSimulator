@@ -27,5 +27,6 @@ namespace Simulation.Measure
         public string PredictionAlg { get; set; }
         public double ImagePullsTotal { get; set; }
         public double ImagePullsRatio { get; set; }
+        public double ContainersAverage { get; set; }
     }
 }

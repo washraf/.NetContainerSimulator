@@ -21,13 +21,17 @@ namespace Simulation.Modules.Management.Host.Forsman2015
     {
         private readonly StrategyActionType _currentActionType;
         public int BidLock { get; set; } = -1;
+        public SimulationSize SimulationSize { get; }
+
         private ForsmanAuction _currentAuction;
         private object _hostLock = new object();
 
 
-        public ForsmanHostHandler(NetworkInterfaceCard communicationModule, ContainerTable containerTable, ILoadManager loadManager, StrategyActionType currentActionType) : base(communicationModule, containerTable, loadManager)
+        public ForsmanHostHandler(NetworkInterfaceCard communicationModule, ContainerTable containerTable, ILoadManager loadManager, StrategyActionType currentActionType,
+            SimulationSize simulationSize) : base(communicationModule, containerTable, loadManager)
         {
             _currentActionType = currentActionType;
+            SimulationSize = simulationSize;
             MaxUtilization = Global.OtherMaxUtilization;
             MinUtilization = Global.OtherMinUtilization;
 
@@ -100,7 +104,7 @@ namespace Simulation.Modules.Management.Host.Forsman2015
         }
         protected override void SendPullRequest()
         {
-            int total = (int)Global.SimulationSize - 1;
+            int total = (int)SimulationSize - 1;
             var load = LoadManager.GetPredictedHostLoadInfo();
             _currentAuction = new ForsmanPullAuction(load, total);
             BidLock = 0;
@@ -114,7 +118,7 @@ namespace Simulation.Modules.Management.Host.Forsman2015
                 //_loadManager.GetHostLoadInfoAWithoutContainer(x)
                 //.CalculateTotalUtilizationState(MinUtilization,MaxUtilization)!= UtilizationStates.UnderUtilization )
                 //.ToList();
-            int total = (int)Global.SimulationSize - 1;
+            int total = (int)SimulationSize - 1;
             var load = LoadManager.GetPredictedHostLoadInfo();
             _currentAuction = new ForsmanPushAuction(load, list, total);
             BidLock = 0;

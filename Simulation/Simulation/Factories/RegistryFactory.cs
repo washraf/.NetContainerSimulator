@@ -5,7 +5,7 @@ using Simulation.LocationStrategies;
 using Simulation.DataCenter.Images;
 using Simulation.Configuration;
 
-namespace Simulation.SimulationController
+namespace Simulation.Factories
 {
     public class RegistryFactory : MachineFactory
     {

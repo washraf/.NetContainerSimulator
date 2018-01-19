@@ -19,5 +19,6 @@ namespace Test.Charting
         PushLoadAvailabilityRequest,
         PullLoadAvailabilityRequest,
         ContainerDownTime,
+        Containers
     }
 }

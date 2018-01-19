@@ -9,7 +9,6 @@ using Simulation.Modules.LoadManagement;
 
 namespace Simulation.Configuration
 {
-
     public static class Global
     {
         /// <summary>
@@ -21,7 +20,6 @@ namespace Simulation.Configuration
 
         public static int GetSimulationTime
         {
-            
             get
             {
                 //return 9000 * Global.Second;
@@ -29,7 +27,6 @@ namespace Simulation.Configuration
                 //good with 50
                 return 18000 * Global.Second;
             }
-
         }
 
         //for container source 5,5
@@ -38,26 +35,22 @@ namespace Simulation.Configuration
 
         //best is 50
         public static int Second { get; private set; } = -1;
-        private static void UpdateTime()
+
+        public static void UpdateTime(SimulationSize simulationSize, Strategies strategy)
         {
-            switch (SimulationSize)
+            switch (simulationSize)
             {
-                case SimulationSize.Five:
-                case SimulationSize.Ten:
-                    Second = 2;
-                    break;
                 case SimulationSize.Twenty:
-                    Second = CurrentStrategy != Strategies.Zhao ? 5 : 10;
+                    Second = strategy != Strategies.Zhao ? 5 : 10;
                     break;
                 case SimulationSize.Fifty:
-                    Second = CurrentStrategy != Strategies.Zhao ? 10 : 20;
+                    Second = strategy != Strategies.Zhao ? 10 : 20;
                     break;
                 case SimulationSize.Hundred:
-                    Second = CurrentStrategy != Strategies.Zhao ? 20 : 40;
+                    Second = strategy != Strategies.Zhao ? 20 : 40;
                     break;
                 case SimulationSize.TwoHundred:
-                    Second = CurrentStrategy != Strategies.Zhao ? 30 :
-                        StartUtilizationPercent==StartUtilizationPercent.Fifty? 60:100;
+                    Second = strategy != Strategies.Zhao ? 30 : 60;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -71,51 +64,9 @@ namespace Simulation.Configuration
             //Read From Test Configuration
         }
 
-        public static LoadPrediction LoadPrediction { get; set; } = LoadPrediction.None;
-        public static Strategies CurrentStrategy { get; private set; } = Strategies.WAshraf2017;
-
-        public static void SetCurrentStrategy(Strategies alg)
-        {
-            CurrentStrategy = alg;
-            switch (alg)
-            {
-                case Strategies.WAshraf2017:
-                    //LoadPrediction = LoadPrediction.LinReg;
-                    break;
-                case Strategies.Zhao:
-                    LoadPrediction = LoadPrediction.None;
-
-                    break;
-                case Strategies.Proposed2018:
-                    LoadPrediction = LoadPrediction.None;
-                    break;
-                case Strategies.ForsmanPush:
-                case Strategies.ForsmanPull:
-                    LoadPrediction = LoadPrediction.Ewma;
-                    break;
-                case Strategies.WAshraf2017Auction:
-                    LoadPrediction = LoadPrediction.Arma;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(alg), alg, null);
-            }
-            UpdateTime();
-        }
-
         public static LoadChangeStrategy LoadChangeStrategy { get; set; } = LoadChangeStrategy.Incremental;
-        //public static LoadCreationStrategy LoadCreationStrategy { get; set; } = LoadCreationStrategy.Selected;
         public static int AccountTime { get; private set; } = -1;
-        //public static int AccountTime { get; } = Second;
         
-        public static SimulationSize SimulationSize { get; private set; } = SimulationSize.Twenty;
-
-        public static void SetSimulationSize(SimulationSize simulationSize)
-        {
-            SimulationSize = simulationSize;
-            UpdateTime();
-        }
-
-        public static LoadChangeAction ChangeAction { get; set; } = LoadChangeAction.Burst;
 
         //Test Default 0.7, 0.9
         //From energy paper its best to be from 0.7 to 0.8
@@ -123,17 +74,6 @@ namespace Simulation.Configuration
         public static double MaxUtilization { get; } = 0.9;
         public static double OtherMinUtilization { get; } = 0.3;
         public static double OtherMaxUtilization { get; } = 0.7;
-
-        //Test Default 8
-        public static int GetNoOfFailures
-        {
-            get
-            {
-                int n = ((int) SimulationSize)/10;
-                n++;
-                return n;
-            }
-        }
 
         public static int CheckRate { get; private set; } = -1;
 
@@ -150,12 +90,6 @@ namespace Simulation.Configuration
         /// </summary>
         public static Load DataCenterHostConfiguration { get; } = new Load(100, 32*1024, 100);
 
-        public static Load ContainerLoadPreNormal { get; } = new Load(2.5, 384, 2.5);
-        public static Load ContainerLoadNormal { get; } = new Load(2.5, 512, 2.5);
-        public static Load ContainerLoadPostNormal { get; } = new Load(7.5, 640, 7.5);
-        public static StrategyActionType OtherPushPullStrategy { get; set; } = StrategyActionType.PushAction;
-        public static StartUtilizationPercent StartUtilizationPercent { get; set; } = StartUtilizationPercent.Fifty;
-        public static TestedHosts TestedItems { get; set; } = TestedHosts.Five ;
 
         ///// <summary>
         ///// Packet size / Bit rate

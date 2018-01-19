@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Simulation.Configuration;
 using Simulation.LocationStrategies;
+using Simulation.SimulationController;
 
 namespace Simulation.Measure
 {
@@ -28,23 +29,22 @@ namespace Simulation.Measure
             }
         }
 
-        public MeasureValueHolder(Strategies strategy, SimulationSize simulationSize,
-            StartUtilizationPercent startUtilization, LoadChangeAction change, LoadPrediction prediction,
-            TestedHosts tested, ContainersType containerType)
+        public MeasureValueHolder(RunConfiguration configuration)
         {
-            Strategy = strategy;
-            SimulationSize = simulationSize;
-            StartUtilization = startUtilization;
-            ChangeAction = change;
-            Prediction = prediction;
-            Tested = tested;
-            ContainerType = containerType;
+            Strategy = configuration.Strategy;
+            SimulationSize = configuration.SimulationSize;
+            StartUtilization = configuration.StartPercent;
+            ChangeAction = configuration.ChangeAction;
+            Prediction = configuration.LoadPrediction;
+            Tested = configuration.TestedHosts;
+            ContainerType = configuration.ContainersType;
+            Configuration = configuration;
         }
 
         
 
         public List<MeasuresValues> MeasuredValuesList { set; get; } = new List<MeasuresValues>();
-        public List<LoadMeasureValue> LoadMeasureValueList { set; get; } = new List<LoadMeasureValue>(); 
+        public List<HostMeasureValue> HostMeasureValueList { set; get; } = new List<HostMeasureValue>(); 
 
         public Dictionary<int, ContainerMeasureValue> ContainerMigrationCount { get; set; } =
             new Dictionary<int, ContainerMeasureValue>();
@@ -58,17 +58,16 @@ namespace Simulation.Measure
             {
                 throw new ArgumentOutOfRangeException();
             }
-            MeasureValueHolder final = new MeasureValueHolder(first.Strategy, first.SimulationSize,
-                first.StartUtilization, first.ChangeAction, first.Prediction,first.Tested,first.ContainerType);
+            MeasureValueHolder final = new MeasureValueHolder(first.Configuration);
             //Prepare for first
             foreach (var listItem in first.MeasuredValuesList)
             {
                 final.MeasuredValuesList.Add(new MeasuresValues(listItem));
             }
             //Hosts
-            foreach (var item in first.LoadMeasureValueList)
+            foreach (var item in first.HostMeasureValueList)
             {
-                final.LoadMeasureValueList.Add(new LoadMeasureValue(item));
+                final.HostMeasureValueList.Add(new HostMeasureValue(item));
             }
 
             //Container Migrations
@@ -97,13 +96,13 @@ namespace Simulation.Measure
                 }
             }
             //hosts
-            for (int i = 0; i < second.LoadMeasureValueList.Count; i++)
+            for (int i = 0; i < second.HostMeasureValueList.Count; i++)
             {
-                if (i < final.LoadMeasureValueList.Count)
-                    final.LoadMeasureValueList[i] += second.LoadMeasureValueList[i];
+                if (i < final.HostMeasureValueList.Count)
+                    final.HostMeasureValueList[i] += second.HostMeasureValueList[i];
                 else
                 {
-                    final.LoadMeasureValueList.Add(new LoadMeasureValue(second.LoadMeasureValueList[i]));
+                    final.HostMeasureValueList.Add(new HostMeasureValue(second.HostMeasureValueList[i]));
                 }
             }
             //contianers
@@ -131,8 +130,7 @@ namespace Simulation.Measure
         }
         public static MeasureValueHolder operator /(MeasureValueHolder first, int c)
         {
-            MeasureValueHolder final = new MeasureValueHolder(first.Strategy, first.SimulationSize,
-                first.StartUtilization, first.ChangeAction, first.Prediction,first.Tested,first.ContainerType);
+            MeasureValueHolder final = new MeasureValueHolder(first.Configuration);
             foreach (var listItem in first.MeasuredValuesList)
             {
                 final.MeasuredValuesList.Add(listItem/c);
@@ -142,9 +140,9 @@ namespace Simulation.Measure
             {
                 final.ContainerMigrationCount.Add(item.Key, item.Value/c);
             }
-            foreach (var item in first.LoadMeasureValueList)
+            foreach (var item in first.HostMeasureValueList)
             {
-                final.LoadMeasureValueList.Add(item/c);
+                final.HostMeasureValueList.Add(item/c);
             }
             foreach (var item in first.PullsPerImage)
             {
@@ -259,7 +257,17 @@ namespace Simulation.Measure
             get { return PullsPerImage.Select(x => x.Value).Average(); }
         }
 
+        public double AverageContainers
+        {
+            get
+            {
+                return HostMeasureValueList.Average(x => x.Containers);
+            }
+        }
+
+        public RunConfiguration Configuration { get; }
+
         #endregion
-       
+
     }
 }

@@ -147,6 +147,10 @@ namespace Test
                         all[k].Add(trial.Size, trial.ImagePullsRatio);
                         myPane.YAxis.Title.Text = "AveragePullsPerImage";
                         break;
+                    case FinalItems.ContainersAverage:
+                        all[k].Add(trial.Size, trial.ContainersAverage);
+                        myPane.YAxis.Title.Text = "ContainersAverage";
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(yAxis), yAxis, null);
                 }

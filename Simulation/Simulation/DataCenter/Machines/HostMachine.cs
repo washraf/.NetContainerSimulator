@@ -45,7 +45,11 @@ namespace Simulation.DataCenter.Machines
         private ILoadManager _loadManager;
         #endregion
 
-        public HostMachine(int id, Load maxLoad, NetworkSwitch networkSwitch, LoadPrediction currentLoadPrediction,Strategies strategy, ContainersType containerType) : base(id, networkSwitch)
+        public HostMachine(int id,
+            Load maxLoad, NetworkSwitch networkSwitch,
+            LoadPrediction currentLoadPrediction,Strategies strategy, 
+            ContainersType containerType, 
+            SimulationSize simulationSize) : base(id, networkSwitch)
         {
            if(containerType == ContainersType.D)
             {
@@ -71,11 +75,11 @@ namespace Simulation.DataCenter.Machines
 
                     break;
                 case Strategies.ForsmanPush:
-                    _handler = new ForsmanHostHandler(CommunicationModule, _containerTable, _loadManager,StrategyActionType.PushAction);
+                    _handler = new ForsmanHostHandler(CommunicationModule, _containerTable, _loadManager,StrategyActionType.PushAction, simulationSize);
 
                     break;
                 case Strategies.ForsmanPull:
-                    _handler = new ForsmanHostHandler(CommunicationModule, _containerTable, _loadManager,StrategyActionType.PullAction);
+                    _handler = new ForsmanHostHandler(CommunicationModule, _containerTable, _loadManager,StrategyActionType.PullAction, simulationSize);
                     break;
                 case Strategies.Proposed2018:
                     _handler = new ProposedHostHandlerModule(CommunicationModule,_containerTable,_loadManager);

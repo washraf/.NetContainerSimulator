@@ -14,6 +14,7 @@ using Simulation.Modules.Management.Master;
 using Simulation.Modules.Management.Master.Proposed;
 using Simulation.Modules.Management.Master.WAshraf2017;
 using Simulation.DataCenter.Network;
+using Simulation.DataCenter.Containers;
 
 namespace Simulation.DataCenter.Machines
 {
@@ -30,6 +31,9 @@ namespace Simulation.DataCenter.Machines
                 CommunicationModule.Started = value;
             }
         }
+
+        public UtilizationTable Holder { get; }
+
         public MasterMachine(NetworkSwitch networkSwitch, IMachinePowerController powerController,
             UtilizationTable holder, Strategies strategy, TestedHosts testedHosts) 
             : base(0, networkSwitch)
@@ -52,12 +56,15 @@ namespace Simulation.DataCenter.Machines
                     _handler = new NoMasterHandlerModule(CommunicationModule);
                     break;
                 case Strategies.Proposed2018:
+
                     _handler = new ProposedMasterHandler(CommunicationModule,powerController,holder,testedHosts);
                     break;
                 default:
 
                     throw new ArgumentOutOfRangeException(nameof(strategy), strategy, null);
             }
+
+            Holder = holder;
             //StartMachine();
         }
 
@@ -94,6 +101,21 @@ namespace Simulation.DataCenter.Machines
         public override Message HandleRequestData(Message message)
         {
             throw new NotImplementedException();
+        }
+
+        public void AddContainer(Container container)
+        {
+            var candidates = Holder.GetCandidateHosts(UtilizationStates.Normal, 0);
+            if (candidates.Count > 0)
+            {
+                var id = candidates.First();
+                Message m = new AddContainerMessage(id,0,container);
+                CommunicationModule.SendMessage(m);
+            }
+            else
+            {
+                //throw new NotImplementedException("Full Case");
+            }
         }
         #endregion
     }

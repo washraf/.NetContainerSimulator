@@ -25,6 +25,9 @@
         ImageTreeRequest,
         ImageTreeResponce,
         ImagePullRequest,
-        ImagePullResponce
+        ImagePullResponce,
+
+        //Scheduling
+        AddContainerMessage
     }
 }

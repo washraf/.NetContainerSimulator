@@ -72,11 +72,14 @@ namespace Simulation.Helpers
             }
             double extra = 0;
             var hosts = values.Count;
-            if (Global.CurrentStrategy == Strategies.WAshraf2017)
-            {
-                var e = hosts*1.05 < (int) Global.SimulationSize ? hosts*0.05 : ((int) Global.SimulationSize - hosts);
-                extra = e*t*util[0];
-            }
+
+            //Update with the added List (list of idle hosts)
+            //if (Global.CurrentStrategy == Strategies.WAshraf2017)
+            //{
+            //    var e = hosts*1.05 < (int) Global.SimulationSize ?
+            //        hosts*0.05 : ((int) Global.SimulationSize - hosts);
+            //    extra = e*t*util[0];
+            //}
 
             consumption += +extra;
 

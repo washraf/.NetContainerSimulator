@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Simulation.DataCenter.Network;
 
-namespace Simulation.SimulationController
+namespace Simulation.Factories
 {
     public abstract class MachineFactory
     {

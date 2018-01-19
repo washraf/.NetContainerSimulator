@@ -4,7 +4,7 @@ using Simulation.DataCenter.InformationModules;
 using Simulation.DataCenter.Network;
 using Simulation.LocationStrategies;
 
-namespace Simulation.SimulationController
+namespace Simulation.Factories
 {
     public class MasterFactory: MachineFactory
     {

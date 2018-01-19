@@ -78,7 +78,7 @@
     <Compile Include="MeasureResults\ITrialResultManagement.cs" />
     <Compile Include="Measure\ContainerMeasureValue.cs" />
     <Compile Include="Accounting\IAccountingModule.cs" />
-    <Compile Include="Measure\LoadMeasureValue.cs" />
+    <Compile Include="Measure\HostMeasureValue.cs" />
     <Compile Include="Measure\MeasureValueHolder.cs" />
     <Compile Include="Measure\MeasuresValues.cs" />
     <Compile Include="Configuration\ContainerTypes.cs" />
@@ -171,11 +171,13 @@
     <Compile Include="Modules\Management\Master\NoMasterHandlerModule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimulationController\ContainerFactory.cs" />
-    <Compile Include="SimulationController\HostFactory.cs" />
-    <Compile Include="SimulationController\MachineFactory.cs" />
-    <Compile Include="SimulationController\MasterFactory.cs" />
-    <Compile Include="SimulationController\RegistryFactory.cs" />
+    <Compile Include="Factories\ContainerFactory.cs" />
+    <Compile Include="Factories\HostFactory.cs" />
+    <Compile Include="Factories\MachineFactory.cs" />
+    <Compile Include="Factories\MasterFactory.cs" />
+    <Compile Include="Factories\RegistryFactory.cs" />
+    <Compile Include="SimulationController\RunConfiguration.cs" />
+    <Compile Include="SimulationController\RunConfigurationFactory.cs" />
     <Compile Include="SimulationController\SimulationController.cs" />
     <Compile Include="SimulationController\ISimulationController.cs" />
   </ItemGroup>

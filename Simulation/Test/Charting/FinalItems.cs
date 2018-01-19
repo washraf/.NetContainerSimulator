@@ -17,6 +17,7 @@ namespace Test.Charting
         FinalEntropy,
         SlaViolations,
         TotalImagePulls,
-        AveragePullsPerImage
+        AveragePullsPerImage,
+        ContainersAverage
     }
 }

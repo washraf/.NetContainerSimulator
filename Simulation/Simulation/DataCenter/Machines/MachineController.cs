@@ -21,23 +21,19 @@ namespace Simulation.DataCenter.Machines
     {
         public bool Started { get; set; } = true;
         public MachineTable MachineTable { get; set; }
-        private NetworkSwitch Network { get; set; }
         private MachineTable ReadyMachineTable { get; set; }
         private MachineTable PoweredOffMachinesTable { get; set; }
-        public Strategies Strategy { get; set; }
         public ContainersType ContainerTypes { get; }
         private UtilizationTable DataHolder { get; set; }
         public bool StartingMachine { get; set; } = false;
         private object _lock = new object();
 
-        public MachineController(UtilizationTable holder, MachineTable machineTable, NetworkSwitch network, Strategies strategy, ContainersType containerTypes)
+        public MachineController(UtilizationTable holder, MachineTable machineTable, ContainersType containerTypes)
         {
             MachineTable = machineTable;
-            Network = network;
             ReadyMachineTable = new MachineTable();
             PoweredOffMachinesTable = new MachineTable();
 
-            Strategy = strategy;
             ContainerTypes = containerTypes;
             DataHolder = holder;
             Task t = new Task(async () =>

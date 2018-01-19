@@ -5,7 +5,7 @@ using Simulation.LocationStrategies;
 using Simulation.Helpers;
 using System;
 
-namespace Simulation.SimulationController
+namespace Simulation.Factories
 {
     public class ContainerFactory
     {

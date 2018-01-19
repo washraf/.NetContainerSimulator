@@ -55,142 +55,52 @@ namespace Test
         List<MeasureValueHolder> _measuredValueListsTrials = new List<MeasureValueHolder>();
         //AccountingModule _accountingModule = AccountingModule.GetAccountingModule();
         static IAccountingResultsManager accountingResultsManager = new AccountingResultsFileManager();
-
         private void btn_Start_Click(object sender, EventArgs e)
         {
 
             Thread t = new Thread(
                 () =>
                 {
-                    var predictors = new List<LoadPrediction>()
-                    {
-                        LoadPrediction.None,
-                        //LoadPrediction.Ewma,
-                        //LoadPrediction.Arma,
-                        //LoadPrediction.LinReg,
-                    };
 
-                    var sizes = new List<SimulationSize>()
+                    #region --ALL--
+                    foreach (var configuration in RunConfigurationFactory.GetConfigurations())
                     {
-                        //SimulationSize.Five,
-                        //SimulationSize.Ten,
-                        SimulationSize.Twenty,
-                        SimulationSize.Fifty,
-                        SimulationSize.Hundred,
-                        SimulationSize.TwoHundred
-                    };
-
-
-                    var util = new List<StartUtilizationPercent>()
-                    {
-                        //StartUtilizationPercent.Thrity,
-                        StartUtilizationPercent.Fifty,
-                        StartUtilizationPercent.Seventy,
-                    };
-
-                    var algorithms = new List<Strategies>()
-                    {
-                       Strategies.Proposed2018,
-                       Strategies.WAshraf2017,
-                        //Strategies.Zhao,
-                        //Strategies.ForsmanPush,
-                        //Strategies.ForsmanPull,
-                    };
-
-                    var cactions = new List<LoadChangeAction>()
-                    {
-                        LoadChangeAction.Burst,
-                        LoadChangeAction.Drain,
-                        LoadChangeAction.Opposite
-                    };
-                    var testingRange = new List<TestedHosts>()
-                    {
-                        TestedHosts.One,
-                        TestedHosts.Five,
-                        TestedHosts.Ten,
-                        TestedHosts.Twenty,
-                    };
-
-
-                    foreach (var u in util)
-                    {
-                        Global.StartUtilizationPercent = u;
-                        foreach (var s in sizes)
+                        btn_Start.Invoke(new Action(() => { btn_Start.Enabled = false; }));
+                        List<MeasureValueHolder> internalValueListsTrials =
+                            new List<MeasureValueHolder>();
+                        //MeasureValueHolder holder = null;
+                        for (int i = 0; i < Global.NoOfTrials; i++)
                         {
-                            Global.SetSimulationSize(s);
-                            foreach (var action in cactions)
+                            //var stime = DateTime.Now;
+                            Global.UpdateTime(configuration.SimulationSize, configuration.Strategy);
+                            SimulationController controller =
+                                new SimulationController(configuration);
+                            controller.StartSimulation();
+
+                            internalValueListsTrials.Add(controller.AccountingModuleObject.MeasureHolder);
+                            if (Global.NoOfTrials > 1)
                             {
-                                //if(action== LoadChangeAction.VeryHightBurst && u==StartUtilizationPercent.Seventy)
-                                //    continue;
-                                Global.ChangeAction = action;
-                                foreach (var alg in algorithms)
-                                {
-                                    Global.SetCurrentStrategy(alg);
-                                    foreach (var testing in testingRange)
-                                    {
-                                        Global.TestedItems = testing;
-                                        #region --ALL--
-                                        if (alg == Strategies.WAshraf2017 && testing != TestedHosts.One)
-                                            continue;
-                                        btn_Start.Invoke(new Action(() => { btn_Start.Enabled = false; }));
-                                        List<MeasureValueHolder> internalValueListsTrials =
-                                            new List<MeasureValueHolder>();
-                                        //MeasureValueHolder holder = null;
-                                        for (int i = 0; i < Global.NoOfTrials; i++)
-                                        {
-                                            //var stime = DateTime.Now;
-                                            SimulationController controller =
-                                                new SimulationController(Global.CurrentStrategy,
-                                                    Global.SimulationSize,
-                                                    Global.StartUtilizationPercent,
-                                                    Global.LoadPrediction,
-                                                    Global.ChangeAction,
-                                                    Global.TestedItems,
-                                                    ContainersType.D);
-                                            controller.StartSimulation();
-                                            //var etime = DateTime.Now;
-                                            //MessageBox.Show((etime - stime).TotalSeconds.ToString());
-                                            //Thread.Sleep(Global.GetSimulationTime);
-
-                                            //controller.EndSimulation();
-                                            //holder = controller.AccountingModuleObject.MeasureHolder;
-                                            internalValueListsTrials.Add(controller.AccountingModuleObject.MeasureHolder);
-                                            //await Task.Delay(5000);
-                                            if (Global.NoOfTrials > 1)
-                                            {
-                                                accountingResultsManager.WriteDataToDisk(controller.AccountingModuleObject.MeasureHolder, i);
-                                            }
-                                            Thread.Sleep(5000);
-
-                                        }
-                                        //List<MeasuresValues> final = new List<MeasuresValues>();
-                                        //MeasureValueHolder final = new MeasureValueHolder(Global.CurrentStrategy,
-                                        //    Global.SimulationSize,
-                                        //    Global.StartUtilizationPercent,
-                                        //    Global.ChangeAction,
-                                        //    Global.LoadPrediction);
-                                        MeasureValueHolder final = internalValueListsTrials[0] / 1;
-                                        foreach (var list in internalValueListsTrials.Skip(1))
-                                        {
-                                            final = final + list;
-                                        }
-                                        final = final / Global.NoOfTrials;
-                                        accountingResultsManager.WriteDataToDisk(final, -1);
-
-                                        btn_Start.Invoke(new Action(() =>
-                                        {
-                                            btn_Start.Enabled = true;
-                                            AddDataHolder(final);
-                                        }));
-
-                                        #endregion
-                                    }
-                                }
+                                accountingResultsManager.WriteDataToDisk(controller.AccountingModuleObject.MeasureHolder, i);
                             }
+                            Thread.Sleep(5000);
+
                         }
+                        MeasureValueHolder final = internalValueListsTrials[0] / 1;
+                        foreach (var list in internalValueListsTrials.Skip(1))
+                        {
+                            final = final + list;
+                        }
+                        final = final / Global.NoOfTrials;
+                        accountingResultsManager.WriteDataToDisk(final, -1);
+
+                        btn_Start.Invoke(new Action(() =>
+                        {
+                            btn_Start.Enabled = true;
+                            AddDataHolder(final);
+                        }));
                     }
-                }
-                );
+                    #endregion
+                });
             t.Priority = ThreadPriority.Highest;
             t.Start();
         }
@@ -300,9 +210,9 @@ namespace Test
                         break;
 
                     case BasicItems.NeededLoadStandardDeviation:
-                        for (int i = 0; i < _measuredValueListsTrials[t].LoadMeasureValueList.Count; i++)
+                        for (int i = 0; i < _measuredValueListsTrials[t].HostMeasureValueList.Count; i++)
                         {
-                            list[0].Add(i * unit, _measuredValueListsTrials[t].LoadMeasureValueList[i].StandardDeviation);
+                            list[0].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValueList[i].StandardDeviation);
                         }
                         myLabel.Text = $"Average Standard Deviation {_measuredValueListsTrials[t].AverageStdDeviation}";
                         break;
@@ -353,6 +263,14 @@ namespace Test
                             list[0].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].TotalMessages);
                         }
                         myLabel.Text = $"Total Messages in All the trial = {_measuredValueListsTrials[t].TotalMessages}";
+
+                        break;
+                    case BasicItems.Containers:
+                        for (int i = 0; i < _measuredValueListsTrials[t].HostMeasureValueList.Count; i++)
+                        {
+                            list[0].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValueList[i].Containers);
+                        }
+                        myLabel.Text = $"Average Containers in All the trial = {_measuredValueListsTrials[t].AverageContainers}";
 
                         break;
                     case BasicItems.PushRequests:
@@ -515,30 +433,11 @@ namespace Test
         }
         private void cb_Strategy_SelectedIndexChanged(object sender, EventArgs e)
         {
-            try
-            {
-                Global.SetCurrentStrategy((Strategies)cb_Strategy.SelectedValue);
-                if (Global.CurrentStrategy == Strategies.WAshraf2017 || Global.CurrentStrategy == Strategies.WAshraf2017Auction)
-                    cb_Prediction.SelectedIndex = 3;
-                else if (Global.CurrentStrategy == Strategies.Zhao)
-                {
-                    cb_Prediction.SelectedIndex = 0;
-                }
-                else
-                {
-                    cb_Prediction.SelectedIndex = 1;
-                }
-            }
-            catch (Exception)
-            {
-            }
-
         }
 
 
         private void cb_StartUtil_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Global.StartUtilizationPercent = (StartUtilizationPercent)cb_StartUtil.SelectedValue;
         }
 
         private void cb_GraphItem_SelectedIndexChanged(object sender, EventArgs e)
@@ -548,17 +447,14 @@ namespace Test
 
         private void cb_HostsCount_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Global.SetSimulationSize((SimulationSize)cb_HostsCount.SelectedValue);
         }
 
         private void cb_FirstWave_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Global.ChangeAction = (LoadChangeAction)cb_Change.SelectedValue;
         }
 
         private void cb_Prediction_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Global.LoadPrediction = (LoadPrediction)cb_Prediction.SelectedValue;
         }
 
         private void btn_AddData_Click(object sender, EventArgs e)

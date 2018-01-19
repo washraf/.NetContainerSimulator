@@ -164,12 +164,19 @@ namespace Simulation.Modules.Management.Host.Proposed
                     case MessageTypes.BidCancellationRequest:
                         HandleBidCancellationRequest(message as BidCancellationRequest);
                         break;
-                    
+                    case MessageTypes.AddContainerMessage:
+                        HandlaAddContainerMessage(message as AddContainerMessage);
+                            break;
                     default:
                         throw new ArgumentOutOfRangeException();
 
                 }
             }
+        }
+
+        private void HandlaAddContainerMessage(AddContainerMessage message)
+        {
+            ContainerTable.AddContainer(message.ScheduledContainer.ContainerId, message.ScheduledContainer);
         }
         #endregion
         #region --Push Message Handlers--

@@ -55,7 +55,7 @@ namespace Simulation.Loads
         //    return new Load(cpu, mem, io);
         //}
 
-        private static Load GetRandomLoad()
+        public static Load GetRandomLoad()
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
             var r = random.NextGaussian(4,1);

@@ -8,13 +8,13 @@ using Simulation.Loads;
 
 namespace Simulation.Measure
 {
-    public class LoadMeasureValue
+    public class HostMeasureValue
     {
-        private LoadMeasureValue()
+        private HostMeasureValue()
         {
             
         }
-        public LoadMeasureValue(List<HostLoadInfo> loads)
+        public HostMeasureValue(List<HostLoadInfo> loads)
         {
             foreach (var l in loads)
             {
@@ -22,7 +22,7 @@ namespace Simulation.Measure
             }
         }
 
-        public LoadMeasureValue(LoadMeasureValue item)
+        public HostMeasureValue(HostMeasureValue item)
         {
             foreach (var l in item.CurrentValues.Values)
             {
@@ -36,9 +36,9 @@ namespace Simulation.Measure
         /// </summary>
         public Dictionary<int,HostLoadInfo> CurrentValues { set; get; } = new Dictionary<int, HostLoadInfo>();
 
-        public static LoadMeasureValue operator +(LoadMeasureValue first, LoadMeasureValue second)
+        public static HostMeasureValue operator +(HostMeasureValue first, HostMeasureValue second)
         {
-            var final = new LoadMeasureValue();
+            var final = new HostMeasureValue();
             foreach (var l in first.CurrentValues.Values)
             {
                 final.CurrentValues.Add(l.HostId, new HostLoadInfo(l.HostId, l.CurrentLoad,l.ContainersCount,l.CPUUtil,l.MemoryUtil,l.IOUtil));
@@ -63,9 +63,9 @@ namespace Simulation.Measure
             return final;
         }
 
-        public static LoadMeasureValue operator /(LoadMeasureValue first, int c)
+        public static HostMeasureValue operator /(HostMeasureValue first, int c)
         {
-            var final = new LoadMeasureValue();
+            var final = new HostMeasureValue();
             foreach (var l in first.CurrentValues.Values)
             {
                 final.CurrentValues.Add(l.HostId, new HostLoadInfo(l.HostId,l.CurrentLoad/c,l.ContainersCount/c,l.CPUUtil/c,l.MemoryUtil/c,l.IOUtil/c));
@@ -78,6 +78,13 @@ namespace Simulation.Measure
         public double StandardDeviation
         {
             get { return CurrentValues.Values.ToList().StandardDeviation(); }
+        }
+
+        public double Containers
+        {
+            get {
+                return CurrentValues.Values.ToList().Sum(x => x.ContainersCount);
+            }
         }
     }
 }

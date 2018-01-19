@@ -38,6 +38,7 @@ namespace Test
             t.ImagePullsTotal = holder.ImagePulls;
             t.ImagePullsRatio = holder.AveragePullPerImage;
             t.FinalEntropy = holder.FinalEntropy;
+            t.ContainersAverage = holder.AverageContainers;
             context.TrialResults.AddOrUpdate(t);
             context.SaveChanges();
         }

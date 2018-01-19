@@ -134,7 +134,8 @@ namespace Simulation.Measure
                 first.SlaViolations/count, 
                 first.Power/count,
                 first.StdDev/count,
-                first.ImagePulls/count);
+                first.ImagePulls/count
+                );
         }
 
 

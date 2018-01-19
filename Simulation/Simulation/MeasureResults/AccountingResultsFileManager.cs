@@ -1,6 +1,7 @@
 ﻿using Simulation.Configuration;
 using Simulation.Loads;
 using Simulation.Measure;
+using Simulation.SimulationController;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -78,7 +79,7 @@ namespace Simulation.AccountingResults
                                          $"{value.MaxNeeded}," +
                                          $"{value.Power}," +
                                          $"{value.StdDev}," +
-                                         $"{value.ImagePulls}");
+                                         $"{value.ImagePulls},");
 
                     }
                     writer.Flush();
@@ -129,10 +130,10 @@ namespace Simulation.AccountingResults
                                      );
                     //public HostLoadInfo(int hostId, Load currentLoad, int containersCount, double cpu, double mem, double io)
 
-                    for (int i = 0; i < measureValueHolder.LoadMeasureValueList.Count; i++)
+                    for (int i = 0; i < measureValueHolder.HostMeasureValueList.Count; i++)
                     {
                         foreach (
-                            var item in measureValueHolder.LoadMeasureValueList[i].CurrentValues)
+                            var item in measureValueHolder.HostMeasureValueList[i].CurrentValues)
                         {
                             writer.WriteLine($"{i}," +
                                              $"{item.Value}");
@@ -152,7 +153,7 @@ namespace Simulation.AccountingResults
         {
             var config = mainFile.Split('\\');
             SimulationSize simulationSize = (SimulationSize)Convert.ToInt32(config[3]);
-            StartUtilizationPercent precent =
+            StartUtilizationPercent perecent =
                (StartUtilizationPercent)Enum.Parse(typeof(StartUtilizationPercent), config[4].Split('_')[0]);
             LoadChangeAction changeAction =
                 (LoadChangeAction)Enum.Parse(typeof(LoadChangeAction), config[4].Split('_')[1]);
@@ -161,8 +162,9 @@ namespace Simulation.AccountingResults
             Strategies strategy = (Strategies)Enum.Parse(typeof(Strategies), config[6].Split('_')[0]);
             ContainersType containerType = (ContainersType)Enum.Parse(typeof(ContainersType), config[6].Split('_')[1]);
             TestedHosts testedHosts = (TestedHosts)Enum.Parse(typeof(TestedHosts), config[7]);
+            var conf = new RunConfiguration(simulationSize, perecent,changeAction,loadPrediction,strategy,testedHosts,containerType);
             MeasureValueHolder holder =
-                new MeasureValueHolder(strategy, simulationSize, precent, changeAction, loadPrediction, testedHosts, containerType);
+                new MeasureValueHolder(conf);
 
             using (StreamReader reader = new StreamReader(mainFile))
             {
@@ -200,7 +202,7 @@ namespace Simulation.AccountingResults
                         avgRealVolume, avgPredictedVolume, minNeeded, maxNeeded,
                         underHosts, overHosts, normalHosts, evacuatingHosts,
                         slaViolations,
-                        power, stdDev, imagePulls);
+                        power, stdDev, imagePulls );
                     holder.MeasuredValuesList.Add(m);
                 }
             }
@@ -245,7 +247,7 @@ namespace Simulation.AccountingResults
                     }
                     else
                     {
-                        holder.LoadMeasureValueList.Add(new LoadMeasureValue(list));
+                        holder.HostMeasureValueList.Add(new HostMeasureValue(list));
                         list.Clear();
                         list.Add(linfo);
                         current++;

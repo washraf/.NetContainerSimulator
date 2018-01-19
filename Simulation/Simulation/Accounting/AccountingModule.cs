@@ -13,22 +13,19 @@ using Simulation.Loads;
 using Simulation.Messages;
 using Simulation.DataCenter.Machines;
 using Simulation.Measure;
+using Simulation.SimulationController;
 
 namespace Simulation.Accounting
 {
     public class AccountingModule:IAccountingModule
     {
         public AccountingModule(MachineTable machineTable, UtilizationTable utilizationTable,
-            Strategies currentStrategy, SimulationSize simulationSize,
-            StartUtilizationPercent startUtilizationPercent,
-            LoadChangeAction changeAction, LoadPrediction loadPrediction,
-            TestedHosts testedHosts, ContainersType containersType)
+            RunConfiguration configuration)
         {
             ClearInformation();
             _machineTable = machineTable;
             this._utilizationTable = utilizationTable;
-            MeasureHolder = new MeasureValueHolder(currentStrategy, simulationSize,startUtilizationPercent, 
-                changeAction, loadPrediction, testedHosts, containersType);
+            MeasureHolder = new MeasureValueHolder(configuration);
         }
         private object _lock = new object();
 
@@ -86,7 +83,7 @@ namespace Simulation.Accounting
                     imagePulls
                     );
                 ClearInformation();
-                MeasureHolder.LoadMeasureValueList.Add(new LoadMeasureValue(loads));
+                MeasureHolder.HostMeasureValueList.Add(new HostMeasureValue(loads));
                 MeasureHolder.MeasuredValuesList.Add(mvalues);
             }
 
