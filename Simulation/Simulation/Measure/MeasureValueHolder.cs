@@ -17,6 +17,8 @@ namespace Simulation.Measure
         public StartUtilizationPercent StartUtilization { get; set; }
         public LoadChangeAction ChangeAction { get; set; }
         public LoadPrediction Prediction { get; set; }
+        public SchedulingAlgorithm Scheduling { get; }
+
         public TestedHosts Tested { get; }
         public ContainersType ContainerType { get; }
 
@@ -25,7 +27,7 @@ namespace Simulation.Measure
             get
             {
                 return (int)SimulationSize + "_" + (int)StartUtilization + "_" + ChangeAction.ToString() +
-                       "_" + Prediction.ToString() + "_" + Strategy.ToString()+"_"+ContainerType+"_"+(int)Tested;
+                       "_" + Prediction.ToString() +"_"+Scheduling.ToString()+ "_" + Strategy.ToString()+"_"+ContainerType+"_"+(int)Tested;
             }
         }
 
@@ -37,8 +39,10 @@ namespace Simulation.Measure
             ChangeAction = configuration.ChangeAction;
             Prediction = configuration.LoadPrediction;
             Tested = configuration.TestedHosts;
+            Scheduling = configuration.SchedulingAlgorithm;
             ContainerType = configuration.ContainersType;
             Configuration = configuration;
+
         }
 
         

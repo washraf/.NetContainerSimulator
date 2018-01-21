@@ -15,6 +15,7 @@ using Simulation.Modules.Management.Master.Proposed;
 using Simulation.Modules.Management.Master.WAshraf2017;
 using Simulation.DataCenter.Network;
 using Simulation.DataCenter.Containers;
+using Simulation.Modules.Scheduling;
 
 namespace Simulation.DataCenter.Machines
 {
@@ -29,13 +30,14 @@ namespace Simulation.DataCenter.Machines
             {
                 _started = value;
                 CommunicationModule.Started = value;
+                scheduler.Started = value;
             }
         }
 
         public UtilizationTable Holder { get; }
-
+        private IScheduler scheduler;
         public MasterMachine(NetworkSwitch networkSwitch, IMachinePowerController powerController,
-            UtilizationTable holder, Strategies strategy, TestedHosts testedHosts) 
+            UtilizationTable holder, Strategies strategy, SchedulingAlgorithm scheduling, TestedHosts testedHosts) 
             : base(0, networkSwitch)
         {
             switch (strategy)
@@ -66,6 +68,14 @@ namespace Simulation.DataCenter.Machines
 
             Holder = holder;
             //StartMachine();
+            switch (scheduling)
+            {
+                case SchedulingAlgorithm.FF:
+                    scheduler = new FirstFitScheduler(holder, CommunicationModule, powerController);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(scheduling), scheduling, null);
+            }
         }
 
         #region --Properties--
@@ -95,7 +105,15 @@ namespace Simulation.DataCenter.Machines
         #region --Message Handlers--
         public override void HandleMessage(Message message)
         {
-            _handler.HandleMessage(message);
+            switch (message.MessageType)
+            {
+                case MessageTypes.CanHaveContainerResponce:
+                    scheduler.HandleMessage(message);
+                    break;
+                default:
+                    _handler.HandleMessage(message);
+                    break;
+            }
         }
 
         public override Message HandleRequestData(Message message)
@@ -105,17 +123,7 @@ namespace Simulation.DataCenter.Machines
 
         public void AddContainer(Container container)
         {
-            var candidates = Holder.GetCandidateHosts(UtilizationStates.Normal, 0);
-            if (candidates.Count > 0)
-            {
-                var id = candidates.First();
-                Message m = new AddContainerMessage(id,0,container);
-                CommunicationModule.SendMessage(m);
-            }
-            else
-            {
-                //throw new NotImplementedException("Full Case");
-            }
+            scheduler.ScheduleContainer(container);
         }
         #endregion
     }

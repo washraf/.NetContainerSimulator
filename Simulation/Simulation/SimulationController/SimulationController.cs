@@ -53,7 +53,7 @@ namespace Simulation.SimulationController
                 = new MachineController(UtilizationTable, MachineTableObject, CurrentConfiguration.ContainersType);
             _masterFactory 
                 = new MasterFactory(_networkSwitchObject, MachineControllerObject, UtilizationTable,
-                CurrentConfiguration.Strategy, CurrentConfiguration.TestedHosts);
+                CurrentConfiguration.Strategy,CurrentConfiguration.SchedulingAlgorithm, CurrentConfiguration.TestedHosts);
             var h = new Load(Global.DataCenterHostConfiguration);
             _hostFactory = new HostFactory(h,
                     _networkSwitchObject, CurrentConfiguration.LoadPrediction, CurrentConfiguration.Strategy, CurrentConfiguration.ContainersType, configuration.SimulationSize);
@@ -97,8 +97,10 @@ namespace Simulation.SimulationController
             MachineControllerObject.StartSimulation();
 
             var done = false;
-            for (int x = 0; x <= Global.GetSimulationTime; x += Global.AccountTime)
+            int c = 0;
+            for (int x = 0; x <= Global.GetSimulationTime; x += Global.AccountTime,c++)
             {
+
                 AccountingModuleObject.ReadCurrentState();
                 Thread.Sleep(Global.AccountTime);
                 if (x >= Global.GetSimulationTime/2 && !done)
@@ -108,6 +110,10 @@ namespace Simulation.SimulationController
                         StartWaveSimmulationAction(LoadChangeAction.Burst, m => true, m => m.ContainerId % 2 == 0);
                         StartWaveSimmulationAction(LoadChangeAction.Drain, m => true, m => m.ContainerId % 2 == 1);
                     }
+                    else if(CurrentConfiguration.ChangeAction == LoadChangeAction.None)
+                    {
+
+                    }
                     else
                     {
                         StartWaveSimmulationAction(CurrentConfiguration.ChangeAction, m =>true, m => m.ContainerId%2==0);
@@ -115,8 +121,14 @@ namespace Simulation.SimulationController
                     done = true;
                 }
                 //Add container to queue
-                //if(x < Global.GetSimulationTime / 2 && x%5==0)
-                // masterMachine.AddContainer(_containerFactory.GetContainer(LoadGenerator.GetRandomLoad()));
+                if(CurrentConfiguration.ChangeAction == LoadChangeAction.None)
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        masterMachine.AddContainer(_containerFactory.GetContainer(LoadGenerator.GetRandomLoad()));
+
+                    }
+                }
             }
             EndSimulation();
         }

@@ -12,6 +12,7 @@ namespace Simulation.Measure
         public int Size { get; set; }
         public string StartUtil { get; set; }
         public string Change { get; set; }
+        public string SchedulingAlgorithm { get; set; }
         public string Algorithm { get; set; }
         public int Tested { get; set; }
         //Results

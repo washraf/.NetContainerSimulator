@@ -7,6 +7,11 @@
         Ten = 10,
         Twenty = 20
     }
+
+    public enum SchedulingAlgorithm
+    {
+        FF
+    }
 }
 
     

@@ -109,8 +109,11 @@
     <Compile Include="LocationStrategies\Forsman2015\ForsmanPullAuction.cs" />
     <Compile Include="LocationStrategies\Forsman2015\PushAuction2015.cs" />
     <Compile Include="Measure\TrialResult.cs" />
+    <Compile Include="Messages\AddContainerRequest.cs" />
     <Compile Include="Messages\BidCancellationRequest.cs" />
     <Compile Include="Messages\CancelEvacuation.cs" />
+    <Compile Include="Messages\CanHaveContainerRequest.cs" />
+    <Compile Include="Messages\CanHaveContainerResponce.cs" />
     <Compile Include="Messages\EvacuationDone.cs" />
     <Compile Include="Messages\ImagePullRequest.cs" />
     <Compile Include="Messages\ImagePullResponce.cs" />
@@ -169,6 +172,7 @@
     <Compile Include="Modules\Management\Master\WAshraf2017\InorderPropingManagement.cs" />
     <Compile Include="Modules\Management\Master\WAshraf2017\MineCommon.cs" />
     <Compile Include="Modules\Management\Master\NoMasterHandlerModule.cs" />
+    <Compile Include="Modules\Scheduling\FirstFitScheduler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Factories\ContainerFactory.cs" />

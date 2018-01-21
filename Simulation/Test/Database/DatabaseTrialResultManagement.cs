@@ -20,7 +20,8 @@ namespace Test
                                                              && x.StartUtil == holder.StartUtilization.ToString()
                                                              && x.Change == holder.ChangeAction.ToString()
                                                              && x.Algorithm == holder.Strategy.ToString()
-                                                             && x.Tested == ((int)holder.Tested);
+                                                             && x.Tested == ((int)holder.Tested)
+                                                             && x.SchedulingAlgorithm == holder.Scheduling.ToString();
             TrialResult t = context.TrialResults.SingleOrDefault(selecTionFunction)??new TrialResult();
             t.Size = ((int)holder.SimulationSize);
             t.StartUtil = holder.StartUtilization.ToString();
@@ -39,6 +40,7 @@ namespace Test
             t.ImagePullsRatio = holder.AveragePullPerImage;
             t.FinalEntropy = holder.FinalEntropy;
             t.ContainersAverage = holder.AverageContainers;
+            t.SchedulingAlgorithm = holder.Scheduling.ToString();
             context.TrialResults.AddOrUpdate(t);
             context.SaveChanges();
         }

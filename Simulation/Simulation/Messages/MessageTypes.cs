@@ -2,10 +2,6 @@
 {
     public enum MessageTypes
     {
-        //GetHostLoadInfoRequest,
-        //GetHostLoadInfoResponce,
-        //PushContainerRequest,
-        //PushContainerResponse,
         PushRequest,
         PushLoadAvailabilityRequest,
         PullRequest,
@@ -21,6 +17,7 @@
         WinnerAnnouncementMessage,
         CommonLoadManager,
         CancelEvacuation,
+
         //Images
         ImageTreeRequest,
         ImageTreeResponce,
@@ -28,6 +25,9 @@
         ImagePullResponce,
 
         //Scheduling
-        AddContainerMessage
+        CanHaveContainerRequest,
+        CanHaveContainerResponce,
+        AddContainerRequest,
+
     }
 }

@@ -72,10 +72,7 @@ namespace Simulation.Modules.Management.Master.Proposed
                 }
             }
         }
-
-
         //Dictionary<int, DateTime> evacuating = new Dictionary<int, DateTime>();
-
         private void HandleUtilizationStateChange(HostStateChange message)
         {
             if (DataHolder.GetUtilization(message.SenderId) == UtilizationStates.Evacuating)
@@ -88,8 +85,6 @@ namespace Simulation.Modules.Management.Master.Proposed
                 DataHolder.SetUtilization(message.SenderId, message.State);
 
         }
-
-        
 
         private void HandleRequest(Request message)
         {
@@ -318,7 +313,7 @@ namespace Simulation.Modules.Management.Master.Proposed
         {
             if (DataHolder.GetUtilization(message.SenderId) != UtilizationStates.Evacuating)
             {
-                //throw new NotImplementedException("Home come");
+                throw new NotImplementedException("Home come");
 
             }
 

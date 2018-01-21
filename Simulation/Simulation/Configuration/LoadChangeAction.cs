@@ -4,6 +4,7 @@ namespace Simulation.Configuration
     {
         Drain = -25,
         Burst = 25,
-        Opposite
+        None,
+        Opposite,
     }
 }

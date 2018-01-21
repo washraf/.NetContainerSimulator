@@ -7,6 +7,10 @@ using Simulation.DataCenter;
 
 namespace Simulation.Messages
 {
+    /// <summary>
+    /// Respresents all message Base Class
+    /// All Message Must be emuatable
+    /// </summary>
     public abstract class Message
     {
         public Message(int target,int sender,MessageTypes messageType,int messageSize = 100)

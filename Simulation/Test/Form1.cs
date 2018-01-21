@@ -63,7 +63,7 @@ namespace Test
                 {
 
                     #region --ALL--
-                    foreach (var configuration in RunConfigurationFactory.GetConfigurations())
+                    foreach (var configuration in RunConfigurationFactory.GetNoneConfigurations())
                     {
                         btn_Start.Invoke(new Action(() => { btn_Start.Enabled = false; }));
                         List<MeasureValueHolder> internalValueListsTrials =

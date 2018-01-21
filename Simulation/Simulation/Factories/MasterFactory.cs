@@ -12,24 +12,28 @@ namespace Simulation.Factories
         private MachineController machineControllerObject;
         private UtilizationTable utilizationTable;
         private Strategies currentStrategy;
+        private readonly SchedulingAlgorithm schedulingAlgorithm;
         private TestedHosts testedHostsCount;
 
         public MasterFactory(NetworkSwitch networkSwitchObject,
             MachineController machineControllerObject,
             UtilizationTable utilizationTable,
-            Strategies currentStrategy, TestedHosts testedHostsCount):base(networkSwitchObject)
+            Strategies currentStrategy,
+            SchedulingAlgorithm schedulingAlgorithm,
+            TestedHosts testedHostsCount):base(networkSwitchObject)
         {
             this.networkSwitchObject = networkSwitchObject;
             this.machineControllerObject = machineControllerObject;
             this.utilizationTable = utilizationTable;
             this.currentStrategy = currentStrategy;
+            this.schedulingAlgorithm = schedulingAlgorithm;
             this.testedHostsCount = testedHostsCount;
         }
 
         public override Machine GetMachine()
         {
             return new MasterMachine(networkSwitchObject, machineControllerObject, utilizationTable,
-                currentStrategy, testedHostsCount);
+                currentStrategy,schedulingAlgorithm, testedHostsCount);
         }
     }
 }

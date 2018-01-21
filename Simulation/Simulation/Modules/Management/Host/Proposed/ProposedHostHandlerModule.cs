@@ -164,9 +164,12 @@ namespace Simulation.Modules.Management.Host.Proposed
                     case MessageTypes.BidCancellationRequest:
                         HandleBidCancellationRequest(message as BidCancellationRequest);
                         break;
-                    case MessageTypes.AddContainerMessage:
-                        HandlaAddContainerMessage(message as AddContainerMessage);
+                    case MessageTypes.CanHaveContainerRequest:
+                        HandlaCanHaveContainerRequest(message as CanHaveContainerRequest);
                             break;
+                    case MessageTypes.AddContainerRequest:
+                        HanleAddContainerRequest(message as AddContainerRequest);
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
 
@@ -174,10 +177,33 @@ namespace Simulation.Modules.Management.Host.Proposed
             }
         }
 
-        private void HandlaAddContainerMessage(AddContainerMessage message)
+        private void HanleAddContainerRequest(AddContainerRequest addContainerRequest)
         {
-            ContainerTable.AddContainer(message.ScheduledContainer.ContainerId, message.ScheduledContainer);
+            Task t = new Task(() => {
+                ContainerTable.AddContainer(addContainerRequest.NewContainer.ContainerId, addContainerRequest.NewContainer);
+            });
+            t.Start();
         }
+
+        private void HandlaCanHaveContainerRequest(CanHaveContainerRequest message)
+        {
+            //ContainerTable.AddContainer(message.ScheduledContainer.ContainerId, message.ScheduledContainer);
+            bool result;
+            var load = LoadManager.GetHostLoadInfoAfterContainer(message.NewContainerLoadInfo);
+            var newState = load.CalculateTotalUtilizationState(MinUtilization, MaxUtilization);
+
+            if (!_hostState.EvacuationMode
+                && LoadManager.CanITakeLoad(message.NewContainerLoadInfo) && newState!= UtilizationStates.OverUtilization) {
+                result = true;
+            }
+            else
+            {
+                result = false;
+            }
+            CanHaveContainerResponce responce = new CanHaveContainerResponce(0, MachineId, message.NewContainerLoadInfo.ContainerId, result);
+            CommunicationModule.SendMessage(responce);
+        }
+
         #endregion
         #region --Push Message Handlers--
         private void HandlePushLoadAvailabilityRequest(PushLoadAvailabilityRequest message)

@@ -55,7 +55,7 @@ namespace Simulation.Configuration
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            AccountTime = 100 * Second;
+            AccountTime = 60 * Second;
             CheckRate = 20*Second;
         }
 
@@ -65,6 +65,9 @@ namespace Simulation.Configuration
         }
 
         public static LoadChangeStrategy LoadChangeStrategy { get; set; } = LoadChangeStrategy.Incremental;
+        /// <summary>
+        /// One Minute
+        /// </summary>
         public static int AccountTime { get; private set; } = -1;
         
 

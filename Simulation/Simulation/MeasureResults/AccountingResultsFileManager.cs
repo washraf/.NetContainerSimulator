@@ -20,6 +20,7 @@ namespace Simulation.AccountingResults
                             (int)measureValueHolder.SimulationSize + "\\" +
                             measureValueHolder.StartUtilization + "_" + measureValueHolder.ChangeAction + "\\" +
                            measureValueHolder.Prediction + "\\" +
+                           measureValueHolder.Scheduling + "\\" +
                             measureValueHolder.Strategy + "_" + measureValueHolder.ContainerType 
                             + "\\" + measureValueHolder.Tested + "\\";
             if (trialNo != -1)
@@ -159,10 +160,11 @@ namespace Simulation.AccountingResults
                 (LoadChangeAction)Enum.Parse(typeof(LoadChangeAction), config[4].Split('_')[1]);
 
             LoadPrediction loadPrediction = (LoadPrediction)Enum.Parse(typeof(LoadPrediction), config[5]);
-            Strategies strategy = (Strategies)Enum.Parse(typeof(Strategies), config[6].Split('_')[0]);
-            ContainersType containerType = (ContainersType)Enum.Parse(typeof(ContainersType), config[6].Split('_')[1]);
-            TestedHosts testedHosts = (TestedHosts)Enum.Parse(typeof(TestedHosts), config[7]);
-            var conf = new RunConfiguration(simulationSize, perecent,changeAction,loadPrediction,strategy,testedHosts,containerType);
+            SchedulingAlgorithm schedulingAlgorithm = (SchedulingAlgorithm)Enum.Parse(typeof(SchedulingAlgorithm), config[6]);
+            Strategies strategy = (Strategies)Enum.Parse(typeof(Strategies), config[7].Split('_')[0]);
+            ContainersType containerType = (ContainersType)Enum.Parse(typeof(ContainersType), config[7].Split('_')[1]);
+            TestedHosts testedHosts = (TestedHosts)Enum.Parse(typeof(TestedHosts), config[8]);
+            var conf = new RunConfiguration(simulationSize, perecent,changeAction,loadPrediction,strategy,schedulingAlgorithm, testedHosts,containerType);
             MeasureValueHolder holder =
                 new MeasureValueHolder(conf);
 
