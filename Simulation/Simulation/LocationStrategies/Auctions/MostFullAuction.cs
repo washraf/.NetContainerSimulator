@@ -6,10 +6,10 @@ using Simulation.LocationStrategies.Auctions;
 
 namespace Simulation.LocationStrategies.Auctions
 {
-    public class PullAuction:Auction
+    public class MostFullAuction:Auction
     {
-        public PullAuction(int auctionId, int auctionOwner, List<int> candidates) 
-            :base(auctionId,auctionOwner, candidates, StrategyActionType.PullAction)
+        public MostFullAuction(int auctionId, int auctionOwner, List<int> candidates, StrategyActionType strategyActionType) 
+            :base(auctionId,auctionOwner, candidates, strategyActionType)
         {
 
         }

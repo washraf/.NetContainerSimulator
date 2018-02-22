@@ -10,8 +10,9 @@ namespace Simulation.SimulationController
             LoadPrediction loadPrediction,
             Strategies strategy,
             SchedulingAlgorithm schedulingAlgorithm,
-            TestedHosts testedHosts = TestedHosts.One,
-            ContainersType containersType = ContainersType.D)
+            TestedHosts testedHosts,
+            ContainersType containersType,
+            int trialId)
         {
             LoadPrediction = loadPrediction;
             SimulationSize = simulationSize;
@@ -21,6 +22,7 @@ namespace Simulation.SimulationController
             ChangeAction = changeAction;
             TestedHosts = testedHosts;
             ContainersType = containersType;
+            TrialId = trialId;
         }
 
         public LoadPrediction LoadPrediction { get; }
@@ -31,5 +33,6 @@ namespace Simulation.SimulationController
         public LoadChangeAction ChangeAction { get; }
         public TestedHosts TestedHosts { get; }
         public ContainersType ContainersType { get; }
+        public int TrialId { get; }
     }    
 }

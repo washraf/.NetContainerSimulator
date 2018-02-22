@@ -14,7 +14,7 @@ namespace Simulation.AccountingResults
     public class AccountingResultsFileManager:IAccountingResultsManager
     {
 
-        public void WriteDataToDisk(MeasureValueHolder measureValueHolder, int trialNo)
+        public void WriteDataToDisk(MeasureValueHolder measureValueHolder)
         {
             string folder = @"D:\Simulations\Results\" +
                             (int)measureValueHolder.SimulationSize + "\\" +
@@ -22,9 +22,7 @@ namespace Simulation.AccountingResults
                            measureValueHolder.Prediction + "\\" +
                            measureValueHolder.Scheduling + "\\" +
                             measureValueHolder.Strategy + "_" + measureValueHolder.ContainerType 
-                            + "\\" + measureValueHolder.Tested + "\\";
-            if (trialNo != -1)
-                folder += trialNo + "\\";
+                            + "\\" + measureValueHolder.Tested + "\\"+measureValueHolder.TrialId+"\\";
             try
             {
                 using (
@@ -146,7 +144,7 @@ namespace Simulation.AccountingResults
             {
                 //MessageBox.Show("Will create Directory");
                 Directory.CreateDirectory(folder);
-                this.WriteDataToDisk(measureValueHolder, trialNo);
+                this.WriteDataToDisk(measureValueHolder);
             }
         }
 
@@ -164,7 +162,8 @@ namespace Simulation.AccountingResults
             Strategies strategy = (Strategies)Enum.Parse(typeof(Strategies), config[7].Split('_')[0]);
             ContainersType containerType = (ContainersType)Enum.Parse(typeof(ContainersType), config[7].Split('_')[1]);
             TestedHosts testedHosts = (TestedHosts)Enum.Parse(typeof(TestedHosts), config[8]);
-            var conf = new RunConfiguration(simulationSize, perecent,changeAction,loadPrediction,strategy,schedulingAlgorithm, testedHosts,containerType);
+            int TrialId = int.Parse(config[9]);
+            var conf = new RunConfiguration(simulationSize, perecent,changeAction,loadPrediction,strategy,schedulingAlgorithm, testedHosts,containerType,TrialId);
             MeasureValueHolder holder =
                 new MeasureValueHolder(conf);
 
@@ -256,17 +255,19 @@ namespace Simulation.AccountingResults
                     }
                 }
             }
-
-            nfile = mainFile.Replace("All", "PullsPerImage");
-            using (StreamReader reader = new StreamReader(new FileStream(nfile, FileMode.Open)))
+            if (containerType == ContainersType.D)
             {
-                reader.ReadLine();
-                while (!reader.EndOfStream)
+                nfile = mainFile.Replace("All", "PullsPerImage");
+                using (StreamReader reader = new StreamReader(new FileStream(nfile, FileMode.Open)))
                 {
-                    var line = reader.ReadLine().Split(',');
-                    int ImageId = Convert.ToInt32(line[0]);
-                    int Pulls = Convert.ToInt32(line[1]);
-                    holder.PullsPerImage.Add(ImageId, Pulls);
+                    reader.ReadLine();
+                    while (!reader.EndOfStream)
+                    {
+                        var line = reader.ReadLine().Split(',');
+                        int ImageId = Convert.ToInt32(line[0]);
+                        int Pulls = Convert.ToInt32(line[1]);
+                        holder.PullsPerImage.Add(ImageId, Pulls);
+                    }
                 }
             }
 

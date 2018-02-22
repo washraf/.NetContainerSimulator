@@ -79,14 +79,15 @@ namespace Test
             myPane.XAxis.Title.Text = $"Number of Availble Hosts (N)";
             myPane.YAxis.Title.Text = yAxis.ToString();
             Dictionary<string, PointPairList> all = new Dictionary<string, PointPairList>();
-            all.Add(Strategies.Proposed2018+"_"+1, new PointPairList());
-            all.Add(Strategies.Proposed2018 + "_" + 5, new PointPairList());
-            all.Add(Strategies.Proposed2018 + "_" + 10, new PointPairList());
-            all.Add(Strategies.Proposed2018 + "_" + 20, new PointPairList());
+            //all.Add(Strategies.Proposed2018+"_"+1, new PointPairList());
+            //all.Add(Strategies.Proposed2018 + "_" + 5, new PointPairList());
+            //all.Add(Strategies.Proposed2018 + "_" + 10, new PointPairList());
+            //all.Add(Strategies.Proposed2018 + "_" + 20, new PointPairList());
             all.Add(Strategies.WAshraf2017.ToString(),new PointPairList());
             all.Add(Strategies.Zhao.ToString(), new PointPairList());
             all.Add(Strategies.ForsmanPush.ToString(), new PointPairList());
             all.Add(Strategies.ForsmanPull.ToString(), new PointPairList());
+            
 
             foreach (var trial in trials)
             {
@@ -151,6 +152,10 @@ namespace Test
                         all[k].Add(trial.Size, trial.ContainersAverage);
                         myPane.YAxis.Title.Text = "ContainersAverage";
                         break;
+                    case FinalItems.RMSE:
+                        all[k].Add(trial.Size, trial.RMSE);
+                        myPane.YAxis.Title.Text = "RMSE";
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(yAxis), yAxis, null);
                 }
@@ -159,9 +164,10 @@ namespace Test
             foreach (var a in all)
             {
                 var st = (Strategies) Enum.Parse(typeof(Strategies), a.Key.Split('_')[0]);
-                int t = 0;
+                TestedHosts t = TestedHosts.Infinity;
                 if (st == Strategies.Proposed2018)
-                    t = int.Parse(a.Key.Split('_')[1]);
+                    t = (TestedHosts)int.Parse(a.Key.Split('_')[1]);
+
                 LineItem l = new LineItem
                     (a.Key,
                     a.Value, GetColor(st,t), SymbolType.Square,3);
@@ -192,7 +198,7 @@ namespace Test
 
         }
 
-        private DashStyle GetDash(Strategies key, int tested)
+        private DashStyle GetDash(Strategies key, TestedHosts tested)
         {
             switch (key)
             {
@@ -211,26 +217,24 @@ namespace Test
             }
         }
 
-        private Color GetColor(Strategies key, int tested)
+        private Color GetColor(Strategies key, TestedHosts tested)
         {
             switch (key)
             {
                 case Strategies.Proposed2018:
                     switch (tested)
                     {
-                        case 1:
+                        case TestedHosts.Ten:
                             return Color.Indigo;
-                        case 5:
+                        case TestedHosts.Twenty:
                             return Color.CadetBlue;
-                        case 10:
+                        case TestedHosts.Infinity:
                             return Color.DarkViolet;
-                        case 20:
-                            return Color.Red;
                         default:
                             throw new NotImplementedException();
                     }
                 case Strategies.WAshraf2017:
-                    return Color.YellowGreen;
+                    return Color.Red;
                 case Strategies.Zhao:
                     return Color.Blue;
                 case Strategies.ForsmanPush:
@@ -248,7 +252,32 @@ namespace Test
             var trials = context.TrialResults
                 .Where(x => x.StartUtil == cb_StartUtil.Text 
                 && x.Change == cb_Change.Text)
-                .OrderBy(y => y.Size).ToList();
+                .ToList()
+                .GroupBy(x => new { x.Algorithm, x.Size })
+                .Select(x => new TrialResult()
+                {
+                    Algorithm = x.Key.Algorithm,
+                    AverageEntropy = x.Average(y => y.AverageEntropy),
+                    Change = x.First().Change,
+                    ContainersAverage = x.Average(y => y.ContainersAverage),
+                    FinalEntropy = x.Average(y => y.FinalEntropy),
+                    Hosts = x.Average(y => y.Hosts),
+                    ImagePullsRatio = x.Average(y => y.ImagePullsRatio),
+                    ImagePullsTotal = x.Average(y => y.ImagePullsTotal),
+                    Migrations = x.Average(y => y.Migrations),
+                    Power = x.Average(y => y.Power),
+                    PredictionAlg = x.First().PredictionAlg,
+                    RMSE = x.Average(y => y.RMSE),
+                    SchedulingAlgorithm = x.First().SchedulingAlgorithm,
+                    Size = x.Key.Size,
+                    SlaViolations = x.Average(y => y.SlaViolations),
+                    StartUtil = x.First().StartUtil,
+                    StdDev = x.Average(y => y.StdDev),
+                    Tested = x.First().Tested,
+                    TotalContainers = x.Average(y => y.TotalContainers),
+                    TotalMessages = x.Average(y => y.TotalMessages),
+                    TrialId = 0,
+                }).OrderBy(y => y.Size).ToList();
             return trials;
         }
 

@@ -8,15 +8,13 @@ using Simulation.LocationStrategies.Auctions;
 
 namespace Simulation.LocationStrategies.Auctions
 {
-    public class PushAuction:Auction
+    public class LeastFullAuction:Auction
     {
-        public PushAuction(int auctionId,int auctionOwner,int containerId,List<int> candidates)
-            :base(auctionId,auctionOwner,candidates, StrategyActionType.PushAction)
+        public LeastFullAuction(int auctionId,int auctionOwner,List<int> candidates, StrategyActionType strategyActionType)
+            :base(auctionId,auctionOwner,candidates, strategyActionType)
         {
-            ContainerId = containerId;
         }
 
-        private int ContainerId { get; set; }
 
         public override Bid GetWinnerBid()
         {

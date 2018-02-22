@@ -34,7 +34,7 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
         {
             var ncandidates = candidates.Take((int)TestedHostsCount).ToList();
             int instanceId = Helpers.RandomNumberGenerator.GetInstanceRandomNumber();
-            PushAuction pushAuction = new PushAuction(instanceId, message.SenderId, message.SelectedContainerLoadInfo.ContainerId, ncandidates);
+            LeastFullAuction pushAuction = new LeastFullAuction(instanceId, message.SenderId, ncandidates, StrategyActionType.PushAction);
             Console.WriteLine($"\tMaster: Initiate a Push Auction of Host#{message.SenderId} with #{instanceId}");
 
             foreach (var candidateHostId in ncandidates)
@@ -61,7 +61,7 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
 
             int instanceId = RandomNumberGenerator.GetInstanceRandomNumber();
            // int count = candidates.Count();
-            PullAuction pullAuction = new PullAuction(instanceId, message.SenderId, ncandidates);
+            MostFullAuction pullAuction = new MostFullAuction(instanceId, message.SenderId, ncandidates, StrategyActionType.PullAction);
             Console.WriteLine($"\tMaster: Initiate a Pull Auction of Host#{message.SenderId} with #{instanceId}");
 
             foreach (var candidateHostId in ncandidates)

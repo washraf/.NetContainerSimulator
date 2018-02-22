@@ -4,5 +4,6 @@
     {
         PushAction,
         PullAction,
+        Scheduling
     }
 }

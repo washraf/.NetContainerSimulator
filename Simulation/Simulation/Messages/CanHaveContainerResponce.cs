@@ -1,15 +1,15 @@
-﻿namespace Simulation.Messages
+﻿using Simulation.LocationStrategies;
+
+namespace Simulation.Messages
 {
     public class CanHaveContainerResponce : Message
     {
-        public CanHaveContainerResponce(int target, int sender, int containerId, bool responce) :
+        public CanHaveContainerResponce(int target, int sender, Bid bid) :
             base(target, sender, MessageTypes.CanHaveContainerResponce)
         {
-            ContainerId = containerId;
-            Responce = responce;
+            Bid = bid;
         }
 
-        public int ContainerId { get; }
-        public bool Responce { get; }
+        public Bid Bid { get; }
     }
 }

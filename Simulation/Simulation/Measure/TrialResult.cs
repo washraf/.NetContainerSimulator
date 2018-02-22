@@ -14,7 +14,8 @@ namespace Simulation.Measure
         public string Change { get; set; }
         public string SchedulingAlgorithm { get; set; }
         public string Algorithm { get; set; }
-        public int Tested { get; set; }
+        public string Tested { get; set; }
+        public int TrialId { get; set; }
         //Results
         public double AverageEntropy { get; set; }
         public double FinalEntropy { get; set; }
@@ -29,5 +30,7 @@ namespace Simulation.Measure
         public double ImagePullsTotal { get; set; }
         public double ImagePullsRatio { get; set; }
         public double ContainersAverage { get; set; }
+        public double TotalContainers { get; set; }
+        public double RMSE { get; set; }
     }
 }

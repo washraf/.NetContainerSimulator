@@ -73,6 +73,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LocationStrategies\Auctions\LeastFullAuction.cs" />
+    <Compile Include="LocationStrategies\Auctions\MostFullAuction.cs" />
     <Compile Include="MeasureResults\AccountingResultsFileManager.cs" />
     <Compile Include="MeasureResults\IAccountingResultsManager.cs" />
     <Compile Include="MeasureResults\ITrialResultManagement.cs" />
@@ -134,8 +136,6 @@
     <Compile Include="LocationStrategies\LocationStrategy.cs" />
     <Compile Include="LocationStrategies\StrategyActionType.cs" />
     <Compile Include="LocationStrategies\Bid.cs" />
-    <Compile Include="LocationStrategies\Auctions\PullAuction.cs" />
-    <Compile Include="LocationStrategies\Auctions\PushAuction.cs" />
     <Compile Include="Accounting\AccountingModule.cs" />
     <Compile Include="DataCenter\Core\Component.cs" />
     <Compile Include="DataCenter\Containers\Container.cs" />
@@ -172,7 +172,10 @@
     <Compile Include="Modules\Management\Master\WAshraf2017\InorderPropingManagement.cs" />
     <Compile Include="Modules\Management\Master\WAshraf2017\MineCommon.cs" />
     <Compile Include="Modules\Management\Master\NoMasterHandlerModule.cs" />
+    <Compile Include="Modules\Scheduling\AuctionScheduler.cs" />
+    <Compile Include="Modules\Scheduling\BaseScheduler.cs" />
     <Compile Include="Modules\Scheduling\FirstFitScheduler.cs" />
+    <Compile Include="Modules\Scheduling\IScheduler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Factories\ContainerFactory.cs" />

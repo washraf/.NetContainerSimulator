@@ -140,7 +140,7 @@ namespace Simulation.Modules.Management.Master.Proposed
         {
             var ncandidates = candidates.Take((int)TestedHostsCount).ToList();
             int instanceId = Helpers.RandomNumberGenerator.GetInstanceRandomNumber();
-            PushAuction pushAuction = new PushAuction(instanceId, message.SenderId, message.SelectedContainerLoadInfo.ContainerId, ncandidates);
+            LeastFullAuction pushAuction = new LeastFullAuction(instanceId, message.SenderId, ncandidates, StrategyActionType.PushAction);
             foreach (var candidateHostId in ncandidates)
             {
                 if (candidateHostId == 0)
@@ -188,7 +188,7 @@ namespace Simulation.Modules.Management.Master.Proposed
 
             int instanceId = RandomNumberGenerator.GetInstanceRandomNumber();
             // int count = candidates.Count();
-            PullAuction pullAuction = new PullAuction(instanceId, message.SenderId, ncandidates);
+            MostFullAuction pullAuction = new MostFullAuction(instanceId, message.SenderId, ncandidates, StrategyActionType.PullAction);
 
             foreach (var candidateHostId in ncandidates)
             {

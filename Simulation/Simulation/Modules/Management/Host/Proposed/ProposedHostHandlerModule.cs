@@ -188,19 +188,20 @@ namespace Simulation.Modules.Management.Host.Proposed
         private void HandlaCanHaveContainerRequest(CanHaveContainerRequest message)
         {
             //ContainerTable.AddContainer(message.ScheduledContainer.ContainerId, message.ScheduledContainer);
-            bool result;
             var load = LoadManager.GetHostLoadInfoAfterContainer(message.NewContainerLoadInfo);
             var newState = load.CalculateTotalUtilizationState(MinUtilization, MaxUtilization);
-
+            Bid bid= null;
             if (!_hostState.EvacuationMode
                 && LoadManager.CanITakeLoad(message.NewContainerLoadInfo) && newState!= UtilizationStates.OverUtilization) {
-                result = true;
+                 bid = new Bid(this.MachineId, true, load, message.AuctionId, message.NewContainerLoadInfo.ContainerId, BidReasons.ValidBid);
+
             }
             else
             {
-                result = false;
+                 bid = new Bid(this.MachineId, false, null, message.AuctionId, message.NewContainerLoadInfo.ContainerId, BidReasons.CantBid);
+
             }
-            CanHaveContainerResponce responce = new CanHaveContainerResponce(0, MachineId, message.NewContainerLoadInfo.ContainerId, result);
+            CanHaveContainerResponce responce = new CanHaveContainerResponce(0, MachineId, bid);
             CommunicationModule.SendMessage(responce);
         }
 

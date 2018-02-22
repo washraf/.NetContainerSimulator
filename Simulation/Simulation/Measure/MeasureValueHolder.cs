@@ -18,7 +18,7 @@ namespace Simulation.Measure
         public LoadChangeAction ChangeAction { get; set; }
         public LoadPrediction Prediction { get; set; }
         public SchedulingAlgorithm Scheduling { get; }
-
+        public int TrialId { get; }
         public TestedHosts Tested { get; }
         public ContainersType ContainerType { get; }
 
@@ -26,8 +26,11 @@ namespace Simulation.Measure
         {
             get
             {
-                return (int)SimulationSize + "_" + (int)StartUtilization + "_" + ChangeAction.ToString() +
-                       "_" + Prediction.ToString() +"_"+Scheduling.ToString()+ "_" + Strategy.ToString()+"_"+ContainerType+"_"+(int)Tested;
+                return (int)SimulationSize + "_" + (int)StartUtilization
+                    + "_" + ChangeAction.ToString()
+                    + "_" + Prediction.ToString() + "_" + Scheduling.ToString()
+                    + "_" + Strategy.ToString() + "_" + ContainerType
+                    + "_" + (int)Tested + "_" + TrialId;
             }
         }
 
@@ -42,7 +45,7 @@ namespace Simulation.Measure
             Scheduling = configuration.SchedulingAlgorithm;
             ContainerType = configuration.ContainersType;
             Configuration = configuration;
-
+            TrialId = configuration.TrialId;
         }
 
         
@@ -163,6 +166,22 @@ namespace Simulation.Measure
             get { return MeasuredValuesList.Select(x => x.NoHosts).Average(); }
         }
 
+        public double RMSE
+        {
+            get {
+                var rmse = 0.0;
+                var l1 = MeasuredValuesList.Select(x => x.IdealHostsCount).ToList();
+                var l2 = MeasuredValuesList.Select(x => x.NoHosts).ToList();
+                for (int i = 0; i < l1.Count(); i++)
+                {
+                    rmse += Math.Pow(l1[i] - l2[i],2);
+                }
+                rmse  /= l1.Count();
+                rmse = Math.Sqrt(rmse);
+                return rmse;
+            }
+        }
+
         public double AveragUtilization
         {
             get { return MeasuredValuesList.Select(x => x.AvgNeededVolume).Average(); }
@@ -258,7 +277,9 @@ namespace Simulation.Measure
 
         public double AveragePullPerImage
         {
-            get { return PullsPerImage.Select(x => x.Value).Average(); }
+            get {
+                return Configuration.ContainersType == ContainersType.D?
+                     PullsPerImage.Select(x => x.Value).Average():0; }
         }
 
         public double AverageContainers
@@ -270,6 +291,14 @@ namespace Simulation.Measure
         }
 
         public RunConfiguration Configuration { get; }
+        public double TotalContainers {
+
+            get
+            {
+                return HostMeasureValueList.Last().Containers;
+            }
+
+        }
 
         #endregion
 

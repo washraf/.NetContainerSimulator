@@ -16,7 +16,7 @@ namespace Simulation.Configuration
         /// Ideal steps = 180
         /// </summary>
         public static int Steps = 180;
-        public static int NoOfTrials { get; } = 1;
+        public static int NoOfTrials { get; } = 3;
 
         public static int GetSimulationTime
         {

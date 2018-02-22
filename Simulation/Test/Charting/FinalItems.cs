@@ -9,6 +9,7 @@ namespace Test.Charting
     enum FinalItems
     {
         Hosts,
+        RMSE,
         Power,
         //StdDev,
         Migrations,
@@ -18,6 +19,7 @@ namespace Test.Charting
         SlaViolations,
         TotalImagePulls,
         AveragePullsPerImage,
-        ContainersAverage
+        ContainersAverage,
+        
     }
 }

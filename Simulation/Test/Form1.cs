@@ -57,49 +57,25 @@ namespace Test
         static IAccountingResultsManager accountingResultsManager = new AccountingResultsFileManager();
         private void btn_Start_Click(object sender, EventArgs e)
         {
-
             Thread t = new Thread(
                 () =>
                 {
 
-                    #region --ALL--
-                    foreach (var configuration in RunConfigurationFactory.GetNoneConfigurations())
+                    foreach (var configuration in RunConfigurationFactory.GetOldConfiguraton())
                     {
                         btn_Start.Invoke(new Action(() => { btn_Start.Enabled = false; }));
-                        List<MeasureValueHolder> internalValueListsTrials =
-                            new List<MeasureValueHolder>();
-                        //MeasureValueHolder holder = null;
-                        for (int i = 0; i < Global.NoOfTrials; i++)
-                        {
-                            //var stime = DateTime.Now;
-                            Global.UpdateTime(configuration.SimulationSize, configuration.Strategy);
-                            SimulationController controller =
-                                new SimulationController(configuration);
-                            controller.StartSimulation();
-
-                            internalValueListsTrials.Add(controller.AccountingModuleObject.MeasureHolder);
-                            if (Global.NoOfTrials > 1)
-                            {
-                                accountingResultsManager.WriteDataToDisk(controller.AccountingModuleObject.MeasureHolder, i);
-                            }
-                            Thread.Sleep(5000);
-
-                        }
-                        MeasureValueHolder final = internalValueListsTrials[0] / 1;
-                        foreach (var list in internalValueListsTrials.Skip(1))
-                        {
-                            final = final + list;
-                        }
-                        final = final / Global.NoOfTrials;
-                        accountingResultsManager.WriteDataToDisk(final, -1);
-
+                        Global.UpdateTime(configuration.SimulationSize, configuration.Strategy);
+                        SimulationController controller = new SimulationController(configuration);
+                        controller.StartSimulation();
+                        accountingResultsManager.WriteDataToDisk(controller.AccountingModuleObject.MeasureHolder);
+                        Thread.Sleep(5000);
                         btn_Start.Invoke(new Action(() =>
                         {
+                            AddDataHolder(controller.AccountingModuleObject.MeasureHolder);
                             btn_Start.Enabled = true;
-                            AddDataHolder(final);
                         }));
                     }
-                    #endregion
+                    
                 });
             t.Priority = ThreadPriority.Highest;
             t.Start();

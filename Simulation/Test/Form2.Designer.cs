@@ -52,12 +52,13 @@
             this.zedGraphControl1.ScrollMinY2 = 0D;
             this.zedGraphControl1.Size = new System.Drawing.Size(777, 412);
             this.zedGraphControl1.TabIndex = 0;
+            this.zedGraphControl1.UseExtendedPrintDialog = true;
             // 
             // cb_Item
             // 
             this.cb_Item.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cb_Item.FormattingEnabled = true;
-            this.cb_Item.Location = new System.Drawing.Point(82, 26);
+            this.cb_Item.Location = new System.Drawing.Point(45, 26);
             this.cb_Item.Name = "cb_Item";
             this.cb_Item.Size = new System.Drawing.Size(121, 21);
             this.cb_Item.TabIndex = 1;
@@ -67,7 +68,7 @@
             // 
             this.cb_StartUtil.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cb_StartUtil.FormattingEnabled = true;
-            this.cb_StartUtil.Location = new System.Drawing.Point(276, 26);
+            this.cb_StartUtil.Location = new System.Drawing.Point(200, 26);
             this.cb_StartUtil.Name = "cb_StartUtil";
             this.cb_StartUtil.Size = new System.Drawing.Size(121, 21);
             this.cb_StartUtil.TabIndex = 1;
@@ -77,7 +78,7 @@
             // 
             this.cb_Change.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cb_Change.FormattingEnabled = true;
-            this.cb_Change.Location = new System.Drawing.Point(470, 26);
+            this.cb_Change.Location = new System.Drawing.Point(370, 26);
             this.cb_Change.Name = "cb_Change";
             this.cb_Change.Size = new System.Drawing.Size(121, 21);
             this.cb_Change.TabIndex = 1;
@@ -86,16 +87,16 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(41, 29);
+            this.label1.Location = new System.Drawing.Point(12, 29);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(29, 13);
+            this.label1.Size = new System.Drawing.Size(27, 13);
             this.label1.TabIndex = 2;
             this.label1.Text = "Item";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(235, 29);
+            this.label3.Location = new System.Drawing.Point(172, 29);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(22, 13);
             this.label3.TabIndex = 2;
@@ -104,7 +105,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(429, 29);
+            this.label4.Location = new System.Drawing.Point(327, 29);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(37, 13);
             this.label4.TabIndex = 2;

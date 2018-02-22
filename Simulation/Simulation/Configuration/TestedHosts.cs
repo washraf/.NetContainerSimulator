@@ -2,15 +2,18 @@
 {
     public enum TestedHosts
     {
-        One = 1,
-        Five = 5,
+        //One = 1,
+        //Five = 5,
         Ten = 10,
-        Twenty = 20
+        Twenty = 20,
+        Infinity  = int.MaxValue,
     }
 
     public enum SchedulingAlgorithm
     {
-        FF
+        FF,
+        MFull,
+        LFull
     }
 }
 

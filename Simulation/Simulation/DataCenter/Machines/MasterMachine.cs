@@ -73,6 +73,10 @@ namespace Simulation.DataCenter.Machines
                 case SchedulingAlgorithm.FF:
                     scheduler = new FirstFitScheduler(holder, CommunicationModule, powerController);
                     break;
+                case SchedulingAlgorithm.MFull:
+                case SchedulingAlgorithm.LFull:
+                    scheduler = new AuctionScheduler(holder, CommunicationModule, powerController,scheduling);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(scheduling), scheduling, null);
             }
