@@ -4,7 +4,7 @@ namespace Simulation.Messages
 {
     public class ImagePullResponce : Message
     {
-        public ImagePullResponce(int target, int sender, int imageId, Image image) : base(target, sender, MessageTypes.ImagePullResponce)
+        public ImagePullResponce(int target, int sender, int imageId, Image image, int imageSize) : base(target, sender, MessageTypes.ImagePullResponce, imageSize)
         {
             ImageId = imageId;
             Image = image;

@@ -49,7 +49,8 @@ namespace Simulation.DataCenter.Machines
 
         private ImagePullResponce HandleImagePullRequest(ImagePullRequest imagePullRequest)
         {
-            var result = new ImagePullResponce(imagePullRequest.SenderId, this.MachineId, imagePullRequest.ImageId, _registryTable.GetImage(imagePullRequest.ImageId));
+            var img = _registryTable.GetImage(imagePullRequest.ImageId);
+            var result = new ImagePullResponce(imagePullRequest.SenderId, this.MachineId, imagePullRequest.ImageId,img , img.Size);
             return result;
         }
 

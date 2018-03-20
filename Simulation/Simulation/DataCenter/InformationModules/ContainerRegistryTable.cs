@@ -18,7 +18,7 @@ namespace Simulation.DataCenter.InformationModules
             int size = (int)simulationSize;
             for (int i = 0; i < size; i++)
             {
-                dic.Add(i, new Image(i, $"Base {i}"));
+                dic.Add(i, new Image(i, $"Base {i}",100));
 
             }
             Random random = new Random(Guid.NewGuid().GetHashCode());
@@ -26,14 +26,14 @@ namespace Simulation.DataCenter.InformationModules
             {
                 var id = i+ size;
                 var bimg = random.Next(0, 20);
-                dic.Add(id, new Image(id, $"Level {id}",bimg));
+                dic.Add(id, new Image(id, $"Level {id}", 100, bimg));
 
             }
             for (int i = 0; i < 3 * (int)simulationSize; i++)
             {
                 var id = i + 3*size;
                 var bimg = random.Next(20, 60);
-                dic.Add(id, new Image(id, $"Final {id}", bimg));
+                dic.Add(id, new Image(id, $"Final {id}", 100, bimg));
 
             }
             return dic;

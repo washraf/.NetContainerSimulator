@@ -61,7 +61,7 @@ namespace Test
                 () =>
                 {
 
-                    foreach (var configuration in RunConfigurationFactory.GetOldConfiguraton())
+                    foreach (var configuration in RunConfigurationFactory.GetConfigurations())
                     {
                         btn_Start.Invoke(new Action(() => { btn_Start.Enabled = false; }));
                         Global.UpdateTime(configuration.SimulationSize, configuration.Strategy);
@@ -447,6 +447,17 @@ namespace Test
         private void button1_Click(object sender, EventArgs e)
         {
             Form2 f = new Form2();
+            f.Show(this);
+            f.FormClosing += (a, b) =>
+            {
+                f.Owner?.Show();
+            };
+            this.Hide();
+        }
+
+        private void DBE_Click(object sender, EventArgs e)
+        {
+            DBE f = new DBE();
             f.Show(this);
             f.FormClosing += (a, b) =>
             {

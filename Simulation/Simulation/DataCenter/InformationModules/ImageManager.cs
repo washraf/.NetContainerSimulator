@@ -40,13 +40,15 @@ namespace Simulation.DataCenter.InformationModules
         {
             var request = new ImageTreeRequest(int.MaxValue, _communicationModule.MachineId, imageId);
             var r = _communicationModule.RequestData(request);
+            
             var result = r as ImageTreeResponce;
             return result.ImageTree;
         }
         private Image GetImage(int imageId)
         {
             var request = new ImagePullRequest(int.MaxValue, _communicationModule.MachineId, imageId);
-            var result = _communicationModule.RequestData(request) as ImagePullResponce;
+            var r = _communicationModule.RequestData(request);
+            var result = r as ImagePullResponce;
             return result.Image;
         }
     }

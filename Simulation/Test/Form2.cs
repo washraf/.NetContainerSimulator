@@ -27,10 +27,18 @@ namespace Test
 
         private void Form2_Load(object sender, EventArgs e)
         {
-            cb_Change.DataSource = Enum.GetValues(typeof(LoadChangeAction)).Cast<LoadChangeAction>();
+            var LoadChangeActionItems = Enum.GetValues(typeof(LoadChangeAction)).Cast<LoadChangeAction>().Select(x=>x.ToString()).ToList();
+            LoadChangeActionItems.Add("All");
+            cb_Change.DataSource = LoadChangeActionItems;
             cb_Change.SelectedIndex = 0;
-            cb_StartUtil.DataSource = Enum.GetValues(typeof(StartUtilizationPercent)).Cast<StartUtilizationPercent>();
+
+            var startutilizationitems = Enum.GetValues(typeof(StartUtilizationPercent)).Cast<StartUtilizationPercent>().Select(x => x.ToString()).ToList();
+            startutilizationitems.Add("All");
+
+            cb_StartUtil.DataSource = startutilizationitems;
             cb_StartUtil.SelectedIndex = 0;
+
+
             cb_Item.DataSource = Enum.GetValues(typeof(FinalItems)).Cast<FinalItems>();
             cb_Item.SelectedIndex = 0;
             Done = true;
@@ -75,9 +83,9 @@ namespace Test
             myPane.YAxis.Scale.MaxAuto = true;
 
             // Set the Titles
-            myPane.Title.Text = yAxis.ToString();
-            myPane.XAxis.Title.Text = $"Number of Availble Hosts (N)";
-            myPane.YAxis.Title.Text = yAxis.ToString();
+            myPane.Title.Text = yAxis.ToString().Replace('_',' ');
+            myPane.XAxis.Title.Text = $"Number of Hosts (N)";
+            myPane.YAxis.Title.Text = yAxis.ToString().Replace('_', ' ');
             Dictionary<string, PointPairList> all = new Dictionary<string, PointPairList>();
             //all.Add(Strategies.Proposed2018+"_"+1, new PointPairList());
             //all.Add(Strategies.Proposed2018 + "_" + 5, new PointPairList());
@@ -99,15 +107,20 @@ namespace Test
                 var k = st == Strategies.Proposed2018 ? Strategies.Proposed2018 + "_" + trial.Tested : st.ToString();
                 switch (yAxis)
                 {
-                    case FinalItems.AverageEntropy:
-                        all[k].Add(trial.Size, trial.AverageEntropy);
-                        myPane.YAxis.Scale.Min = 0.99;
-                        myPane.YAxis.Scale.Max = 1.01;
+                    
+                    case FinalItems.Hosts:
+                        all[k].Add(trial.Size, trial.Hosts);
+                        myPane.YAxis.Title.Text = "Number Of Used Hosts";
                         break;
-                    case FinalItems.FinalEntropy:
-                        all[k].Add(trial.Size, trial.FinalEntropy);
-                        myPane.YAxis.Scale.Min = 0.99;
-                        myPane.YAxis.Scale.Max = 1.01;
+                    case FinalItems.RMSE:
+                        all[k].Add(trial.Size, trial.RMSE);
+                        myPane.YAxis.Title.Text = "RMSE";
+                        break;
+                    case FinalItems.RMSE_Ratio:
+                        var rmseval = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.RMSE);
+                        var rmseMaxtrial = trials.First(x => x.Size == trial.Size && x.Change == trial.Change && x.RMSE == rmseval);
+                        all[k].Add(trial.Size, trial.RMSE/rmseMaxtrial.RMSE);
+                        myPane.YAxis.Title.Text = "RMSE Ratio";
                         break;
                     case FinalItems.Power:
                         var val = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.Power);
@@ -118,9 +131,21 @@ namespace Test
                     //case DrawItems.StdDev:
                     //    all[st].Add(trial.Size, trial.StdDev);
                     //    break;
-                    case FinalItems.Hosts:
-                        all[k].Add(trial.Size, trial.Hosts);
-                        myPane.YAxis.Title.Text = "Number Of Used Hosts";
+                    case FinalItems.Average_Entropy:
+                        all[k].Add(trial.Size, trial.AverageEntropy);
+                        myPane.YAxis.Scale.Min = 0.99;
+                        myPane.YAxis.Scale.Max = 1.01;
+                        break;
+                    case FinalItems.Average_Entropy_Ratio:
+                        var AEval = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.AverageEntropy);
+                        var AEMaxtrial = trials.First(x => x.Size == trial.Size && x.Change == trial.Change && x.AverageEntropy == AEval);
+                        all[k].Add(trial.Size, trial.AverageEntropy / AEMaxtrial.AverageEntropy);
+                        myPane.YAxis.Title.Text = "Average Entropy Ratio";
+                        break;
+                    case FinalItems.Final_Entropy:
+                        all[k].Add(trial.Size, trial.FinalEntropy);
+                        myPane.YAxis.Scale.Min = 0.99;
+                        myPane.YAxis.Scale.Max = 1.01;
                         break;
                     case FinalItems.Migrations:
                         val = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.Migrations);
@@ -129,7 +154,7 @@ namespace Test
                         all[k].Add(trial.Size, trial.Migrations / mtrial.Migrations);
                         myPane.YAxis.Title.Text = "Migrations Count Ratio";
                         break;
-                    case FinalItems.SlaViolations:
+                    case FinalItems.SLA_Violations:
                         all[k].Add(trial.Size, trial.SlaViolations);
                         break;
                     case FinalItems.Messages:
@@ -140,22 +165,19 @@ namespace Test
                         myPane.YAxis.Title.Text = "Message Count Ratio";
                         all[k].Add(trial.Size, trial.TotalMessages / mtrial.TotalMessages);
                         break;
-                    case FinalItems.TotalImagePulls:
+                    case FinalItems.Total_Image_Pulls:
                         all[k].Add(trial.Size, trial.ImagePullsTotal);
-                        myPane.YAxis.Title.Text = "TotalImagePulls";
+                        myPane.YAxis.Title.Text = "Total Image Pulls";
                         break;
-                    case FinalItems.AveragePullsPerImage:
+                    case FinalItems.Average_Pulls_PerImage:
                         all[k].Add(trial.Size, trial.ImagePullsRatio);
-                        myPane.YAxis.Title.Text = "AveragePullsPerImage";
+                        myPane.YAxis.Title.Text = "Average Pulls PerImage";
                         break;
-                    case FinalItems.ContainersAverage:
+                    case FinalItems.Containers_Average:
                         all[k].Add(trial.Size, trial.ContainersAverage);
-                        myPane.YAxis.Title.Text = "ContainersAverage";
+                        myPane.YAxis.Title.Text = "Containers Average";
                         break;
-                    case FinalItems.RMSE:
-                        all[k].Add(trial.Size, trial.RMSE);
-                        myPane.YAxis.Title.Text = "RMSE";
-                        break;
+                    
                     default:
                         throw new ArgumentOutOfRangeException(nameof(yAxis), yAxis, null);
                 }
@@ -167,9 +189,9 @@ namespace Test
                 TestedHosts t = TestedHosts.Infinity;
                 if (st == Strategies.Proposed2018)
                     t = (TestedHosts)int.Parse(a.Key.Split('_')[1]);
-
+                
                 LineItem l = new LineItem
-                    (a.Key,
+                    (a.Key == "WAshraf2017" ? "Proposed Algorithm" : a.Key.ToString(),
                     a.Value, GetColor(st,t), SymbolType.Square,3);
                 l.Symbol.Size = 5;
                 l.Symbol.Fill = new Fill(GetColor(st,t));
@@ -185,13 +207,17 @@ namespace Test
             //myPane.Chart.Fill = new Fill(Color.White, Color.LightCyan, 360.0f);
 
             
-            if (yAxis== FinalItems.Messages || yAxis == FinalItems.Power || yAxis == FinalItems.Migrations)
-                myPane.YAxis.Scale.Format = "# %";
+            if (yAxis== FinalItems.Messages || 
+                yAxis == FinalItems.Power || 
+                yAxis == FinalItems.Migrations || 
+                yAxis == FinalItems.RMSE_Ratio ||
+                yAxis == FinalItems.Average_Entropy_Ratio)
+                myPane.YAxis.Scale.Format = "#.### %";
             else
             {
                 myPane.YAxis.Scale.Format = "";
             }
-            // Tell ZedGraph to refigure the
+            // Tell ZedGraph to reconfigure the
             // axes since the data have changed
             zgc.AxisChange();
             zgc.Refresh();
@@ -249,11 +275,15 @@ namespace Test
         private List<TrialResult> GetValue()
         {
             SimulationContext context = new SimulationContext();
-            var trials = context.TrialResults
-                .Where(x => x.StartUtil == cb_StartUtil.Text 
-                && x.Change == cb_Change.Text)
+            var trials = context.TrialResults.AsQueryable();
+            if (cb_StartUtil.Text != "All")
+                trials = trials.Where(x => x.StartUtil == cb_StartUtil.Text);
+            if (cb_Change.Text != "All")
+                trials = trials.Where(x => x.Change == cb_Change.Text);
+
+           var  ftrials = trials
                 .ToList()
-                .GroupBy(x => new { x.Algorithm, x.Size })
+                .GroupBy(x => new { x.Algorithm, x.Size})
                 .Select(x => new TrialResult()
                 {
                     Algorithm = x.Key.Algorithm,
@@ -269,7 +299,7 @@ namespace Test
                     PredictionAlg = x.First().PredictionAlg,
                     RMSE = x.Average(y => y.RMSE),
                     SchedulingAlgorithm = x.First().SchedulingAlgorithm,
-                    Size = x.Key.Size,
+                    Size = x.First().Size,
                     SlaViolations = x.Average(y => y.SlaViolations),
                     StartUtil = x.First().StartUtil,
                     StdDev = x.Average(y => y.StdDev),
@@ -278,7 +308,7 @@ namespace Test
                     TotalMessages = x.Average(y => y.TotalMessages),
                     TrialId = 0,
                 }).OrderBy(y => y.Size).ToList();
-            return trials;
+            return ftrials;
         }
 
         private void button1_Click(object sender, EventArgs e)

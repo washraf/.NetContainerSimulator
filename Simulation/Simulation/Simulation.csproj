@@ -73,6 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\SizeUnit.cs" />
     <Compile Include="LocationStrategies\Auctions\LeastFullAuction.cs" />
     <Compile Include="LocationStrategies\Auctions\MostFullAuction.cs" />
     <Compile Include="MeasureResults\AccountingResultsFileManager.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="MeasureResults\ITrialResultManagement.cs" />
     <Compile Include="Measure\ContainerMeasureValue.cs" />
     <Compile Include="Accounting\IAccountingModule.cs" />
+    <Compile Include="Measure\DBEHolder.cs" />
     <Compile Include="Measure\HostMeasureValue.cs" />
     <Compile Include="Measure\MeasureValueHolder.cs" />
     <Compile Include="Measure\MeasuresValues.cs" />

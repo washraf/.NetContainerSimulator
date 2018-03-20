@@ -16,7 +16,7 @@ namespace Simulation.Configuration
         /// Ideal steps = 180
         /// </summary>
         public static int Steps = 180;
-        public static int NoOfTrials { get; } = 3;
+        public static int NoOfTrials { get; } = 10;
 
         public static int GetSimulationTime
         {
@@ -100,52 +100,30 @@ namespace Simulation.Configuration
         ///// </summary>
         ///// <param name="size"></param>
         ///// <param name="speed"></param>
-        ///// <param name="unit"></param>
         ///// <returns></returns>
-        //public static int GetNetworkDelay(int size, NetWorkSpeed speed, SizeUnit unit)
-        //{
-        //    decimal finalSize = size;
-        //    switch (unit)
-        //    {
-        //        case SizeUnit.Bit:
-        //            break;
-        //        case SizeUnit.Byte:
-        //            finalSize *= 8;
-        //            break;
-        //        case SizeUnit.KByte:
-        //            finalSize *= 8;
-        //            finalSize *= 1024;
-        //            break;
-        //        case SizeUnit.MByte:
-        //            finalSize *= 8;
-        //            finalSize *= 1024;
-        //            finalSize *= 1024;
-        //            break;
-        //        case SizeUnit.GByte:
-        //            finalSize *= 8;
-        //            finalSize *= 1024;
-        //            finalSize *= 1024;
-        //            finalSize *= 1024;
-        //            break;
-        //        default:
-        //            throw new ArgumentOutOfRangeException(nameof(unit), unit, null);
-        //    }
-        //    decimal finalDelay = Convert.ToDecimal(Math.Pow(10, 6));
-        //    switch (speed)
-        //    {
-        //        case NetWorkSpeed.TenG:
-        //            finalDelay *= 10;
-        //            break;
-        //        case NetWorkSpeed.HundredG:
-        //            finalDelay *= 100;
-        //            break;
-        //        default:
-        //            throw new ArgumentOutOfRangeException(nameof(speed), speed, null);
-        //    }
+        public static int GetNetworkDelay(int size, NetworkSpeed speed = NetworkSpeed.HundredG)
+        {
+            //return 0;
+            decimal finalSize = size;
+            finalSize *= 8;
+            finalSize *= 1024;
+            finalSize *= 1024;
+            decimal finalDelay = Convert.ToDecimal(Math.Pow(10, 6));
+            switch (speed)
+            {
+                case NetworkSpeed.TenG:
+                    finalDelay *= 10;
+                    break;
+                case NetworkSpeed.HundredG:
+                    finalDelay *= 100;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(speed), speed, null);
+            }
 
-        //    var result = finalSize/finalDelay;
-        //    return Convert.ToInt32(result);
-        //}
+            var result = finalSize / finalDelay;
+            return Convert.ToInt32(result);
+        }
 
         //Move to network resource
         public static CommonLoadManager CommonLoadManager = null;

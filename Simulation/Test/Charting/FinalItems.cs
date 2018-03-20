@@ -10,16 +10,18 @@ namespace Test.Charting
     {
         Hosts,
         RMSE,
+        RMSE_Ratio,
         Power,
         //StdDev,
         Migrations,
         Messages,
-        AverageEntropy,
-        FinalEntropy,
-        SlaViolations,
-        TotalImagePulls,
-        AveragePullsPerImage,
-        ContainersAverage,
+        Average_Entropy,
+        Average_Entropy_Ratio,
+        Final_Entropy,
+        SLA_Violations,
+        Total_Image_Pulls,
+        Average_Pulls_PerImage,
+        Containers_Average,
         
     }
 }
