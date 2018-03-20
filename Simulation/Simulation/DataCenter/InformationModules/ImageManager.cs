@@ -1,6 +1,8 @@
 ﻿using Simulation.DataCenter.Images;
 using System.Collections.Generic;
 using Simulation.Messages;
+using System.Threading.Tasks;
+using Simulation.Configuration;
 
 namespace Simulation.DataCenter.InformationModules
 {
@@ -25,22 +27,25 @@ namespace Simulation.DataCenter.InformationModules
             {
                 return;
             }
-
-            var list = GetImageTree(imageId);
-            foreach (var item in list)
-            {
-                if (!dictionary.ContainsKey(item))
+            //Task t = new Task(() =>
+            //{
+                var list = GetImageTree(imageId);
+                foreach (var item in list)
                 {
-                    dictionary.Add(item, GetImage(item));
+                    if (!dictionary.ContainsKey(item))
+                    {
+                        dictionary.Add(item, GetImage(item));
+                    }
                 }
-            }
+            //    Task.Delay(Global.Second).Wait();
+            //});
+            //t.Start();
         }
 
         private List<int> GetImageTree(int imageId)
         {
             var request = new ImageTreeRequest(int.MaxValue, _communicationModule.MachineId, imageId);
             var r = _communicationModule.RequestData(request);
-            
             var result = r as ImageTreeResponce;
             return result.ImageTree;
         }

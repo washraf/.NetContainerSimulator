@@ -25,14 +25,6 @@ namespace Simulation.DataCenter.Network
         private readonly IAccountingModule _accountingModule;
         public override bool Started { get; set; } = true;
 
-        public Machines.MasterMachine MasterMachine
-        {
-            get => default(Machines.MasterMachine);
-            set
-            {
-            }
-        }
-
         public bool ReceiveMessage(Message message)
         {
             if (Started)
@@ -43,8 +35,6 @@ namespace Simulation.DataCenter.Network
                         if (_switchTable.ValidateMachineId(message.TargetId))
                         {
                             _accountingModule.RequestCreated(message.MessageType);
-
-                            
                             HandleMessage(message);
 
                         }

@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Simulation.Messages;
 using Simulation.DataCenter.Network;
 using Simulation.DataCenter.Core;
+using System.Threading;
+using Simulation.Configuration;
 
 namespace Simulation.DataCenter
 {
@@ -39,6 +41,8 @@ namespace Simulation.DataCenter
             {
                 Task t = new Task(() =>
                 {
+                    //if(message.MessageType == MessageTypes.MigrateContainerRequest)
+                    //    Thread.Sleep(2 * Global.Second);
                     _handler.HandleMessage(message);
                 });
                 t.Start();
@@ -52,9 +56,20 @@ namespace Simulation.DataCenter
 
         public Message RequestData(Message message)
         {
-           // if (!Started)
-           //     return null;
-            return _networkSwitch.RequestData(message);
+            // if (!Started)
+            //     return null;
+            //Task<Message> t = new Task<Message>(() =>
+            //{
+                var result = _networkSwitch.RequestData(message);
+                //if(result.MessageType == MessageTypes.ImagePullResponce)
+                //{
+                //    Thread.Sleep(Global.Second);
+                //}
+                return result;
+            //});
+            //t.Start();
+            //t.Wait();
+            //return t.Result;
         }
 
         public Message HandleRequestData(Message message)
