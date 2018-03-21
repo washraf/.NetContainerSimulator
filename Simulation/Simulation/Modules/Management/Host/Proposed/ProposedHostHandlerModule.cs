@@ -10,6 +10,7 @@ using Simulation.DataCenter.InformationModules;
 using Simulation.Loads;
 using Simulation.Messages;
 using Simulation.LocationStrategies;
+using Simulation.DataCenter.Containers;
 
 namespace Simulation.Modules.Management.Host.Proposed
 {
@@ -352,15 +353,6 @@ namespace Simulation.Modules.Management.Host.Proposed
         }
 
         #region -- Migration Management --
-        /*
-         * Migration Sequence:
-         * 1 - Initiate Migration Function
-         * 2 - Tell Host To Load Images
-         * 3 - Finish Loading Images
-         * 4 - Start Migration
-         * 5 - Handle MigrateContainerRequest
-         * 6 - Handle Migrate Container Response
-         */
         private void HandleInitiateMigration(InitiateMigration message)
         {
             Task t = new Task(() =>
@@ -368,7 +360,7 @@ namespace Simulation.Modules.Management.Host.Proposed
                 var container = ContainerTable.GetContainerById(message.ContainerId);
                 ContainerTable.LockContainer(message.ContainerId);
                 container.Checkpoint(this.MachineId);
-                var size = (int)container.GetContainerNeededLoadInfo().CurrentLoad.MemorySize * 1024;
+                var size = (int)container.GetContainerNeededLoadInfo().CurrentLoad.MemorySize;
                 MigrateContainerRequest request = 
                 new MigrateContainerRequest(message.TargetHost, this.MachineId, container, size);
                 CommunicationModule.SendMessage(request);
@@ -383,7 +375,8 @@ namespace Simulation.Modules.Management.Host.Proposed
             Task t = new Task(async () =>
             {
                 ContainerTable.AddContainer(message.MigratedContainer.ContainerId, message.MigratedContainer);
-                await Task.Delay(Global.Second);
+                //var nd = Global.GetNetworkDelay(message.MessageSize);
+                //await Task.Delay(nd*Global.Second);
                 message.MigratedContainer.Restore(this.MachineId);
                 var responce =
                     new MigrateContainerResponse(message.SenderId, this.MachineId, message.MigratedContainer.ContainerId,

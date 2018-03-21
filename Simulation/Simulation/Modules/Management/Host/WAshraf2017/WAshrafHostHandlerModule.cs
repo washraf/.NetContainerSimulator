@@ -308,7 +308,7 @@ namespace Simulation.Modules.Management.Host.WAshraf2017
                 var container = ContainerTable.GetContainerById(message.ContainerId);
                 ContainerTable.LockContainer(message.ContainerId);
                 container.Checkpoint(this.MachineId);
-                var size = (int)container.GetContainerNeededLoadInfo().CurrentLoad.MemorySize * 1024;
+                var size = (int)container.GetContainerNeededLoadInfo().CurrentLoad.MemorySize;
                 MigrateContainerRequest request = new MigrateContainerRequest(message.TargetHost, this.MachineId,
                     container, size);
                 CommunicationModule.SendMessage(request);

@@ -21,15 +21,15 @@ namespace Simulation.DataCenter
         public int MachineId { get; private set; }
         private readonly IMessageHandler _handler;
         private readonly NetworkSwitch _networkSwitch;
-
+        public double DataSizeOut { get; private set; } = 0;
+        public double DataSizeIn { get; private set; } = 0;
         public bool Started { get; set; }
 
         public void SendMessage(Message message)
         {
-            //if (message.SenderId == message.TargetId)
-            //    throw new NotImplementedException();
             if (message.SenderId != this.MachineId)
                 throw new NotImplementedException();
+            DataSizeOut += message.MessageSize;
             _networkSwitch.ReceiveMessage(message);
         }
 
@@ -39,6 +39,7 @@ namespace Simulation.DataCenter
                 return true;
             if (message.TargetId == this.MachineId || message.TargetId == -1)
             {
+                DataSizeIn += message.MessageSize;
                 Task t = new Task(() =>
                 {
                     //if(message.MessageType == MessageTypes.MigrateContainerRequest)
@@ -56,25 +57,25 @@ namespace Simulation.DataCenter
 
         public Message RequestData(Message message)
         {
-            // if (!Started)
-            //     return null;
-            //Task<Message> t = new Task<Message>(() =>
-            //{
-                var result = _networkSwitch.RequestData(message);
-                //if(result.MessageType == MessageTypes.ImagePullResponce)
-                //{
-                //    Thread.Sleep(Global.Second);
-                //}
-                return result;
-            //});
-            //t.Start();
-            //t.Wait();
-            //return t.Result;
+            DataSizeOut += message.MessageSize;
+            var result = _networkSwitch.RequestData(message);
+            DataSizeIn += result.MessageSize;
+            return result;
         }
 
         public Message HandleRequestData(Message message)
         {
-            return _handler.HandleRequestData(message);
+            DataSizeIn += message.MessageSize;
+            var result =  _handler.HandleRequestData(message);
+            DataSizeOut += result.MessageSize;
+            return result;
+        }
+
+
+        public void ResetDataSize()
+        {
+            DataSizeIn = 0;
+            DataSizeOut = 0;
         }
     }
 }

@@ -14,6 +14,7 @@ using Simulation.Messages;
 using Simulation.DataCenter.Machines;
 using Simulation.Measure;
 using Simulation.SimulationController;
+using System.Diagnostics;
 
 namespace Simulation.Accounting
 {
@@ -30,6 +31,7 @@ namespace Simulation.Accounting
         private object _lock = new object();
 
         Dictionary<MessageTypes, int> _currentRequests = new Dictionary<MessageTypes, int>();
+        private double communicatedSize = 0;
 
         public MeasureValueHolder MeasureHolder { get;} 
        
@@ -80,20 +82,27 @@ namespace Simulation.Accounting
                     slaViolations,
                     loads.PowerConsumption(),
                     loads.StandardDeviation(),
-                    imagePulls
+                    imagePulls,
+                    communicatedSize
                     );
-                ClearInformation();
+                
                 MeasureHolder.HostMeasureValueList.Add(new HostMeasureValue(loads));
                 MeasureHolder.MeasuredValuesList.Add(mvalues);
+                //Debug.WriteLine($"Communicated Size = {communicatedSize}");
+                //Debug.WriteLine($"Total Data  = {MeasureHolder.HostMeasureValueList.Last().AverageDataTotal}");
+
+
+                ClearInformation();
             }
 
         }
 
-        public void RequestCreated(MessageTypes type)
+        public void RequestCreated(MessageTypes type, double messageSize)
         {
             lock (_lock)
             {
                 _currentRequests[type]++;
+                communicatedSize += messageSize;
             }
         }
 
@@ -119,6 +128,7 @@ namespace Simulation.Accounting
                 else
                 {
                     loads.Add((machine as HostMachine).GetNeededHostLoadInfo());
+                    machine.CommunicationModule.ResetDataSize();
                 }
             }
             return loads;
@@ -142,6 +152,7 @@ namespace Simulation.Accounting
                 {
                     _currentRequests[t] = 0;
                 }
+                communicatedSize = 0;
             }
             
         }

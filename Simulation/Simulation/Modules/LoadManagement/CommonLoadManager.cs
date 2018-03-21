@@ -25,7 +25,7 @@ namespace Simulation.Modules.LoadManagement
         {
             lock (_lock)
             {
-                _accountingModule.RequestCreated(MessageTypes.CommonLoadManager);
+                _accountingModule.RequestCreated(MessageTypes.CommonLoadManager, 0);
                 return _currentHostLoadInfos[hostId];
             }
         }
@@ -34,7 +34,7 @@ namespace Simulation.Modules.LoadManagement
         {
             lock (_lock)
             {
-                _accountingModule.RequestCreated(MessageTypes.CommonLoadManager);
+                _accountingModule.RequestCreated(MessageTypes.CommonLoadManager,0);
                 var item = _currentHostLoadInfos[hostId];
                 var nload =  item.CurrentLoad+info.CurrentLoad;
                 var machinePower = Global.DataCenterHostConfiguration;
@@ -42,7 +42,7 @@ namespace Simulation.Modules.LoadManagement
                 var mem = nload.MemorySize / machinePower.MemorySize;
                 var io = nload.IoSecond / machinePower.IoSecond;
 
-                return new HostLoadInfo(hostId,nload,item.ContainersCount+1,cpu,mem,io);
+                return new HostLoadInfo(hostId,nload,item.ContainersCount+1,cpu,mem,io,item.DataSizeOut,item.DataSizeIn);
             }
         }
 
@@ -50,7 +50,7 @@ namespace Simulation.Modules.LoadManagement
         {
             lock (_lock)
             {
-                _accountingModule.RequestCreated(MessageTypes.CommonLoadManager);
+                _accountingModule.RequestCreated(MessageTypes.CommonLoadManager,0);
 
                 if (_currentHostLoadInfos.ContainsKey(info.HostId))
                     _currentHostLoadInfos[info.HostId] = info;
@@ -65,7 +65,7 @@ namespace Simulation.Modules.LoadManagement
         {
             lock (_lock)
             {
-                _accountingModule.RequestCreated(MessageTypes.CommonLoadManager);
+                _accountingModule.RequestCreated(MessageTypes.CommonLoadManager,0);
 
                 return _currentHostLoadInfos.Values.ToList();
             }
@@ -75,7 +75,7 @@ namespace Simulation.Modules.LoadManagement
         {
             lock (_lock)
             {
-                _accountingModule.RequestCreated(MessageTypes.CommonLoadManager);
+                _accountingModule.RequestCreated(MessageTypes.CommonLoadManager,0);
                 _currentHostLoadInfos.Clear();
             }
         }

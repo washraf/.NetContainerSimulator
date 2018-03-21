@@ -20,7 +20,5 @@ namespace Simulation.DataCenter.InformationModules
                 ContainersTable.Add(containerId, container);
             }
         }
-
-
     }
 }

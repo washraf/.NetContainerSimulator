@@ -167,7 +167,7 @@ namespace Simulation.Modules.Management.Host.Forsman2015
         private void HandleInitiateMigrationRequest(InitiateMigration message)
         {
             var con = ContainerTable.GetContainerById(message.ContainerId);
-            var size = (int)con.GetContainerNeededLoadInfo().CurrentLoad.MemorySize * 1024;
+            var size = (int)con.GetContainerNeededLoadInfo().CurrentLoad.MemorySize;
             ContainerTable.LockContainer(con.ContainerId);
             con.Checkpoint(this.MachineId);
             MigrateContainerRequest request =
@@ -239,7 +239,7 @@ namespace Simulation.Modules.Management.Host.Forsman2015
                     if (_currentActionType == StrategyActionType.PushAction)
                     {
                         var con = ContainerTable.GetContainerById(winner.ContainerId);
-                        var size = (int)con.GetContainerNeededLoadInfo().CurrentLoad.MemorySize * 1024;
+                        var size = (int)con.GetContainerNeededLoadInfo().CurrentLoad.MemorySize;
                         ContainerTable.LockContainer(con.ContainerId);
                         con.Checkpoint(this.MachineId);
                         MigrateContainerRequest request =

@@ -8,7 +8,7 @@ namespace Simulation.Accounting
         //void StartCounting();
         void StopCounting();
         void ReadCurrentState();
-        void RequestCreated(MessageTypes messageType);
+        void RequestCreated(MessageTypes messageType, double messageSize);
         MeasureValueHolder MeasureHolder { get; }
         
     }

@@ -13,7 +13,7 @@ namespace Simulation.Messages
     /// </summary>
     public abstract class Message
     {
-        public Message(int target,int sender,MessageTypes messageType,int messageSize = 0)
+        public Message(int target,int sender,MessageTypes messageType,double messageSize = 0.01)
         {
             TargetId = target;
             SenderId = sender;
@@ -28,7 +28,7 @@ namespace Simulation.Messages
         /// <summary>
         /// By MByte
         /// </summary>
-        public int MessageSize { get; private set; }
+        public double MessageSize { get; private set; }
 
     }
 }

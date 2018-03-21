@@ -20,8 +20,8 @@ namespace Simulation.SimulationController
                         //SimulationSize.Ten,
                         SimulationSize.Twenty,
                         SimulationSize.Fifty,
-                        //SimulationSize.Hundred,
-                        //SimulationSize.TwoHundred
+                        SimulationSize.Hundred,
+                        SimulationSize.TwoHundred
                     };
             var tested = new List<TestedHosts>()
             {

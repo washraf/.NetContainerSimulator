@@ -5,7 +5,7 @@ namespace Simulation.Loads
 {
     public class HostLoadInfo
     {
-        public HostLoadInfo(int hostId,Load currentLoad,int containersCount,double cpu,double mem,double io)
+        public HostLoadInfo(int hostId,Load currentLoad,int containersCount,double cpu,double mem,double io, double dataSizeOut, double dataSizeIn)
         {
             HostId = hostId;
             CurrentLoad = currentLoad;
@@ -13,6 +13,8 @@ namespace Simulation.Loads
             CPUUtil = cpu;
             MemoryUtil = mem;
             IOUtil = io;
+            DataSizeOut = dataSizeOut;
+            DataSizeIn = dataSizeIn;
         }
         /// <summary>
         /// The Current Load of the Host in terms of CPU Usage, Memory and IO/S
@@ -33,7 +35,9 @@ namespace Simulation.Loads
         /// Ration between the Current IO/S Load and The Max IO/S
         /// </summary>
         public double IOUtil { get; private set; }
-
+        public double DataSizeOut { get; }
+        public double DataSizeIn { get; }
+        public double DataTotal { get { return DataSizeIn + DataSizeOut; } }
 
         private UtilizationStates GetFloatState(double v,double min,double max)
         {
@@ -76,7 +80,7 @@ namespace Simulation.Loads
 
         public override string ToString()
         {
-            return $"{HostId}, {CurrentLoad},{ContainersCount},{CPUUtil},{MemoryUtil},{IOUtil}";
+            return $"{HostId}, {CurrentLoad},{ContainersCount},{CPUUtil},{MemoryUtil},{IOUtil},{DataSizeOut},{DataSizeIn}";
         }
     }
 }

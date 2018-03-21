@@ -121,9 +121,9 @@ namespace Test
             int unit = Global.AccountTime / Global.Second;
             myPane.CurveList.Clear();
             // Set the Titles
-            myPane.Title.Text = title;
+            myPane.Title.Text = title.ToString().Replace('_', ' ');
             myPane.XAxis.Title.Text = $"Time Unit is Second";
-            myPane.YAxis.Title.Text = yAxis.ToString();
+            myPane.YAxis.Title.Text = yAxis.ToString().Replace('_',' ');
             flowLayoutPanel2.Controls.Clear();
             for (int t = 0; t < _measuredValueListsTrials.Count; t++)
             {
@@ -154,14 +154,14 @@ namespace Test
                             }
 
                         }
-                        myLabel.Text = $"Avegare entropy in All the trial = {_measuredValueListsTrials[t].AverageEntropy}";
+                        myLabel.Text = $"Average entropy in All the trial = {_measuredValueListsTrials[t].AverageEntropy}";
                         break;
-                    case BasicItems.PowerConsumption:
+                    case BasicItems.Power_Consumption:
                         list[0].Add(0, _measuredValueListsTrials[t].PowerConsumption);
                         myLabel.Text = $"Power Consumption in All the trial = {_measuredValueListsTrials[t].PowerConsumption} Watts";
 
                         break;
-                    case BasicItems.AverageNeededVolume:
+                    case BasicItems.Average_Needed_Volume:
                         if (cb_DrawExtra.Checked)
                         {
                             list.Add(new PointPairList());
@@ -181,18 +181,18 @@ namespace Test
                                 list[3].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].MaxNeeded);
                             }
                         }
-                        myLabel.Text = $"Avegare Volume in All the trial vs Average predicted volume";
+                        myLabel.Text = $"Average Volume in All the trial vs Average predicted volume";
 
                         break;
 
-                    case BasicItems.NeededLoadStandardDeviation:
+                    case BasicItems.Needed_Load_Standard_Deviation:
                         for (int i = 0; i < _measuredValueListsTrials[t].HostMeasureValueList.Count; i++)
                         {
                             list[0].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValueList[i].StandardDeviation);
                         }
                         myLabel.Text = $"Average Standard Deviation {_measuredValueListsTrials[t].AverageStdDeviation}";
                         break;
-                    case BasicItems.NoHosts:
+                    case BasicItems.No_of_Hosts:
                         if (cb_DrawExtra.Checked)
                         {
                             list.Add(new PointPairList());
@@ -209,7 +209,8 @@ namespace Test
                         myLabel.Text = $"Average No of Hosts {_measuredValueListsTrials[t].AverageHosts}";
 
                         break;
-                    case BasicItems.HostsStates:
+                    
+                    case BasicItems.Hosts_States:
                         //list.Clear()
                         list.Add(new PointPairList());
                         list.Add(new PointPairList());
@@ -233,12 +234,32 @@ namespace Test
                             $"Evacuating:{_measuredValueListsTrials[t].FinalEvacuatingUtilized} ";
 
                         break;
-                    case BasicItems.TotalMessages:
+                    case BasicItems.Total_Messages:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].TotalMessages);
                         }
                         myLabel.Text = $"Total Messages in All the trial = {_measuredValueListsTrials[t].TotalMessages}";
+
+                        break;
+                    case BasicItems.Total_Communicated_Size:
+                        for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
+                        {
+                            list[0].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].CommunicatedSize);
+                        }
+                        myLabel.Text = $"Total Communicated Size = {(int)_measuredValueListsTrials[t].TotalCommunicatedSize/1024} GB ";
+                        break;
+                    case BasicItems.Average_Host_Data_Out_and_In:
+
+                        list.Add(new PointPairList());
+                        labeList[0] = ($"Data Out of Trial {_measuredValueListsTrials[t].Name}");
+                        labeList.Add($"Data In of Trial {_measuredValueListsTrials[t].Name}");
+                        for (int i = 0; i < _measuredValueListsTrials[t].HostMeasureValueList.Count; i++)
+                        {
+                            list[0].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValueList[i].AverageDataOut);
+                            list[1].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValueList[i].AverageDataIn);
+                        }
+                        myLabel.Text = $"Average data Out/In = {_measuredValueListsTrials[t].AverageDataOut } / { _measuredValueListsTrials[t].AverageDataIn} MB";
 
                         break;
                     case BasicItems.Containers:
@@ -249,7 +270,7 @@ namespace Test
                         myLabel.Text = $"Average Containers in All the trial = {_measuredValueListsTrials[t].AverageContainers}";
 
                         break;
-                    case BasicItems.PushRequests:
+                    case BasicItems.Push_Requests:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].PushRequests);
@@ -257,7 +278,7 @@ namespace Test
                         myLabel.Text = $"Total Push Requests in All the trial = {_measuredValueListsTrials[t].TotalPushRequests}";
 
                         break;
-                    case BasicItems.PullRequests:
+                    case BasicItems.Pull_Requests:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit, _measuredValueListsTrials[t].MeasuredValuesList[i].PullRequests);
@@ -275,15 +296,15 @@ namespace Test
                         myLabel.Text = $"Total Migrations in All the trial = {_measuredValueListsTrials[t].TotalMigrations}";
 
                         break;
-                    case BasicItems.MigrationCount:
+                    case BasicItems.Migration_Count:
                         foreach (var item in _measuredValueListsTrials[t].ContainerMigrationCount)
                         {
                             list[0].Add(item.Key, item.Value.MigrationCount);
                         }
-                        myLabel.Text = $"Avarage Migration per container in All the trial = {_measuredValueListsTrials[t].AvgMigrations}";
+                        myLabel.Text = $"Average Migration per container in All the trial = {_measuredValueListsTrials[t].AvgMigrations}";
 
                         break;
-                    case BasicItems.PushLoadAvailabilityRequest:
+                    case BasicItems.Push_Load_Availability_Request:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit,
@@ -292,7 +313,7 @@ namespace Test
                         myLabel.Text = $"Total Push Availability Requests in All the trial = {_measuredValueListsTrials[t].TotalPushAvailabilityRequests}";
 
                         break;
-                    case BasicItems.PullLoadAvailabilityRequest:
+                    case BasicItems.Pull_Load_Availability_Request:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit,
@@ -301,7 +322,7 @@ namespace Test
                         myLabel.Text = $"Total Pull Availability Requests in All the trial = {_measuredValueListsTrials[t].TotalPullAvailabilityRequests}";
 
                         break;
-                    case BasicItems.UtilizationSlaViolations:
+                    case BasicItems.Utilization_SLA_Violations:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit,
@@ -310,7 +331,7 @@ namespace Test
                         myLabel.Text = $"Total SLA Violations the trial = {_measuredValueListsTrials[t].TotalSlaViolations}";
 
                         break;
-                    case BasicItems.ContainerDownTime:
+                    case BasicItems.Container_DownTime:
                         foreach (var item in _measuredValueListsTrials[t].ContainerMigrationCount)
                         {
                             list[0].Add(item.Key, item.Value.Downtime);
@@ -319,7 +340,7 @@ namespace Test
 
                         break;
 
-                    case BasicItems.ImagePulls:
+                    case BasicItems.Image_Pulls:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit,
@@ -327,7 +348,7 @@ namespace Test
                         }
                         myLabel.Text = $"Total ImagePulls of trial = {_measuredValueListsTrials[t].ImagePulls}";
                         break;
-                    case BasicItems.ImagePullsRatio:
+                    case BasicItems.Image_Pulls_Ratio:
                         list[0].Add(0, _measuredValueListsTrials[t].AveragePullPerImage);
                         myLabel.Text = $"Image Pull Ratio in All the trial = {_measuredValueListsTrials[t].AveragePullPerImage}";
                         break;
@@ -336,7 +357,7 @@ namespace Test
                 }
                 // Generate a red curve with diamond
                 // symbols, and "Porsche" in the legend
-                if (yAxis == BasicItems.MigrationCount || yAxis == BasicItems.ContainerDownTime || yAxis == BasicItems.PowerConsumption || yAxis == BasicItems.ImagePullsRatio)// || yAxis == BasicItems.OutOfBoundHosts)
+                if (yAxis == BasicItems.Migration_Count || yAxis == BasicItems.Container_DownTime || yAxis == BasicItems.Power_Consumption || yAxis == BasicItems.Image_Pulls_Ratio)// || yAxis == BasicItems.OutOfBoundHosts)
                 {
                     for (int i = 0; i < list.Count; i++)
                     {

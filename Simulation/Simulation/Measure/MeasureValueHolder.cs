@@ -300,6 +300,37 @@ namespace Simulation.Measure
 
         }
 
+        public double TotalCommunicatedSize
+        {
+            get {
+                return MeasuredValuesList.Sum(x => x.CommunicatedSize);
+            }
+        }
+
+        public double AverageDataOut
+        {
+            get
+            {
+                return HostMeasureValueList.Average(x => x.AverageDataOut);
+            }
+        }
+        public double AverageDataIn
+        {
+            get
+            {
+
+                return HostMeasureValueList.Average(x => x.AverageDataIn);
+            }
+        }
+
+        public double AverageDataTotal
+        {
+            get
+            {
+                return HostMeasureValueList.Average(x => x.AverageDataTotal);
+            }
+        }
+
         #endregion
 
     }

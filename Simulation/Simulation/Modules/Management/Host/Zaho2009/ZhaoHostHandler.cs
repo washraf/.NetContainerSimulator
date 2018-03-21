@@ -84,7 +84,7 @@ namespace Simulation.Modules.Management.Host.Other
         private void MigrationContainer(ContainerToHost result)
         {
             var con = ContainerTable.GetContainerById(result.ConId);
-            var size = (int)con.GetContainerNeededLoadInfo().CurrentLoad.MemorySize * 1024;
+            var size = (int)con.GetContainerNeededLoadInfo().CurrentLoad.MemorySize;
             ContainerTable.LockContainer(con.ContainerId);
             con.Checkpoint(this.MachineId);
 

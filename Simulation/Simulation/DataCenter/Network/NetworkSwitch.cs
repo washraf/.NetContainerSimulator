@@ -29,12 +29,14 @@ namespace Simulation.DataCenter.Network
         {
             if (Started)
             {
-                Task t = new Task(() =>
+                Task t = new Task(async () =>
                 {
                     {
                         if (_switchTable.ValidateMachineId(message.TargetId))
                         {
-                            _accountingModule.RequestCreated(message.MessageType);
+                            var nd = Global.GetNetworkDelay(message.MessageSize);
+                            await Task.Delay(nd * Global.Second);
+                            _accountingModule.RequestCreated(message.MessageType,message.MessageSize);
                             HandleMessage(message);
 
                         }
@@ -48,7 +50,7 @@ namespace Simulation.DataCenter.Network
             return true;
         }
 
-        protected void HandleMessage(Message message)
+        private void HandleMessage(Message message)
         {
             if (Started)
             {
@@ -76,9 +78,17 @@ namespace Simulation.DataCenter.Network
             {
                 if (message == null)
                     throw new NullReferenceException();
-                _accountingModule.RequestCreated(message.MessageType);
+                //Dangerous is commented
+                //var nd = Global.GetNetworkDelay(message.MessageSize);
+                //Task.Delay(nd * Global.Second).Wait();
+                _accountingModule.RequestCreated(message.MessageType,message.MessageSize);
+
                 var machine = _switchTable.GetMachineById(message.TargetId);
-                return machine.CommunicationModule.HandleRequestData(message);
+                var result =  machine.CommunicationModule.HandleRequestData(message);
+                //nd = Global.GetNetworkDelay(message.MessageSize);
+                //Task.Delay(nd * Global.Second).Wait();
+                _accountingModule.RequestCreated(result.MessageType, result.MessageSize);
+                return result;
             }
             return null;
         }

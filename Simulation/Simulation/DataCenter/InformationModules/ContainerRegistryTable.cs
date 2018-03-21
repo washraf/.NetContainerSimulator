@@ -1,5 +1,6 @@
 ﻿using Simulation.Configuration;
 using Simulation.DataCenter.Images;
+using Simulation.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,26 +15,29 @@ namespace Simulation.DataCenter.InformationModules
         public readonly Dictionary<int, int> pullsPerImage;
         public static Dictionary<int,Image> FillContainerRegistry(SimulationSize simulationSize)
         {
+            Random random = new Random(Guid.NewGuid().GetHashCode());
             var dic =  new Dictionary<int, Image>();
             int size = (int)simulationSize;
             for (int i = 0; i < size; i++)
             {
-                dic.Add(i, new Image(i, $"Base {i}",100));
+                int imageSize = (int)random.NextGaussian(50, 20);
+                dic.Add(i, new Image(i, $"Base {i}",imageSize));
 
             }
-            Random random = new Random(Guid.NewGuid().GetHashCode());
             for (int i = 0; i < 2* size; i++)
             {
                 var id = i+ size;
                 var bimg = random.Next(0, 20);
-                dic.Add(id, new Image(id, $"Level {id}", 100, bimg));
+                int imageSize = (int)random.NextGaussian(50, 20);
+                dic.Add(id, new Image(id, $"Level {id}",imageSize , bimg));
 
             }
             for (int i = 0; i < 3 * (int)simulationSize; i++)
             {
                 var id = i + 3*size;
                 var bimg = random.Next(20, 60);
-                dic.Add(id, new Image(id, $"Final {id}", 100, bimg));
+                int imageSize = (int)random.NextGaussian(50, 20);
+                dic.Add(id, new Image(id, $"Final {id}", imageSize, bimg));
 
             }
             return dic;

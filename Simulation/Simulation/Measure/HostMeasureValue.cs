@@ -12,13 +12,13 @@ namespace Simulation.Measure
     {
         private HostMeasureValue()
         {
-            
+
         }
         public HostMeasureValue(List<HostLoadInfo> loads)
         {
             foreach (var l in loads)
             {
-                CurrentValues.Add(l.HostId,l);
+                CurrentValues.Add(l.HostId, l);
             }
         }
 
@@ -26,7 +26,7 @@ namespace Simulation.Measure
         {
             foreach (var l in item.CurrentValues.Values)
             {
-                CurrentValues.Add(l.HostId,l);
+                CurrentValues.Add(l.HostId, l);
             }
         }
 
@@ -34,14 +34,14 @@ namespace Simulation.Measure
         /// Key => Host Id
         /// Value => Host Load Info for this id
         /// </summary>
-        public Dictionary<int,HostLoadInfo> CurrentValues { set; get; } = new Dictionary<int, HostLoadInfo>();
+        public Dictionary<int, HostLoadInfo> CurrentValues { set; get; } = new Dictionary<int, HostLoadInfo>();
 
         public static HostMeasureValue operator +(HostMeasureValue first, HostMeasureValue second)
         {
             var final = new HostMeasureValue();
             foreach (var l in first.CurrentValues.Values)
             {
-                final.CurrentValues.Add(l.HostId, new HostLoadInfo(l.HostId, l.CurrentLoad,l.ContainersCount,l.CPUUtil,l.MemoryUtil,l.IOUtil));
+                final.CurrentValues.Add(l.HostId, new HostLoadInfo(l.HostId, l.CurrentLoad, l.ContainersCount, l.CPUUtil, l.MemoryUtil, l.IOUtil, l.DataSizeOut, l.DataSizeIn));
             }
             foreach (var l in second.CurrentValues.Values)
             {
@@ -52,12 +52,14 @@ namespace Simulation.Measure
                         final.CurrentValues[l.HostId].ContainersCount + l.ContainersCount,
                         final.CurrentValues[l.HostId].CPUUtil + l.CPUUtil,
                         final.CurrentValues[l.HostId].MemoryUtil + l.MemoryUtil,
-                        final.CurrentValues[l.HostId].IOUtil + l.IOUtil
+                        final.CurrentValues[l.HostId].IOUtil + l.IOUtil,
+                        final.CurrentValues[l.HostId].DataSizeOut + l.DataSizeOut,
+                        final.CurrentValues[l.HostId].DataSizeIn + l.DataSizeIn
                         );
                 }
                 else
                 {
-                    final.CurrentValues.Add(l.HostId, new HostLoadInfo(l.HostId, l.CurrentLoad,l.ContainersCount, l.CPUUtil, l.MemoryUtil, l.IOUtil));
+                    final.CurrentValues.Add(l.HostId, new HostLoadInfo(l.HostId, l.CurrentLoad, l.ContainersCount, l.CPUUtil, l.MemoryUtil, l.IOUtil, l.DataSizeOut, l.DataSizeIn));
                 }
             }
             return final;
@@ -68,7 +70,7 @@ namespace Simulation.Measure
             var final = new HostMeasureValue();
             foreach (var l in first.CurrentValues.Values)
             {
-                final.CurrentValues.Add(l.HostId, new HostLoadInfo(l.HostId,l.CurrentLoad/c,l.ContainersCount/c,l.CPUUtil/c,l.MemoryUtil/c,l.IOUtil/c));
+                final.CurrentValues.Add(l.HostId, new HostLoadInfo(l.HostId, l.CurrentLoad / c, l.ContainersCount / c, l.CPUUtil / c, l.MemoryUtil / c, l.IOUtil / c, l.DataSizeOut / c, l.DataSizeIn / c));
             }
             return final;
         }
@@ -82,8 +84,33 @@ namespace Simulation.Measure
 
         public double Containers
         {
-            get {
+            get
+            {
                 return CurrentValues.Values.ToList().Sum(x => x.ContainersCount);
+            }
+        }
+
+
+        public double AverageDataTotal
+        {
+            get
+            {
+                return CurrentValues.Values.Average(x => x.DataTotal);
+            }
+        }
+        public double AverageDataIn
+        {
+            get
+            {
+                return CurrentValues.Values.Average(x => x.DataSizeIn);
+            }
+        }
+
+        public double AverageDataOut
+        {
+            get
+            {
+                return CurrentValues.Values.Average(x => x.DataSizeOut);
             }
         }
     }

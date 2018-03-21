@@ -13,7 +13,6 @@ namespace Simulation.Loads
         {
             if (double.IsNaN(cpu))
             {
-                //MessageBox.Show("A7a");
                 throw new NotImplementedException("Load ");
                 
             }
@@ -36,7 +35,7 @@ namespace Simulation.Loads
         /// </summary>
         public double MemorySize { get; }
         /// <summary>
-        /// Unit of IOSec
+        /// Unit of MB/Sec
         /// </summary>
         public double IoSecond { get; }
 

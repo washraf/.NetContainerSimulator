@@ -51,7 +51,8 @@ namespace Simulation.AccountingResults
                                      "MaxNeeded," +
                                      "Power," +
                                      "stdDev,",
-                                     "ImagePulls");
+                                     "ImagePulls",
+                                     "CommunicatedSize");
 
                     for (int i = 0; i < measureValueHolder.MeasuredValuesList.Count; i++)
                     {
@@ -78,8 +79,8 @@ namespace Simulation.AccountingResults
                                          $"{value.MaxNeeded}," +
                                          $"{value.Power}," +
                                          $"{value.StdDev}," +
-                                         $"{value.ImagePulls},");
-
+                                         $"{value.ImagePulls}," +
+                                         $"{value.CommunicatedSize},");
                     }
                     writer.Flush();
                 }
@@ -125,7 +126,9 @@ namespace Simulation.AccountingResults
                                      "concount," +
                                      "cpuutil," +
                                      "memutil," +
-                                     "ioutil,"
+                                     "ioutil,"+
+                                     "DataSizeOut,"+
+                                     "DataSizeIn"
                                      );
                     //public HostLoadInfo(int hostId, Load currentLoad, int containersCount, double cpu, double mem, double io)
 
@@ -135,7 +138,7 @@ namespace Simulation.AccountingResults
                             var item in measureValueHolder.HostMeasureValueList[i].CurrentValues)
                         {
                             writer.WriteLine($"{i}," +
-                                             $"{item.Value}");
+                                             $"{item.Value.ToString()}");
                         }
                     }
                 }
@@ -196,6 +199,7 @@ namespace Simulation.AccountingResults
                     double power = Convert.ToDouble(line[20]);
                     double stdDev = Convert.ToDouble(line[21]);
                     double imagePulls = Convert.ToDouble(line[22]);
+                    double communicatedSize = Convert.ToDouble(line[23]);
                     MeasuresValues m = new MeasuresValues(pushRequests, pullRequests, idealHostCount, noHosts,
                         migrations,
                         totalMessages, entropy, predictedEntropy, pushLoadAvailabilityRequest,
@@ -203,7 +207,7 @@ namespace Simulation.AccountingResults
                         avgRealVolume, avgPredictedVolume, minNeeded, maxNeeded,
                         underHosts, overHosts, normalHosts, evacuatingHosts,
                         slaViolations,
-                        power, stdDev, imagePulls );
+                        power, stdDev, imagePulls,communicatedSize);
                     holder.MeasuredValuesList.Add(m);
                 }
             }
@@ -241,7 +245,10 @@ namespace Simulation.AccountingResults
                     double cpuutil = Convert.ToDouble(line[6]);
                     double memutil = Convert.ToDouble(line[7]);
                     double ioutil = Convert.ToDouble(line[8]);
-                    var linfo = new HostLoadInfo(hostId, new Load(cpu, mem, io), concount, cpuutil, memutil, ioutil);
+                    double dataSizeOut = Convert.ToDouble(line[9]);
+                    double dataSizeIn = Convert.ToDouble(line[10]);
+
+                    var linfo = new HostLoadInfo(hostId, new Load(cpu, mem, io), concount, cpuutil, memutil, ioutil,dataSizeOut,dataSizeIn);
                     if (it == current)
                     {
                         list.Add(linfo);

@@ -12,7 +12,7 @@ namespace Simulation.Measure
             double pushLoadAvailabilityRequest, double pullLoadAvailabilityRequest,
             double avgNeededVol, double avgPredictedVol,double minNeeded,double maxNeeded,
             double underHosts, double overHosts, double normalHosts, double evacuatingHosts,
-            double slaViolations,double power,double stdDev,double imagePulls)
+            double slaViolations,double power,double stdDev,double imagePulls, double communicatedSize)
         {
             PushRequests = pushRequests;
             PullRequests = pullRequests;
@@ -36,6 +36,7 @@ namespace Simulation.Measure
             Power = power;
             StdDev = stdDev;
             ImagePulls = imagePulls;
+            CommunicatedSize = communicatedSize;
         }
         public MeasuresValues(MeasuresValues listItem)
         {
@@ -59,6 +60,7 @@ namespace Simulation.Measure
             Power = listItem.Power;
             StdDev = listItem.StdDev;
             ImagePulls = listItem.ImagePulls;
+            CommunicatedSize = listItem.CommunicatedSize;
         }
 
         public double PushRequests { get; private set; }
@@ -83,6 +85,7 @@ namespace Simulation.Measure
         public double Power { get; set; }
         public double StdDev { get; set; }
         public double ImagePulls { get; }
+        public double CommunicatedSize { get; }
 
         public static MeasuresValues operator +(MeasuresValues first, MeasuresValues second)
         {
@@ -102,12 +105,13 @@ namespace Simulation.Measure
                 first.MaxNeeded + second.MaxNeeded,
                 first.UnderHosts + second.UnderHosts,
                 first.OverHosts + second.OverHosts,
-                first.NormalHosts+second.NormalHosts,
-                first.EvacuatingHosts+second.EvacuatingHosts,
+                first.NormalHosts + second.NormalHosts,
+                first.EvacuatingHosts + second.EvacuatingHosts,
                 first.SlaViolations + second.SlaViolations,
                 first.Power + second.Power,
                 first.StdDev + second.StdDev,
-                first.ImagePulls + second.ImagePulls
+                first.ImagePulls + second.ImagePulls,
+                first.CommunicatedSize + second.CommunicatedSize
                 );
         }
 
@@ -134,7 +138,8 @@ namespace Simulation.Measure
                 first.SlaViolations/count, 
                 first.Power/count,
                 first.StdDev/count,
-                first.ImagePulls/count
+                first.ImagePulls/count,
+                first.CommunicatedSize/count
                 );
         }
 

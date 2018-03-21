@@ -94,35 +94,59 @@ namespace Simulation.Configuration
         public static Load DataCenterHostConfiguration { get; } = new Load(100, 32*1024, 100);
 
 
-        ///// <summary>
-        ///// Packet size / Bit rate
-        ///// Needs Great Modification
-        ///// </summary>
-        ///// <param name="size"></param>
-        ///// <param name="speed"></param>
-        ///// <returns></returns>
-        public static int GetNetworkDelay(int size, NetworkSpeed speed = NetworkSpeed.HundredG)
+        /// <summary>
+        /// https://www.incapsula.com/blog/mtu-mss-explained.html
+        /// https://blog.thousandeyes.com/a-very-simple-model-for-tcp-throughput/
+        /// https://www.netcraftsmen.com/tcp-performance-and-the-mathis-equation/
+        /// Paper = PTP-Mesh
+        /// //Loss Percentage (p) = 10^-4
+        /// MaxTrasmissionUnit (MTU)= 1460 byte
+        /// MaxSegmentsize = MTU + 40 = 1500 byte
+        /// TCPHeader = 24 byte
+        /// MSS = 1524
+        /// RTT = 1 m sec
+        /// C = 1.22 = root 1.5
+        /// T = MSS*C/RTT*root(p)
+        /// </summary>
+        /// <param name="size"></param>
+        /// <param name="speed"></param>
+        /// <returns></returns>
+        public static int GetNetworkDelay(double size, NetworkSpeed speed = NetworkSpeed.HundredG)
         {
-            //return 0;
-            decimal finalSize = size;
-            finalSize *= 8;
-            finalSize *= 1024;
-            finalSize *= 1024;
-            decimal finalDelay = Convert.ToDecimal(Math.Pow(10, 6));
-            switch (speed)
+            if (size > 1)
             {
-                case NetworkSpeed.TenG:
-                    finalDelay *= 10;
-                    break;
-                case NetworkSpeed.HundredG:
-                    finalDelay *= 100;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(speed), speed, null);
-            }
 
-            var result = finalSize / finalDelay;
-            return Convert.ToInt32(result);
+            }
+            var p = 0.0001;
+            var mss = 1524;
+            var RTT = 400 / Math.Pow(10,6);
+            var c = Math.Sqrt(1.5);
+            var throuputinByte = mss * c / (RTT*Math.Sqrt(p));
+            //var T = throuputinByte / (1024 * 1024);
+            var sizeinByte = size * 1024 * 1024;
+            var noofPackets = Math.Ceiling(sizeinByte / 1460.0);
+            var finalSize = sizeinByte + 64 * noofPackets;
+            var delay =  finalSize/throuputinByte;
+            return Convert.ToInt32(delay);
+            //decimal finalSize = size;
+            //finalSize *= 8;
+            //finalSize *= 1024;
+            //finalSize *= 1024;
+            //decimal finalDelay = Convert.ToDecimal(Math.Pow(10, 6));
+            //switch (speed)
+            //{
+            //    case NetworkSpeed.TenG:
+            //        finalDelay *= 10;
+            //        break;
+            //    case NetworkSpeed.HundredG:
+            //        finalDelay *= 100;
+            //        break;
+            //    default:
+            //        throw new ArgumentOutOfRangeException(nameof(speed), speed, null);
+            //}
+
+            //var result = finalSize / finalDelay;
+            //return Convert.ToInt32(result);
         }
 
         //Move to network resource

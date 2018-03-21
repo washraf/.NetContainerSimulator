@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Simulation.Messages;
 using System.Threading.Tasks;
 using Simulation.Configuration;
+using System;
 
 namespace Simulation.DataCenter.InformationModules
 {
@@ -20,10 +21,15 @@ namespace Simulation.DataCenter.InformationModules
             _communicationModule = CommunicationModule;
         }
 
+        public bool ContainsImage(int imageId)
+        {
+            return dictionary.ContainsKey(imageId);
+        }
+
         //add puling time to downtime
         public void LoadImage(int imageId)
         {
-            if (dictionary.ContainsKey(imageId))
+            if (ContainsImage(imageId))
             {
                 return;
             }

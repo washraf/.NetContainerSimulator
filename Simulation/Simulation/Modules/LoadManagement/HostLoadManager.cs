@@ -265,7 +265,9 @@ namespace Simulation.Modules.LoadManagement
             var CPUUtil = totalLoad.CpuLoad/_maxLoad.CpuLoad;
             var IOUtil = totalLoad.IoSecond/_maxLoad.IoSecond;
             var MemoryUtil = totalLoad.MemorySize/_maxLoad.MemorySize;
-            var load = new HostLoadInfo(this.MachineId, totalLoad,_containerTable.GetContainersCount(), CPUUtil, MemoryUtil, IOUtil);
+            var dataSizeOut = _networkCard.DataSizeOut;
+            var dataSizeIn = _networkCard.DataSizeIn;
+            var load = new HostLoadInfo(this.MachineId, totalLoad,_containerTable.GetContainersCount(), CPUUtil, MemoryUtil, IOUtil,dataSizeOut,dataSizeIn);
             return load;
         }
 
