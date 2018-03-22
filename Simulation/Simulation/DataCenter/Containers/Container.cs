@@ -214,6 +214,7 @@ namespace Simulation.DataCenter.Containers
 
                 int rTime = _calculator.GetRestorationTime(this.NeededLoad.MemorySize);
                 DownTime += 1.0 * rTime / Global.Second;
+                DownTime += Global.GetNetworkDelay(this.NeededLoad.MemorySize);
                 await Task.Delay(rTime);
                 Started = true;
                 StartPrediction();

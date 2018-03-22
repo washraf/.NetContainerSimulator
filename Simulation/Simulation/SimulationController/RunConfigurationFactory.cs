@@ -50,7 +50,7 @@ namespace Simulation.SimulationController
                         t, ContainersType.D, 0));
                 }
             }
-            //Trials.AddRange(GetNoneConfigurations());
+            Trials.AddRange(GetNoneConfigurations());
             return Trials;
         }
         public static List<RunConfiguration> GetNoneConfigurations()
@@ -60,21 +60,21 @@ namespace Simulation.SimulationController
                     {
                         //SimulationSize.Five,
                         //SimulationSize.Ten,
-                        //SimulationSize.Twenty,
-                        //SimulationSize.Fifty,
-                        //SimulationSize.Hundred,
+                        SimulationSize.Twenty,
+                        SimulationSize.Fifty,
+                        SimulationSize.Hundred,
                         SimulationSize.TwoHundred
                     };
             var tested = new List<TestedHosts>()
             {
-                TestedHosts.Ten,
-                TestedHosts.Twenty,
-                //TestedHosts.Infinity,
+                //TestedHosts.Ten,
+                //TestedHosts.Twenty,
+                TestedHosts.Infinity,
             };
             var schedulings = new List<SchedulingAlgorithm>()
             {
-                //SchedulingAlgorithm.FF,
-                //SchedulingAlgorithm.LFull,
+                SchedulingAlgorithm.FF,
+                SchedulingAlgorithm.LFull,
                 SchedulingAlgorithm.MFull,
             };
             foreach (var size in sizes)
