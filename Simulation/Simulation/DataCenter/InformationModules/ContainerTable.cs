@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Simulation.Loads;
 using Simulation.DataCenter.Containers;
+using Simulation.Configuration;
 
 namespace Simulation.DataCenter.InformationModules
 {
@@ -15,11 +16,14 @@ namespace Simulation.DataCenter.InformationModules
         public ContainerTable(int machineId)
         {
             MachineId = machineId;
+            ContainerType = ContainersType.N;
         }
 
         protected object _lock = new object();
         private Container MigratedContainer { get; set; }
         protected Dictionary<int, Container> ContainersTable { get; set; } = new Dictionary<int, Container>();
+        public ContainersType ContainerType { get; protected set; }
+
         public List<Container> GetAllContainers()
         {
             lock (_lock)

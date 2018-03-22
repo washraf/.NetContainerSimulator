@@ -171,6 +171,12 @@ namespace Simulation.Modules.Management.Host.Proposed
                     case MessageTypes.AddContainerRequest:
                         HanleAddContainerRequest(message as AddContainerRequest);
                         break;
+                    case MessageTypes.ImageLoadRequest:
+                        HandleImageLoadRequest(message as ImageLoadRequest);
+                        break;
+                    case MessageTypes.ImageLoadResponce:
+                        HandleImageLoadResponce(message as ImageLoadResponce);
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
 
@@ -180,7 +186,10 @@ namespace Simulation.Modules.Management.Host.Proposed
 
         private void HanleAddContainerRequest(AddContainerRequest addContainerRequest)
         {
-            Task t = new Task(() => {
+            Task t = new Task( async () => {
+                var table = ContainerTable as DockerContainerTable;
+                var dockerCon = addContainerRequest.NewContainer as DockerContainer;
+                await table.LoadImage(dockerCon.ImageId);
                 ContainerTable.AddContainer(addContainerRequest.NewContainer.ContainerId, addContainerRequest.NewContainer);
             });
             t.Start();
@@ -355,24 +364,67 @@ namespace Simulation.Modules.Management.Host.Proposed
         #region -- Migration Management --
         private void HandleInitiateMigration(InitiateMigration message)
         {
-            Task t = new Task(() =>
-            {
-                var container = ContainerTable.GetContainerById(message.ContainerId);
-                ContainerTable.LockContainer(message.ContainerId);
-                container.Checkpoint(this.MachineId);
-                var size = (int)container.GetContainerNeededLoadInfo().CurrentLoad.MemorySize;
-                MigrateContainerRequest request = 
-                new MigrateContainerRequest(message.TargetHost, this.MachineId, container, size);
+            //Case Docker
+            if (ContainerTable.ContainerType == ContainersType.D) {
+                var container = ContainerTable.GetContainerById(message.ContainerId) as DockerContainer;
+                var imageId = container.ImageId;
+                var request = new ImageLoadRequest(message.TargetHost, this.MachineId, imageId,message.ContainerId);
                 CommunicationModule.SendMessage(request);
-                ResetBackOff();
-            });
-            t.Start();
+            }
+            //Case Normal
+            else {
+                Task t = new Task(() =>
+                {
+                    var container = ContainerTable.GetContainerById(message.ContainerId);
+                    ContainerTable.LockContainer(message.ContainerId);
+                    container.Checkpoint(this.MachineId);
+                    var size = (int)container.GetContainerNeededLoadInfo().CurrentLoad.MemorySize;
+                    MigrateContainerRequest request =
+                    new MigrateContainerRequest(message.TargetHost, this.MachineId, container, size);
+                    CommunicationModule.SendMessage(request);
+                    ResetBackOff();
+                });
+                t.Start();
+            }
             //GlobalEnviromentVariables.ResetCheckRate();
         }
-
+        private void HandleImageLoadRequest(ImageLoadRequest message)
+        {
+            Task t = new Task(async() =>
+            {
+                var table = ContainerTable as DockerContainerTable;
+                await table.LoadImage(message.ImageId);
+                var responce = new ImageLoadResponce(message.SenderId, this.MachineId, message.ContainerId, true);
+                CommunicationModule.SendMessage(responce);
+            });
+            t.Start();
+        }
+        private void HandleImageLoadResponce(ImageLoadResponce message)
+        {
+            if (message.State)
+            {
+                Task t = new Task(() =>
+                {
+                    var container = ContainerTable.GetContainerById(message.ContainerId);
+                    ContainerTable.LockContainer(message.ContainerId);
+                    container.Checkpoint(this.MachineId);
+                    var size = (int)container.GetContainerNeededLoadInfo().CurrentLoad.MemorySize;
+                    MigrateContainerRequest request =
+                    new MigrateContainerRequest(message.SenderId, this.MachineId, container, size);
+                    CommunicationModule.SendMessage(request);
+                    ResetBackOff();
+                });
+                t.Start();
+            }
+            else
+            {
+                throw new Exception("How Come its not loaded");
+            }
+            //GlobalEnviromentVariables.ResetCheckRate();
+        }
         private void HandleMigrateContainerRequest(MigrateContainerRequest message)
         {
-            Task t = new Task(async () =>
+            Task t = new Task(() =>
             {
                 ContainerTable.AddContainer(message.MigratedContainer.ContainerId, message.MigratedContainer);
                 //var nd = Global.GetNetworkDelay(message.MessageSize);

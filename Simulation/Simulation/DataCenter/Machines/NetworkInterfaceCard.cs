@@ -55,10 +55,10 @@ namespace Simulation.DataCenter
             }
         }
 
-        public Message RequestData(Message message)
+        public async Task <Message> RequestData(Message message)
         {
             DataSizeOut += message.MessageSize;
-            var result = _networkSwitch.RequestData(message);
+            var result = await _networkSwitch.RequestData(message);
             DataSizeIn += result.MessageSize;
             return result;
         }

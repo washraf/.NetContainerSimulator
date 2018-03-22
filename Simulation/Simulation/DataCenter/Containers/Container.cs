@@ -25,6 +25,7 @@ namespace Simulation.DataCenter.Containers
         private Load OlderLoad { get; set; }
         public int MigrationCount { get; private set; } = 0;
         public double DownTime { get; private set; } = 0;
+        public ContainersType ContainerType { get; protected set; }
 
         public Container(int containerId, Load containerLoad, LoadPrediction currentLoadPrediction)
         {
@@ -36,6 +37,7 @@ namespace Simulation.DataCenter.Containers
             NeededLoad = new Load(containerLoad);
             Started = true;
             StartPrediction();
+            ContainerType = ContainersType.N;
         }
         private void StartPrediction()
         {

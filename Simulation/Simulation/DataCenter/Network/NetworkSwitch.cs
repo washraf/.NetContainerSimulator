@@ -72,21 +72,21 @@ namespace Simulation.DataCenter.Network
             }
         }
 
-        public Message RequestData(Message message)
+        public async Task<Message> RequestData(Message message)
         {
             if(Started)
             {
                 if (message == null)
                     throw new NullReferenceException();
                 //Dangerous is commented
-                //var nd = Global.GetNetworkDelay(message.MessageSize);
-                //Task.Delay(nd * Global.Second).Wait();
+                var nd = Global.GetNetworkDelay(message.MessageSize);
+                await Task.Delay(nd * Global.Second);
                 _accountingModule.RequestCreated(message.MessageType,message.MessageSize);
 
                 var machine = _switchTable.GetMachineById(message.TargetId);
                 var result =  machine.CommunicationModule.HandleRequestData(message);
-                //nd = Global.GetNetworkDelay(message.MessageSize);
-                //Task.Delay(nd * Global.Second).Wait();
+                nd = Global.GetNetworkDelay(message.MessageSize);
+                await Task.Delay(nd * Global.Second);
                 _accountingModule.RequestCreated(result.MessageType, result.MessageSize);
                 return result;
             }

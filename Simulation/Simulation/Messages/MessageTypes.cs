@@ -23,6 +23,8 @@
         ImageTreeResponce,
         ImagePullRequest,
         ImagePullResponce,
+        ImageLoadRequest,
+        ImageLoadResponce,
 
         //Scheduling
         CanHaveContainerRequest,

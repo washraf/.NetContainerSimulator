@@ -36,7 +36,7 @@ namespace Simulation.Modules.Scheduling
             }
         }
 
-        protected Container currentContainer = null;
+        protected Container currentContainer { get; set; } = null;
 
         public BaseScheduler(UtilizationTable holder, NetworkInterfaceCard communicationModule, IMachinePowerController powerContoller)
         {

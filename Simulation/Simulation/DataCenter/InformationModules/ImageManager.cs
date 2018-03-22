@@ -12,7 +12,7 @@ namespace Simulation.DataCenter.InformationModules
         //private DockerRegistry Registry { get; }
         public Dictionary<int, Image> dictionary;
         private readonly NetworkInterfaceCard _communicationModule;
-
+        private object _lock = new object();
         public ImageManager(NetworkInterfaceCard CommunicationModule)
         {
 
@@ -27,38 +27,41 @@ namespace Simulation.DataCenter.InformationModules
         }
 
         //add puling time to downtime
-        public void LoadImage(int imageId)
+        public async Task LoadImage(int imageId)
         {
             if (ContainsImage(imageId))
             {
                 return;
             }
-            //Task t = new Task(() =>
-            //{
-                var list = GetImageTree(imageId);
-                foreach (var item in list)
+            var list = await GetImageTree(imageId);
+            foreach (var item in list)
+            {
+                if (!ContainsImage(item))
                 {
-                    if (!dictionary.ContainsKey(item))
+                    var image = await GetImage(item);
+                    lock (_lock)
                     {
-                        dictionary.Add(item, GetImage(item));
+                        if (!ContainsImage(image.Id))
+                        {
+
+                            dictionary.Add(item, image);
+                        }
                     }
                 }
-            //    Task.Delay(Global.Second).Wait();
-            //});
-            //t.Start();
+            }
         }
 
-        private List<int> GetImageTree(int imageId)
+        private async Task<List<int>> GetImageTree(int imageId)
         {
             var request = new ImageTreeRequest(int.MaxValue, _communicationModule.MachineId, imageId);
-            var r = _communicationModule.RequestData(request);
+            var r = await _communicationModule.RequestData(request);
             var result = r as ImageTreeResponce;
             return result.ImageTree;
         }
-        private Image GetImage(int imageId)
+        private async Task<Image> GetImage(int imageId)
         {
             var request = new ImagePullRequest(int.MaxValue, _communicationModule.MachineId, imageId);
-            var r = _communicationModule.RequestData(request);
+            var r = await _communicationModule.RequestData(request);
             var result = r as ImagePullResponce;
             return result.Image;
         }

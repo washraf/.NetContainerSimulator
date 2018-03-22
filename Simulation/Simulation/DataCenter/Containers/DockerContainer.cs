@@ -16,6 +16,7 @@ namespace Simulation.DataCenter.Containers
             : base(containerId, containerLoad, currentLoadPrediction)
         {
             ImageId = imageId;
+            ContainerType = ContainersType.D;
         }
 
     }

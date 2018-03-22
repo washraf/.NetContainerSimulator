@@ -119,6 +119,7 @@
     <Compile Include="Messages\CanHaveContainerRequest.cs" />
     <Compile Include="Messages\CanHaveContainerResponce.cs" />
     <Compile Include="Messages\EvacuationDone.cs" />
+    <Compile Include="Messages\ImageLoadRequest.cs" />
     <Compile Include="Messages\ImagePullRequest.cs" />
     <Compile Include="Messages\ImagePullResponce.cs" />
     <Compile Include="Messages\ImageTreeRequest.cs" />

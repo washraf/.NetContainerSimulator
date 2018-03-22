@@ -123,7 +123,25 @@ namespace Simulation.SimulationController
                 //Add container to queue
                 if(CurrentConfiguration.ChangeAction == LoadChangeAction.None)
                 {
-                    for (int i = 0; i < 10; i++)
+                    int s = 0;
+                    switch (CurrentConfiguration.SimulationSize)
+                    {
+                        case SimulationSize.Twenty:
+                            s = 2;
+                            break;
+                        case SimulationSize.Fifty:
+                            s = 15;
+                            break;
+                        case SimulationSize.Hundred:
+                            s = 60;
+                            break;
+                        case SimulationSize.TwoHundred:
+                            s = 150;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    for (int i = 0; i < s; i++)
                     {
                         masterMachine.AddContainer(_containerFactory.GetContainer(LoadGenerator.GetRandomLoad()));
 

@@ -47,13 +47,13 @@ namespace Simulation.DataCenter.Machines
 
         public HostMachine(int id,
             Load maxLoad, NetworkSwitch networkSwitch,
-            LoadPrediction currentLoadPrediction,Strategies strategy, 
-            ContainersType containerType, 
+            LoadPrediction currentLoadPrediction, Strategies strategy,
+            ContainersType containerType,
             SimulationSize simulationSize) : base(id, networkSwitch)
         {
-           if(containerType == ContainersType.D)
+            if (containerType == ContainersType.D)
             {
-                _containerTable = new DockerContainerTable(id,new ImageManager(this.CommunicationModule));
+                _containerTable = new DockerContainerTable(id, new ImageManager(this.CommunicationModule));
             }
             else
             {
@@ -71,18 +71,18 @@ namespace Simulation.DataCenter.Machines
 
                     break;
                 case Strategies.Zhao:
-                    _handler = new ZhaorHostHandler(CommunicationModule, _containerTable, _loadManager,Global.CommonLoadManager);
+                    _handler = new ZhaorHostHandler(CommunicationModule, _containerTable, _loadManager, Global.CommonLoadManager);
 
                     break;
                 case Strategies.ForsmanPush:
-                    _handler = new ForsmanHostHandler(CommunicationModule, _containerTable, _loadManager,StrategyActionType.PushAction, simulationSize);
+                    _handler = new ForsmanHostHandler(CommunicationModule, _containerTable, _loadManager, StrategyActionType.PushAction, simulationSize);
 
                     break;
                 case Strategies.ForsmanPull:
-                    _handler = new ForsmanHostHandler(CommunicationModule, _containerTable, _loadManager,StrategyActionType.PullAction, simulationSize);
+                    _handler = new ForsmanHostHandler(CommunicationModule, _containerTable, _loadManager, StrategyActionType.PullAction, simulationSize);
                     break;
                 case Strategies.Proposed2018:
-                    _handler = new ProposedHostHandlerModule(CommunicationModule,_containerTable,_loadManager);
+                    _handler = new ProposedHostHandlerModule(CommunicationModule, _containerTable, _loadManager);
                     break;
                 default:
 
@@ -154,10 +154,17 @@ namespace Simulation.DataCenter.Machines
 
         public void AddContainer(Container container)
         {
-            //lock (_hostLock)
+            Task t = new Task(async () =>
             {
+                if(container.ContainerType == ContainersType.D)
+                {
+                    var dockerCon = container as DockerContainer;
+                    var table = _containerTable as DockerContainerTable;
+                    await table.LoadImage(dockerCon.ImageId);
+                }
                 _containerTable.AddContainer(container.ContainerId, container);
-            }
+            });
+            t.Start();
         }
 
         public Dictionary<int, ContainerMeasureValue> CollectMigrationCounts()
