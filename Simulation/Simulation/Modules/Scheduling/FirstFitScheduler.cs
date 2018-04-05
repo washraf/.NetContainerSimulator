@@ -26,7 +26,7 @@ namespace Simulation.Modules.Scheduling
         InOrderProping inOrderProping = null;
         protected override void AddContainer(Container container)
         {
-            if (currentContainer != null)
+            if (CurrentContainer != null)
                 throw new NotImplementedException("How come");
             List<int> candidates = new List<int>( Holder.GetCandidateHosts(UtilizationStates.Normal, 0));
             var under = Holder.GetCandidateHosts(UtilizationStates.UnderUtilization, 0);
@@ -34,7 +34,7 @@ namespace Simulation.Modules.Scheduling
             
             if (candidates.Count > 0)
             {
-                currentContainer = container;
+                CurrentContainer = container;
                 int instanceId = Helpers.RandomNumberGenerator.GetInstanceRandomNumber();
                 inOrderProping = new InOrderProping(instanceId, 0, candidates, StrategyActionType.Scheduling, container.GetContainerPredictedLoadInfo());
                 TestHostForAContainer();
@@ -47,14 +47,18 @@ namespace Simulation.Modules.Scheduling
         protected void FailedScheduling()
         {
             powerContoller.PowerOnHost();
-            Containers.Enqueue(currentContainer);
-            currentContainer = null;
+            Containers.Enqueue(CurrentContainer);
+            if (Containers.Count > 100)
+            {
+
+            }
+            CurrentContainer = null;
             inOrderProping = null;
         }
         private void TestHostForAContainer()
         {
             var id = inOrderProping.GetNextCandidate();
-            Message m = new CanHaveContainerRequest(id, 0, inOrderProping.InstanceId, currentContainer.GetContainerPredictedLoadInfo());
+            Message m = new CanHaveContainerRequest(id, 0, inOrderProping.InstanceId, CurrentContainer.GetContainerPredictedLoadInfo());
             CommunicationModule.SendMessage(m);
         }
         protected override void HandleCanHaveContainerResponce(CanHaveContainerResponce message)
@@ -63,9 +67,9 @@ namespace Simulation.Modules.Scheduling
                 throw new NotImplementedException("How come");
             if (message.Bid.Valid)
             {
-                AddContainerRequest request = new AddContainerRequest(message.SenderId, 0, currentContainer);
+                AddContainerRequest request = new AddContainerRequest(message.SenderId, 0, CurrentContainer);
                 CommunicationModule.SendMessage(request);
-                currentContainer = null;
+                CurrentContainer = null;
                 inOrderProping = null;
 
             }

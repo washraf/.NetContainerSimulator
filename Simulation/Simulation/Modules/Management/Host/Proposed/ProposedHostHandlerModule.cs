@@ -297,17 +297,6 @@ namespace Simulation.Modules.Management.Host.Proposed
         #endregion
         private void HandleRejectRequest(RejectRequest message)
         {
-            switch (_hostState.CurrentAction)
-            {
-                case HostCurrentAction.None:
-                    break;
-                case HostCurrentAction.Pulling:
-                    break;
-                case HostCurrentAction.Pushing:
-                    break;
-                case HostCurrentAction.Bidding:
-                    break;
-            }
             switch (message.RejectAction)
             {
                 case RejectActions.Nothing:

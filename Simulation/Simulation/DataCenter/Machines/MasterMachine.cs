@@ -37,7 +37,9 @@ namespace Simulation.DataCenter.Machines
         public UtilizationTable Holder { get; }
         private IScheduler scheduler;
         public MasterMachine(NetworkSwitch networkSwitch, IMachinePowerController powerController,
-            UtilizationTable holder, Strategies strategy, SchedulingAlgorithm scheduling, TestedHosts testedHosts) 
+            UtilizationTable holder, Strategies strategy,AuctionTypes pushAuctionType,AuctionTypes pullAuctionType,
+            SchedulingAlgorithm scheduling,
+            TestedHosts testedHosts) 
             : base(0, networkSwitch)
         {
             switch (strategy)
@@ -59,7 +61,7 @@ namespace Simulation.DataCenter.Machines
                     break;
                 case Strategies.Proposed2018:
 
-                    _handler = new ProposedMasterHandler(CommunicationModule,powerController,holder,testedHosts);
+                    _handler = new ProposedMasterHandler(CommunicationModule,powerController,holder,testedHosts,pushAuctionType,pullAuctionType);
                     break;
                 default:
 

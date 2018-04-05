@@ -186,7 +186,7 @@ namespace Test
             foreach (var a in all)
             {
                 var st = (Strategies) Enum.Parse(typeof(Strategies), a.Key.Split('_')[0]);
-                TestedHosts t = TestedHosts.Infinity;
+                TestedHosts t = TestedHosts.All;
                 if (st == Strategies.Proposed2018)
                     t = (TestedHosts)int.Parse(a.Key.Split('_')[1]);
                 
@@ -254,7 +254,7 @@ namespace Test
                             return Color.Indigo;
                         case TestedHosts.Twenty:
                             return Color.CadetBlue;
-                        case TestedHosts.Infinity:
+                        case TestedHosts.All:
                             return Color.DarkViolet;
                         default:
                             throw new NotImplementedException();

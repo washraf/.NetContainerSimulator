@@ -73,9 +73,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\AuctionTypes.cs" />
+    <Compile Include="Configuration\SchedulingAlgorithm.cs" />
     <Compile Include="Configuration\SizeUnit.cs" />
     <Compile Include="LocationStrategies\Auctions\LeastFullAuction.cs" />
     <Compile Include="LocationStrategies\Auctions\MostFullAuction.cs" />
+    <Compile Include="LocationStrategies\Auctions\RandomAuction.cs" />
+    <Compile Include="LocationStrategies\BidReasons.cs" />
+    <Compile Include="LocationStrategies\Forsman2015\ForsmanBid.cs" />
     <Compile Include="MeasureResults\AccountingResultsFileManager.cs" />
     <Compile Include="MeasureResults\IAccountingResultsManager.cs" />
     <Compile Include="MeasureResults\ITrialResultManagement.cs" />
@@ -119,6 +124,9 @@
     <Compile Include="Messages\CanHaveContainerRequest.cs" />
     <Compile Include="Messages\CanHaveContainerResponce.cs" />
     <Compile Include="Messages\EvacuationDone.cs" />
+    <Compile Include="Messages\Forsman\ForsmanLoadAvailabilityResponce.cs" />
+    <Compile Include="Messages\Forsman\ForsmanPullRequest.cs" />
+    <Compile Include="Messages\Forsman\ForsmanPushRequest.cs" />
     <Compile Include="Messages\ImageLoadRequest.cs" />
     <Compile Include="Messages\ImagePullRequest.cs" />
     <Compile Include="Messages\ImagePullResponce.cs" />
@@ -126,8 +134,7 @@
     <Compile Include="Messages\ImageTreeResponce.cs" />
     <Compile Include="Messages\LoadAvailabilityResponce.cs" />
     <Compile Include="Messages\MigrateContainerResponse.cs" />
-    <Compile Include="Messages\Other\OtherPushRequest.cs" />
-    <Compile Include="Messages\Other\WinnerAnnouncementMessage.cs" />
+    <Compile Include="Messages\Forsman\WinnerAnnouncementMessage.cs" />
     <Compile Include="Messages\PullLoadAvailabilityRequest.cs" />
     <Compile Include="Modules\LoadManagement\CommonLoadManager.cs" />
     <Compile Include="Modules\LoadManagement\HostLoadManager.cs" />

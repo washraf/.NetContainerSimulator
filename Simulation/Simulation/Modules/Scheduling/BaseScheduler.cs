@@ -36,7 +36,7 @@ namespace Simulation.Modules.Scheduling
             }
         }
 
-        protected Container currentContainer { get; set; } = null;
+        protected Container CurrentContainer { get; set; } = null;
 
         public BaseScheduler(UtilizationTable holder, NetworkInterfaceCard communicationModule, IMachinePowerController powerContoller)
         {
@@ -54,7 +54,7 @@ namespace Simulation.Modules.Scheduling
                     await Task.Delay(Global.Second);
                     lock (_lock)
                     {
-                        if ( currentContainer== null && Containers.Any())
+                        if ( CurrentContainer== null && Containers.Any())
                         {
                             AddContainer(Containers.Dequeue());
                         }

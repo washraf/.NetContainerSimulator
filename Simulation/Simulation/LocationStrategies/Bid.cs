@@ -3,19 +3,10 @@ using Simulation.Loads;
 
 namespace Simulation.LocationStrategies
 {
-    public enum BidReasons
-    {
-        //None,
-        ValidBid,
-        Empty,
-        FullLoad,
-        MinimumLoad,
-        CantBid,
-        Evacuate,
-    }
     public class Bid
     {
-        public Bid(int host,bool valid, HostLoadInfo load,int targetAuction,int containerId,BidReasons reason,ContainerLoadInfo containerLoadInfo = null)
+        public Bid(int host,bool valid, HostLoadInfo load,
+            int targetAuction,int containerId,BidReasons reason)
         {
             BiddingHost = host;
             Valid = valid;
@@ -23,12 +14,11 @@ namespace Simulation.LocationStrategies
             AuctionId = targetAuction;
             ContainerId = containerId;
             Reason = reason;
-            ContainerLoadInfo = containerLoadInfo;
         }
 
         public int ContainerId { get; private set; }
         public BidReasons Reason { get; set; }
-        public ContainerLoadInfo ContainerLoadInfo { get; set; }
+        public int ImagePulls { get; }
         public int BiddingHost { get; private set; }
         public bool Valid { get; private set; }
         public HostLoadInfo NewLoadInfo { get; private set; }

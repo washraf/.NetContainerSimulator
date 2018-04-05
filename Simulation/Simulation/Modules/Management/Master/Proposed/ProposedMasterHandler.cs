@@ -34,13 +34,22 @@ namespace Simulation.Modules.Management.Master.Proposed
     {
         protected IMachinePowerController PowerController { get; set; }
         protected UtilizationTable DataHolder { get; set; }
+        private AuctionTypes PushAuctionType { get; set; }
+        private AuctionTypes PullAuctionType { get; set; }
+
         private readonly MasterState _masterState = new MasterState();
         private readonly TestedHosts TestedHostsCount;
-        public ProposedMasterHandler(NetworkInterfaceCard communicationModule,IMachinePowerController powerController, UtilizationTable dataHolder, TestedHosts testedHosts) : base(communicationModule)
+
+        public ProposedMasterHandler(NetworkInterfaceCard communicationModule,
+            IMachinePowerController powerController,
+            UtilizationTable dataHolder,
+            TestedHosts testedHosts, AuctionTypes pushAuctionType, AuctionTypes pullAuctionType) : base(communicationModule)
         {
             PowerController = powerController;
             DataHolder = dataHolder;
             TestedHostsCount = testedHosts;
+            PushAuctionType = pushAuctionType;
+            PullAuctionType = pullAuctionType;
         }
 
         public override void HandleMessage(Message message)
@@ -139,15 +148,15 @@ namespace Simulation.Modules.Management.Master.Proposed
         private void HandlePushRequest(PushRequest message, List<int> candidates)
         {
             var ncandidates = candidates.Take((int)TestedHostsCount).ToList();
-            int instanceId = Helpers.RandomNumberGenerator.GetInstanceRandomNumber();
-            LeastFullAuction pushAuction = new LeastFullAuction(instanceId, message.SenderId, ncandidates, StrategyActionType.PushAction);
+            Auction pushAuction = CreateAuctionInstance(PushAuctionType, message.SenderId, ncandidates, StrategyActionType.PushAction);
             foreach (var candidateHostId in ncandidates)
             {
                 if (candidateHostId == 0)
                 {
                     throw new NotImplementedException();
                 }
-                PushLoadAvailabilityRequest request = new PushLoadAvailabilityRequest(candidateHostId, this.MachineId, message.SelectedContainerLoadInfo, instanceId);
+                PushLoadAvailabilityRequest request 
+                    = new PushLoadAvailabilityRequest(candidateHostId, this.MachineId, message.SelectedContainerLoadInfo, pushAuction.InstanceId);
                 CommunicationModule.SendMessage(request);
                 //Console.WriteLine($"+\n\tSending Message for Host #{candidateHostId} and Auction #{auctionId}");
             }
@@ -186,9 +195,8 @@ namespace Simulation.Modules.Management.Master.Proposed
         {
             var ncandidates = candidates.Take((int)TestedHostsCount).ToList();
 
-            int instanceId = RandomNumberGenerator.GetInstanceRandomNumber();
             // int count = candidates.Count();
-            MostFullAuction pullAuction = new MostFullAuction(instanceId, message.SenderId, ncandidates, StrategyActionType.PullAction);
+            Auction pullAuction = CreateAuctionInstance(PullAuctionType, message.SenderId, ncandidates, StrategyActionType.PullAction);
 
             foreach (var candidateHostId in ncandidates)
             {
@@ -196,7 +204,7 @@ namespace Simulation.Modules.Management.Master.Proposed
                 {
                     throw new NotImplementedException();
                 }
-                PullLoadAvailabilityRequest request = new PullLoadAvailabilityRequest(candidateHostId, this.MachineId, instanceId);
+                PullLoadAvailabilityRequest request = new PullLoadAvailabilityRequest(candidateHostId, this.MachineId, pullAuction.InstanceId);
                 CommunicationModule.SendMessage(request);
             }
             if (_masterState.Auction != null)
@@ -322,6 +330,29 @@ namespace Simulation.Modules.Management.Master.Proposed
             //EvacuatingHost = 0;
             //EvacuatingHosts.Remove(message.SenderId);
 
+        }
+
+        private Auction CreateAuctionInstance(AuctionTypes auctionType,int auctionOwner, List<int> candidates, StrategyActionType strategyActionType)
+        {
+            int instanceId = Helpers.RandomNumberGenerator.GetInstanceRandomNumber();
+
+            switch (auctionType)
+            {
+                case AuctionTypes.MostFull:
+                    return new MostFullAuction(instanceId,auctionOwner, candidates, strategyActionType);
+                case AuctionTypes.LeastFull:
+                    return new LeastFullAuction(instanceId, auctionOwner, candidates, strategyActionType);
+                case AuctionTypes.Random:
+                    return new RandomAuction(instanceId, auctionOwner, candidates, strategyActionType);
+                //case AuctionTypes.LeastPulls:
+                //    break;
+                //case AuctionTypes.MaxEntropy:
+                //    break;
+                //case AuctionTypes.LeastEnergy:
+                //    break;
+                default:
+                    throw new ArgumentOutOfRangeException("auctionType");
+            }
         }
     }
 }

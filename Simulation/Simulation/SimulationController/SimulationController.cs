@@ -18,6 +18,7 @@ using Simulation.DataCenter.Containers;
 using Simulation.DataCenter.Machines;
 using Simulation.DataCenter.Network;
 using Simulation.Factories;
+using System.Diagnostics;
 
 namespace Simulation.SimulationController
 {
@@ -53,7 +54,7 @@ namespace Simulation.SimulationController
                 = new MachineController(UtilizationTable, MachineTableObject, CurrentConfiguration.ContainersType);
             _masterFactory 
                 = new MasterFactory(_networkSwitchObject, MachineControllerObject, UtilizationTable,
-                CurrentConfiguration.Strategy,CurrentConfiguration.SchedulingAlgorithm, CurrentConfiguration.TestedHosts);
+                CurrentConfiguration.Strategy,CurrentConfiguration.PushAuctionType,CurrentConfiguration.PullAuctionType, CurrentConfiguration.SchedulingAlgorithm, CurrentConfiguration.TestedHosts);
             var h = new Load(Global.DataCenterHostConfiguration);
             _hostFactory = new HostFactory(h,
                     _networkSwitchObject, CurrentConfiguration.LoadPrediction, CurrentConfiguration.Strategy, CurrentConfiguration.ContainersType, configuration.SimulationSize);
@@ -100,7 +101,7 @@ namespace Simulation.SimulationController
             int c = 0;
             for (int x = 0; x <= Global.GetSimulationTime; x += Global.AccountTime,c++)
             {
-
+                Debug.WriteLine($"Time = {x}/{Global.GetSimulationTime}");
                 AccountingModuleObject.ReadCurrentState();
                 Thread.Sleep(Global.AccountTime);
                 if (x >= Global.GetSimulationTime/2 && !done)
@@ -124,24 +125,27 @@ namespace Simulation.SimulationController
                 if(CurrentConfiguration.ChangeAction == LoadChangeAction.None)
                 {
                     int s = 0;
+                    Predicate<int> anotherTest = new Predicate<int>(n=>true);
                     switch (CurrentConfiguration.SimulationSize)
                     {
                         case SimulationSize.Twenty:
-                            s = 2;
+                            s = 3;
+                            anotherTest = n => n % 4 == 0;
                             break;
                         case SimulationSize.Fifty:
-                            s = 15;
+                            s = 2;
                             break;
                         case SimulationSize.Hundred:
-                            s = 60;
+                            s = 7;
+                            anotherTest = n => n % 2 == 0;
                             break;
                         case SimulationSize.TwoHundred:
-                            s = 150;
+                            s = 7;
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
-                    for (int i = 0; i < s; i++)
+                    for (int i = 0; i < s & anotherTest(c); i++)
                     {
                         masterMachine.AddContainer(_containerFactory.GetContainer(LoadGenerator.GetRandomLoad()));
 

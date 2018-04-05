@@ -9,6 +9,7 @@ namespace Simulation.SimulationController
             LoadChangeAction changeAction,
             LoadPrediction loadPrediction,
             Strategies strategy,
+            AuctionTypes pushAuctionType,AuctionTypes pullAuctionType,
             SchedulingAlgorithm schedulingAlgorithm,
             TestedHosts testedHosts,
             ContainersType containersType,
@@ -18,6 +19,8 @@ namespace Simulation.SimulationController
             SimulationSize = simulationSize;
             StartPercent = startPercent;
             Strategy = strategy;
+            PushAuctionType = pushAuctionType;
+            PullAuctionType = pullAuctionType;
             SchedulingAlgorithm = schedulingAlgorithm;
             ChangeAction = changeAction;
             TestedHosts = testedHosts;
@@ -29,6 +32,8 @@ namespace Simulation.SimulationController
         public SimulationSize SimulationSize { get; }
         public StartUtilizationPercent StartPercent { get; }
         public Strategies Strategy { get; }
+        public AuctionTypes PushAuctionType { get; }
+        public AuctionTypes PullAuctionType { get; }
         public SchedulingAlgorithm SchedulingAlgorithm { get; }
         public LoadChangeAction ChangeAction { get; }
         public TestedHosts TestedHosts { get; }

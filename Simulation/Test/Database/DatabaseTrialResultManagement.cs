@@ -20,6 +20,8 @@ namespace Test
                                                              && x.StartUtil == holder.StartUtilization.ToString()
                                                              && x.Change == holder.ChangeAction.ToString()
                                                              && x.Algorithm == holder.Strategy.ToString()
+                                                             && x.PushAuctionType == holder.Configuration.PushAuctionType.ToString()
+                                                             && x.PullAcutionType == holder.Configuration.PullAuctionType.ToString()
                                                              && x.Tested == holder.Tested.ToString()
                                                              && x.SchedulingAlgorithm == holder.Scheduling.ToString()
                                                              && x.TrialId == holder.TrialId;
@@ -28,6 +30,8 @@ namespace Test
             t.StartUtil = holder.StartUtilization.ToString();
             t.Change = holder.ChangeAction.ToString();
             t.Algorithm = holder.Strategy.ToString();
+            t.PushAuctionType = holder.Configuration.PushAuctionType.ToString();
+            t.PullAcutionType = holder.Configuration.PullAuctionType.ToString();
             t.Tested = holder.Tested.ToString();
             t.SchedulingAlgorithm = holder.Scheduling.ToString();
             t.TrialId = holder.TrialId;

@@ -16,7 +16,7 @@ namespace Simulation.LocationStrategies.Forsman2015
         private readonly int _candidates;
         public bool OpenSession { get; set; } = true;
 
-        protected readonly List<Bid> Bids = new List<Bid>();
+        protected readonly List<ForsmanBid> Bids = new List<ForsmanBid>();
         //protected readonly List<Bid> InValidBids = new List<Bid>();
         protected readonly Dictionary<int, HostLoadInfo> HostsLoads;
 
@@ -28,7 +28,7 @@ namespace Simulation.LocationStrategies.Forsman2015
             _candidates = candidates;
         }
 
-        public void AddBid(Bid bid,double min,double max)
+        public void AddBid(ForsmanBid bid,double min,double max)
         {
             if (bid.Valid)
             {

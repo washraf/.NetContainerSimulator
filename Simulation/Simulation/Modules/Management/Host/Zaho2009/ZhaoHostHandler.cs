@@ -10,7 +10,6 @@ using Simulation.DataCenter.InformationModules;
 using Simulation.Helpers;
 using Simulation.Loads;
 using Simulation.Messages;
-using Simulation.Messages.Other;
 using Simulation.Modules.LoadManagement;
 
 namespace Simulation.Modules.Management.Host.Other

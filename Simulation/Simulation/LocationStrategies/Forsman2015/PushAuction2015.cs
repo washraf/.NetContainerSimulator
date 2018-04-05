@@ -33,7 +33,7 @@ namespace Simulation.LocationStrategies.Forsman2015
                 var avgCost =
                     Bids.Select(x => x.ContainerId).Select(x => Containers[x].MigrationCost).Average();
                 var NewBids = Bids.Where(x => Containers[x.ContainerId].MigrationCost >= avgCost).ToList();
-                Bid winner = NewBids.First();
+                ForsmanBid winner = NewBids.First();
                 var lds = ToBeHostLoadInfos(NewBids[0].BiddingHost, NewBids[0].NewLoadInfo);
                 var bentropy = AccountingHelpers.CalculateEntropy(lds);
                 //3: Find the new entropy after migration

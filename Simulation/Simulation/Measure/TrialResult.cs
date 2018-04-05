@@ -14,6 +14,8 @@ namespace Simulation.Measure
         public string Change { get; set; }
         public string SchedulingAlgorithm { get; set; }
         public string Algorithm { get; set; }
+        public string PushAuctionType { get; set; }
+        public string PullAcutionType { get; set; }
         public string Tested { get; set; }
         public int TrialId { get; set; }
         //Results

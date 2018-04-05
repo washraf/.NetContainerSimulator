@@ -30,7 +30,8 @@ namespace Simulation.Measure
                     + "_" + ChangeAction.ToString()
                     + "_" + Prediction.ToString() + "_" + Scheduling.ToString()
                     + "_" + Strategy.ToString() + "_" + ContainerType
-                    + "_" + (int)Tested + "_" + TrialId;
+                    + "_" + Configuration.PushAuctionType.ToString() + "_" + Configuration.PullAuctionType
+                    + "_" + Tested.ToString() + "_" + TrialId;
             }
         }
 

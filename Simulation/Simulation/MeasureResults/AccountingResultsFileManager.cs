@@ -21,8 +21,9 @@ namespace Simulation.AccountingResults
                             measureValueHolder.StartUtilization + "_" + measureValueHolder.ChangeAction + "\\" +
                            measureValueHolder.Prediction + "\\" +
                            measureValueHolder.Scheduling + "\\" +
-                            measureValueHolder.Strategy + "_" + measureValueHolder.ContainerType 
-                            + "\\" + measureValueHolder.Tested + "\\"+measureValueHolder.TrialId+"\\";
+                            measureValueHolder.Strategy + "_" + measureValueHolder.ContainerType +"\\"+
+                            measureValueHolder.Configuration.PushAuctionType + "_" + measureValueHolder.Configuration.PullAuctionType + "\\" +
+                            measureValueHolder.Tested + "\\" + measureValueHolder.TrialId + "\\";
             try
             {
                 using (
@@ -164,9 +165,11 @@ namespace Simulation.AccountingResults
             SchedulingAlgorithm schedulingAlgorithm = (SchedulingAlgorithm)Enum.Parse(typeof(SchedulingAlgorithm), config[6]);
             Strategies strategy = (Strategies)Enum.Parse(typeof(Strategies), config[7].Split('_')[0]);
             ContainersType containerType = (ContainersType)Enum.Parse(typeof(ContainersType), config[7].Split('_')[1]);
-            TestedHosts testedHosts = (TestedHosts)Enum.Parse(typeof(TestedHosts), config[8]);
-            int TrialId = int.Parse(config[9]);
-            var conf = new RunConfiguration(simulationSize, perecent,changeAction,loadPrediction,strategy,schedulingAlgorithm, testedHosts,containerType,TrialId);
+            AuctionTypes pushAuctionType = (AuctionTypes)Enum.Parse(typeof(AuctionTypes), config[8].Split('_')[0]);
+            AuctionTypes pullAuctionType = (AuctionTypes)Enum.Parse(typeof(AuctionTypes), config[8].Split('_')[1]);
+            TestedHosts testedHosts = (TestedHosts)Enum.Parse(typeof(TestedHosts), config[9]);
+            int TrialId = int.Parse(config[10]);
+            var conf = new RunConfiguration(simulationSize, perecent,changeAction,loadPrediction,strategy,pushAuctionType,pullAuctionType,schedulingAlgorithm, testedHosts,containerType,TrialId);
             MeasureValueHolder holder =
                 new MeasureValueHolder(conf);
 

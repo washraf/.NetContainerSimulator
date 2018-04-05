@@ -19,6 +19,8 @@ namespace Simulation.Factories
             MachineController machineControllerObject,
             UtilizationTable utilizationTable,
             Strategies currentStrategy,
+            AuctionTypes pushAuctionType,
+            AuctionTypes pullAuctionType,
             SchedulingAlgorithm schedulingAlgorithm,
             TestedHosts testedHostsCount):base(networkSwitchObject)
         {
@@ -26,14 +28,19 @@ namespace Simulation.Factories
             this.machineControllerObject = machineControllerObject;
             this.utilizationTable = utilizationTable;
             this.currentStrategy = currentStrategy;
+            PushAuctionType = pushAuctionType;
+            PullAuctionType = pullAuctionType;
             this.schedulingAlgorithm = schedulingAlgorithm;
             this.testedHostsCount = testedHostsCount;
         }
 
+        public AuctionTypes PushAuctionType { get; }
+        public AuctionTypes PullAuctionType { get; }
+
         public override Machine GetMachine()
         {
             return new MasterMachine(networkSwitchObject, machineControllerObject, utilizationTable,
-                currentStrategy,schedulingAlgorithm, testedHostsCount);
+                currentStrategy,PushAuctionType,PullAuctionType, schedulingAlgorithm, testedHostsCount);
         }
     }
 }

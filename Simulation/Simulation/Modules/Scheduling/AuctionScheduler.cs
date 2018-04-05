@@ -24,7 +24,7 @@ namespace Simulation.Modules.Scheduling
 
         protected override void AddContainer(Container container)
         {
-            if (currentContainer != null)
+            if (CurrentContainer != null)
                 throw new NotImplementedException("How come");
             List<int> candidates = new List<int>(Holder.GetCandidateHosts(UtilizationStates.Normal, 0));
             var under = Holder.GetCandidateHosts(UtilizationStates.UnderUtilization, 0);
@@ -32,11 +32,11 @@ namespace Simulation.Modules.Scheduling
 
             if (candidates.Count > 0)
             {
-                currentContainer = container;
+                CurrentContainer = container;
                 AuctionFactory(candidates);
                 foreach (var id in candidates)
                 {
-                    Message m = new CanHaveContainerRequest(id, 0, auction.InstanceId, currentContainer.GetContainerPredictedLoadInfo());
+                    Message m = new CanHaveContainerRequest(id, 0, auction.InstanceId, CurrentContainer.GetContainerPredictedLoadInfo());
                     CommunicationModule.SendMessage(m);
                 }
 
@@ -66,8 +66,8 @@ namespace Simulation.Modules.Scheduling
         protected void FailedScheduling()
         {
             powerContoller.PowerOnHost();
-            Containers.Enqueue(currentContainer);
-            currentContainer = null;
+            Containers.Enqueue(CurrentContainer);
+            CurrentContainer = null;
             auction = null;
         }
         
@@ -85,9 +85,9 @@ namespace Simulation.Modules.Scheduling
                 }
                 else
                 {
-                    AddContainerRequest request = new AddContainerRequest(message.SenderId, 0, currentContainer);
+                    AddContainerRequest request = new AddContainerRequest(message.SenderId, 0, CurrentContainer);
                     CommunicationModule.SendMessage(request);
-                    currentContainer = null;
+                    CurrentContainer = null;
                     auction = null;
                 }
 

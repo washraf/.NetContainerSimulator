@@ -13,7 +13,7 @@ using Simulation.LocationStrategies;
 using Simulation.LocationStrategies.Auctions;
 using Simulation.LocationStrategies.Forsman2015;
 using Simulation.Messages;
-using Simulation.Messages.Other;
+using Simulation.Messages.Forsman;
 
 namespace Simulation.Modules.Management.Host.Forsman2015
 {
@@ -108,7 +108,7 @@ namespace Simulation.Modules.Management.Host.Forsman2015
             var load = LoadManager.GetPredictedHostLoadInfo();
             _currentAuction = new ForsmanPullAuction(load, total);
             BidLock = 0;
-            OtherPullRequest m = new OtherPullRequest(-1, this.MachineId, load, this.MachineId);
+            ForsmanPullRequest m = new ForsmanPullRequest(-1, this.MachineId, load, this.MachineId);
             CommunicationModule.SendMessage(m);
         }
         protected override bool SendPushRequest()
@@ -122,7 +122,7 @@ namespace Simulation.Modules.Management.Host.Forsman2015
             var load = LoadManager.GetPredictedHostLoadInfo();
             _currentAuction = new ForsmanPushAuction(load, list, total);
             BidLock = 0;
-            OtherPushRequest m = new OtherPushRequest(-1, this.MachineId, load, this.MachineId, list);
+            ForsmanPushRequest m = new ForsmanPushRequest(-1, this.MachineId, load, this.MachineId, list);
             CommunicationModule.SendMessage(m);
             Console.WriteLine($"Host No{MachineId} send Push Request");
             return false;
@@ -138,13 +138,13 @@ namespace Simulation.Modules.Management.Host.Forsman2015
                 switch (mt)
                 {
                     case MessageTypes.PushRequest:
-                        HandlePushRequest(message as OtherPushRequest);
+                        HandlePushRequest(message as ForsmanPushRequest);
                         break;
                         case MessageTypes.PullRequest:
-                        HandlePullRequest(message as OtherPullRequest);
+                        HandlePullRequest(message as ForsmanPullRequest);
                         break;
                     case MessageTypes.LoadAvailabilityResponse:
-                        HandleLoadAvailabilityResponse(message as OtherLoadAvailabilityResponce);
+                        HandleLoadAvailabilityResponse(message as ForsmanLoadAvailabilityResponce);
                         break;
                     case MessageTypes.WinnerAnnouncementMessage:
                         HandleWinnerAnnouncementMessage(message as WinnerAnnouncementMessage);
@@ -218,7 +218,7 @@ namespace Simulation.Modules.Management.Host.Forsman2015
                 }
             }
         }
-        private void HandleLoadAvailabilityResponse(OtherLoadAvailabilityResponce message)
+        private void HandleLoadAvailabilityResponse(ForsmanLoadAvailabilityResponce message)
         {
             _currentAuction.EndWaitFor(message.SenderId,message.OldLoadInfo);
             if (message.Valid)
@@ -267,14 +267,14 @@ namespace Simulation.Modules.Management.Host.Forsman2015
                 _currentAuction = null;
             }
         }
-        private void HandlePushRequest(OtherPushRequest message)
+        private void HandlePushRequest(ForsmanPushRequest message)
         {
-            OtherLoadAvailabilityResponce responce;
+            ForsmanLoadAvailabilityResponce responce;
 
             if (BidLock == -1)
             {
                 BidLock = message.SenderId;
-                List<Bid> bids = new List<Bid>();
+                List<ForsmanBid> bids = new List<ForsmanBid>();
                 var load = LoadManager.GetPredictedHostLoadInfo();
 
                 foreach (var conload in message.ContainerLoads)
@@ -284,29 +284,29 @@ namespace Simulation.Modules.Management.Host.Forsman2015
                         //&& nload.CalculateTotalUtilizationState(MinUtilization,MaxUtilization)
                         //!=UtilizationStates.OverUtilization)
                     {
-                        Bid bid = new Bid(MachineId, true, nload, message.AuctionId, conload.ContainerId,
+                        ForsmanBid bid = new ForsmanBid(MachineId, true, nload, message.AuctionId, conload.ContainerId,
                             BidReasons.ValidBid);
                         bids.Add(bid);
                     }
                 }
-                responce = new OtherLoadAvailabilityResponce(message.SenderId,this.MachineId, load, true,bids);
+                responce = new ForsmanLoadAvailabilityResponce(message.SenderId,this.MachineId, load, true,bids);
 
             }
             else
             {
-                responce = new OtherLoadAvailabilityResponce(message.SenderId,this.MachineId,null,false,null);
+                responce = new ForsmanLoadAvailabilityResponce(message.SenderId,this.MachineId,null,false,null);
                 //Resources are locked in the first place   
             }
             CommunicationModule.SendMessage(responce);
         }
-        private void HandlePullRequest(OtherPullRequest message)
+        private void HandlePullRequest(ForsmanPullRequest message)
         {
-            OtherLoadAvailabilityResponce responce;
+            ForsmanLoadAvailabilityResponce responce;
 
             if (BidLock == -1)
             {
                 BidLock = message.SenderId;
-                List<Bid> bids = new List<Bid>();
+                List<ForsmanBid> bids = new List<ForsmanBid>();
                 var load = LoadManager.GetPredictedHostLoadInfo();
 
                 foreach (var cont in ContainerTable.GetAllContainers())
@@ -316,16 +316,16 @@ namespace Simulation.Modules.Management.Host.Forsman2015
                     if (LoadManager.CanITakeLoad(conload))
                         //&& nload.CalculateTotalUtilizationState(MinUtilization, MaxUtilization) != UtilizationStates.UnderUtilization)
                     {
-                        Bid bid = new Bid(MachineId, true, nload, message.AuctionId, conload.ContainerId,
+                        ForsmanBid bid = new ForsmanBid(MachineId, true, nload, message.AuctionId, conload.ContainerId,
                             BidReasons.ValidBid,conload);
                         bids.Add(bid);
                     }
                 }
-                responce = new OtherLoadAvailabilityResponce(message.SenderId, this.MachineId, load, true, bids);
+                responce = new ForsmanLoadAvailabilityResponce(message.SenderId, this.MachineId, load, true, bids);
             }
             else
             {
-                responce = new OtherLoadAvailabilityResponce(message.SenderId, this.MachineId, null, false, null);
+                responce = new ForsmanLoadAvailabilityResponce(message.SenderId, this.MachineId, null, false, null);
                 //Resources are locked in the first place   
             }
             CommunicationModule.SendMessage(responce);

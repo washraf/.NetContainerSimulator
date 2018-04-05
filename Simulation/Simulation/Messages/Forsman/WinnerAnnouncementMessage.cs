@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Simulation.Messages.Other
+namespace Simulation.Messages.Forsman
 {
     public class WinnerAnnouncementMessage:Message
     {

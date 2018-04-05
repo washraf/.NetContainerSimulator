@@ -6,14 +6,7 @@
         //Five = 5,
         Ten = 10,
         Twenty = 20,
-        Infinity  = int.MaxValue,
-    }
-
-    public enum SchedulingAlgorithm
-    {
-        FF,
-        MFull,
-        LFull
+        All  = int.MaxValue,
     }
 }
 
