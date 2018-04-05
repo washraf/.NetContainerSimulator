@@ -76,6 +76,7 @@
     <Compile Include="Configuration\AuctionTypes.cs" />
     <Compile Include="Configuration\SchedulingAlgorithm.cs" />
     <Compile Include="Configuration\SizeUnit.cs" />
+    <Compile Include="LocationStrategies\Auctions\AuctionBid.cs" />
     <Compile Include="LocationStrategies\Auctions\LeastFullAuction.cs" />
     <Compile Include="LocationStrategies\Auctions\MostFullAuction.cs" />
     <Compile Include="LocationStrategies\Auctions\RandomAuction.cs" />

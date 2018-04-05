@@ -16,20 +16,21 @@ namespace Simulation.LocationStrategies.Auctions
 
         
 
-        protected readonly List<Bid> ValidBids = new List<Bid>();
-        protected readonly List<Bid> InValidBids = new List<Bid>();
+        protected readonly List<AuctionBid> ValidBids = new List<AuctionBid>();
+        protected readonly List<AuctionBid> InValidBids = new List<AuctionBid>();
 
 
         public void AddBid(Bid bid)
         {
+            var nbid = bid as AuctionBid;
             _remaningBids--;
             if (bid.Valid)
             {
-                ValidBids.Add(bid);
+                ValidBids.Add(nbid);
             }
             else
             {
-                InValidBids.Add(bid);
+                InValidBids.Add(nbid);
             }
             if (_remaningBids == 0)
             {

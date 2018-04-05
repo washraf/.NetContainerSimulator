@@ -11,6 +11,7 @@ using Simulation.Loads;
 using Simulation.Messages;
 using Simulation.LocationStrategies;
 using Simulation.DataCenter.Containers;
+using Simulation.LocationStrategies.Auctions;
 
 namespace Simulation.Modules.Management.Host.Proposed
 {
@@ -203,12 +204,12 @@ namespace Simulation.Modules.Management.Host.Proposed
             Bid bid= null;
             if (!_hostState.EvacuationMode
                 && LoadManager.CanITakeLoad(message.NewContainerLoadInfo) && newState!= UtilizationStates.OverUtilization) {
-                 bid = new Bid(this.MachineId, true, load, message.AuctionId, message.NewContainerLoadInfo.ContainerId, BidReasons.ValidBid);
+                 bid = new AuctionBid(this.MachineId, true, load, message.AuctionId, message.NewContainerLoadInfo.ContainerId, BidReasons.ValidBid);
 
             }
             else
             {
-                 bid = new Bid(this.MachineId, false, null, message.AuctionId, message.NewContainerLoadInfo.ContainerId, BidReasons.CantBid);
+                 bid = new AuctionBid(this.MachineId, false, null, message.AuctionId, message.NewContainerLoadInfo.ContainerId, BidReasons.CantBid);
 
             }
             CanHaveContainerResponce responce = new CanHaveContainerResponce(0, MachineId, bid);
@@ -232,12 +233,12 @@ namespace Simulation.Modules.Management.Host.Proposed
                 if (newState == UtilizationStates.OverUtilization)
                 {
 
-                    bid = new Bid(MachineId, false, load, message.AuctionId,
+                    bid = new AuctionBid(MachineId, false, load, message.AuctionId,
                         message.NewContainerLoadInfo.ContainerId, BidReasons.FullLoad);
                 }
                 else
                 {
-                    bid = new Bid(MachineId, true, load, message.AuctionId, message.NewContainerLoadInfo.ContainerId,
+                    bid = new AuctionBid(MachineId, true, load, message.AuctionId, message.NewContainerLoadInfo.ContainerId,
                         BidReasons.ValidBid);
                     _hostState.CurrentAction = HostCurrentAction.Bidding;
                     _hostState.AuctionId = message.AuctionId;
@@ -245,7 +246,7 @@ namespace Simulation.Modules.Management.Host.Proposed
             }
             else
             {
-                bid = new Bid(MachineId, false, null, message.AuctionId, message.NewContainerLoadInfo.ContainerId,
+                bid = new AuctionBid(MachineId, false, null, message.AuctionId, message.NewContainerLoadInfo.ContainerId,
                     BidReasons.CantBid);
             }
             LoadAvailabilityResponce availabilityResponce =
@@ -268,11 +269,11 @@ namespace Simulation.Modules.Management.Host.Proposed
 
                     if (oldstate == UtilizationStates.Normal && newState == UtilizationStates.UnderUtilization)
                     {
-                        bid = new Bid(MachineId, false, load, message.AuctionId, -1, BidReasons.MinimumLoad);
+                        bid = new AuctionBid(MachineId, false, load, message.AuctionId, -1, BidReasons.MinimumLoad);
                     }
                     else
                     {
-                        bid = new Bid(MachineId, true, load, message.AuctionId, selectedContainerload.ContainerId, BidReasons.ValidBid);
+                        bid = new AuctionBid(MachineId, true, load, message.AuctionId, selectedContainerload.ContainerId, BidReasons.ValidBid);
                         _hostState.CurrentAction = HostCurrentAction.Bidding;
                         _hostState.AuctionId = message.AuctionId;
                     }
@@ -280,13 +281,13 @@ namespace Simulation.Modules.Management.Host.Proposed
                 }
                 else
                 {
-                    bid = new Bid(MachineId, false, null, message.AuctionId, -1, BidReasons.Empty);
+                    bid = new AuctionBid(MachineId, false, null, message.AuctionId, -1, BidReasons.Empty);
                 }
 
             }
             else
             {
-                bid = new Bid(MachineId, false, null, message.AuctionId, -1, BidReasons.CantBid);
+                bid = new AuctionBid(MachineId, false, null, message.AuctionId, -1, BidReasons.CantBid);
             }
 
 
