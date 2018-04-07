@@ -148,6 +148,10 @@ namespace Simulation.Modules.Management.Host.WAshraf2017
                 }
             }
         }
+        public override Message HandleRequestData(Message message)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
         #region --Push Message Handlers--

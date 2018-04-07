@@ -19,5 +19,10 @@ namespace Simulation.DataCenter.Containers
             ContainerType = ContainersType.D;
         }
 
+        protected override ContainerLoadInfo CarveContainerLoadInfo(Load load)
+        {
+            return new ContainerLoadInfo(this.ContainerId, ImageId, this.MigrationCount, CalculateMigrationCost(), new Load(load));
+        }
+
     }
 }

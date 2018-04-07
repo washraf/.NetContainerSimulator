@@ -23,7 +23,7 @@ namespace Simulation.AccountingResults
                            measureValueHolder.Scheduling + "\\" +
                             measureValueHolder.Strategy + "_" + measureValueHolder.ContainerType +"\\"+
                             measureValueHolder.Configuration.PushAuctionType + "_" + measureValueHolder.Configuration.PullAuctionType + "\\" +
-                            measureValueHolder.Tested + "\\" + measureValueHolder.TrialId + "\\";
+                            measureValueHolder.TestedPercent + "\\" + measureValueHolder.TrialId + "\\";
             try
             {
                 using (
@@ -133,10 +133,10 @@ namespace Simulation.AccountingResults
                                      );
                     //public HostLoadInfo(int hostId, Load currentLoad, int containersCount, double cpu, double mem, double io)
 
-                    for (int i = 0; i < measureValueHolder.HostMeasureValueList.Count; i++)
+                    for (int i = 0; i < measureValueHolder.HostMeasureValuesList.Count; i++)
                     {
                         foreach (
-                            var item in measureValueHolder.HostMeasureValueList[i].CurrentValues)
+                            var item in measureValueHolder.HostMeasureValuesList[i].CurrentValues)
                         {
                             writer.WriteLine($"{i}," +
                                              $"{item.Value.ToString()}");
@@ -258,7 +258,7 @@ namespace Simulation.AccountingResults
                     }
                     else
                     {
-                        holder.HostMeasureValueList.Add(new HostMeasureValue(list));
+                        holder.HostMeasureValuesList.Add(new HostMeasureValues(list));
                         list.Clear();
                         list.Add(linfo);
                         current++;

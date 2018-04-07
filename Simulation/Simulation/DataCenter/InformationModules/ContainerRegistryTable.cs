@@ -13,6 +13,12 @@ namespace Simulation.DataCenter.InformationModules
     {
         public readonly Dictionary<int, Image> dictionary;
         public readonly Dictionary<int, int> pullsPerImage;
+        /// <summary>
+        /// The Images count is 15 * the simulation size
+        /// The images is almost equals the number of containers
+        /// </summary>
+        /// <param name="simulationSize"></param>
+        /// <returns></returns>
         public static Dictionary<int,Image> FillContainerRegistry(SimulationSize simulationSize)
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
@@ -27,19 +33,36 @@ namespace Simulation.DataCenter.InformationModules
             for (int i = 0; i < 2* size; i++)
             {
                 var id = i+ size;
-                var bimg = random.Next(0, 20);
+                var bimg = random.Next(0, size);
                 int imageSize = (int)random.NextGaussian(50, 20);
                 dic.Add(id, new Image(id, $"Level {id}",imageSize , bimg));
 
             }
-            for (int i = 0; i < 3 * (int)simulationSize; i++)
+            for (int i = 0; i < 3 * size; i++)
             {
                 var id = i + 3*size;
-                var bimg = random.Next(20, 60);
+                var bimg = random.Next(size, 3*size);
                 int imageSize = (int)random.NextGaussian(50, 20);
                 dic.Add(id, new Image(id, $"Final {id}", imageSize, bimg));
 
             }
+
+            for (int i = 0; i < 4 * size; i++)
+            {
+                var id = i + 6 * size;
+                var bimg = random.Next(3*size, 6*size);
+                int imageSize = (int)random.NextGaussian(50, 20);
+                dic.Add(id, new Image(id, $"Final {id}", imageSize, bimg));
+            }
+
+            for (int i = 0; i < 5 * size; i++)
+            {
+                var id = i + 10 * size;
+                var bimg = random.Next(6*size, 10 * size);
+                int imageSize = (int)random.NextGaussian(50, 20);
+                dic.Add(id, new Image(id, $"Final {id}", imageSize, bimg));
+            }
+
             return dic;
         }
 

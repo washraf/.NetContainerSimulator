@@ -21,8 +21,8 @@ namespace Test
                                                              && x.Change == holder.ChangeAction.ToString()
                                                              && x.Algorithm == holder.Strategy.ToString()
                                                              && x.PushAuctionType == holder.Configuration.PushAuctionType.ToString()
-                                                             && x.PullAcutionType == holder.Configuration.PullAuctionType.ToString()
-                                                             && x.Tested == holder.Tested.ToString()
+                                                             && x.PullAuctionType == holder.Configuration.PullAuctionType.ToString()
+                                                             && x.TestedPercent == (int)holder.TestedPercent
                                                              && x.SchedulingAlgorithm == holder.Scheduling.ToString()
                                                              && x.TrialId == holder.TrialId;
             TrialResult t = context.TrialResults.SingleOrDefault(selecTionFunction)??new TrialResult();
@@ -31,8 +31,8 @@ namespace Test
             t.Change = holder.ChangeAction.ToString();
             t.Algorithm = holder.Strategy.ToString();
             t.PushAuctionType = holder.Configuration.PushAuctionType.ToString();
-            t.PullAcutionType = holder.Configuration.PullAuctionType.ToString();
-            t.Tested = holder.Tested.ToString();
+            t.PullAuctionType = holder.Configuration.PullAuctionType.ToString();
+            t.TestedPercent = (int)holder.TestedPercent;
             t.SchedulingAlgorithm = holder.Scheduling.ToString();
             t.TrialId = holder.TrialId;
             t.PredictionAlg = holder.Prediction.ToString();
@@ -48,6 +48,7 @@ namespace Test
             t.ImagePullsRatio = holder.AveragePullPerImage;
             t.FinalEntropy = holder.FinalEntropy;
             t.ContainersAverage = holder.AverageContainers;
+            t.AverageContainerPerHost = holder.AverageContainersPerHost;
             t.TotalContainers = holder.TotalContainers;
             context.TrialResults.AddOrUpdate(t);
             context.SaveChanges();

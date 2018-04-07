@@ -43,7 +43,7 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
                 {
                     throw new NotImplementedException();
                 }
-                PushLoadAvailabilityRequest request = new PushLoadAvailabilityRequest(candidateHostId, this.MachineId, message.SelectedContainerLoadInfo, instanceId);
+                PushLoadAvailabilityRequest request = new PushLoadAvailabilityRequest(candidateHostId, this.MachineId, message.SelectedContainerLoadInfo, instanceId,pushAuction.Owner);
                 CommunicationModule.SendMessage(request);
                 //Console.WriteLine($"+\n\tSending Message for Host #{candidateHostId} and Auction #{auctionId}");
             }
@@ -70,7 +70,7 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
                 {
                     throw new NotImplementedException();
                 }
-                PullLoadAvailabilityRequest request = new PullLoadAvailabilityRequest(candidateHostId, this.MachineId, instanceId);
+                PullLoadAvailabilityRequest request = new PullLoadAvailabilityRequest(candidateHostId, this.MachineId, instanceId,pullAuction.Owner);
                 CommunicationModule.SendMessage(request);
             }
             if (_currentAuction != null)

@@ -1,26 +1,24 @@
 <html>
 <head>
+    <style>
+        .done{
+            color:red;
+        }
+
+    </style>
 </head>
 <body>
     <section>
-        <header>To-do</header>
+        <h3>To-do</h3>
         <ol>
-            <li>Create Images &#10004</li>
-            <li>Track all hosts states &#10004</li>
-            <li>Tracks pulls per image  &#10004</li>
-            <li>Check aggregations view   &#10004</li>
-            <li>Storage Per Host  &#10004</li>
-            <li>add containers   &#10004</li>
-            <li>Scheduling   &#10004</li>
-            <li>Scheduling auction use the same as later   &#10004</li>
             <li>
-                Implement auctions  &#10004
+                Selection Auctions:
                 <ol>
-                    <li>add in auction is the image there or not</li>
+                    <li>Implement auctions  &#10004</li>
+                    <li>add in auction is the image there or not &#10004</li>
                     <li>Create A cost function</li>
                 </ol>
             </li>
-            <li>Update Downtime   &#10004</li>
             <li>
                 Network
                 <ol>
@@ -31,10 +29,11 @@
                     <li>Account for Network Bandwidth &#10004</li>
                 </ol>
             </li>
-            <li> Add Container PetHost Metric</li>
             <li>
-                Update SLA violation Model<input type="checkbox">
+                Update SLA violation Model
                 <ul>
+                    <li>Include SLA percentage</li>
+                    <li>Include Average Downtime in SLA metrics</li>
                     <li>
                         Include time for migration and checkpoint and restoration time
                     </li>
@@ -49,8 +48,7 @@
                     <li>HVAC Equipment and PME</li>
                 </ul>
             </li>
-
-            <li>Algorithm Scalability Test</li>
+            <li>Test the effect of tested hosts</li>
             <li>Measure Elasticity</li>
             <li>scheduling back-off</li>
             <li>Kill Containers</li>
@@ -59,8 +57,24 @@
             <li>Implement evacuation initiated by the master</li>
             <li>Implement Real Data</li>
             <li>test different ratios 70-90,70-80, 80-90</li>
-            <li>use serilog for logging<input type="checkbox"></li>
-            <li>Add System Metrics</li>
+            <li>use serilog for logging</li>
+            <li>Algorithm Scalability Test</li>
+            <li>Add Operating System Metrics</li>
+        </ol>
+    </section>
+    <section class="done">
+        <h3>Done</h3>
+        <ol>
+            <li>Create Images &#10004</li>
+            <li>Track all hosts states &#10004</li>
+            <li>Tracks pulls per image  &#10004</li>
+            <li>Check aggregations view   &#10004</li>
+            <li>Storage Per Host  &#10004</li>
+            <li>add containers   &#10004</li>
+            <li>Scheduling   &#10004</li>
+            <li>Scheduling auction use the same as later   &#10004</li>
+            <li> Add Container PerHost Metric &#10004</li>
+            <li>Update Downtime   &#10004</li>
         </ol>
     </section>
 </body>

@@ -131,7 +131,7 @@ namespace Test
             foreach (var a in all)
             {
                 var st = (Strategies) Enum.Parse(typeof(Strategies), a.Key.Split('_')[0]);
-                TestedHosts t = TestedHosts.All;
+                TestedHosts t = TestedHosts.Hundred;
                 myPane.AddBar(a.Key == "WAshraf2017" ? "Proposed Algorithm" : a.Key.ToString()
                     , new PointPairList() {
                     new PointPair(0,a.Value.Total/a.Value.Count)}, GetColor(st, t));
@@ -171,11 +171,11 @@ namespace Test
                 case Strategies.Proposed2018:
                     switch (tested)
                     {
-                        case TestedHosts.Ten:
+                        case TestedHosts.TwentyFive:
                             return Color.Indigo;
-                        case TestedHosts.Twenty:
+                        case TestedHosts.Fifty:
                             return Color.CadetBlue;
-                        case TestedHosts.All:
+                        case TestedHosts.Hundred:
                             return Color.DarkViolet;
                         default:
                             throw new NotImplementedException();

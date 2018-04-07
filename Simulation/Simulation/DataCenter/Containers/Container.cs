@@ -151,7 +151,7 @@ namespace Simulation.DataCenter.Containers
             }
         }
 
-        private int CalculateMigrationCost()
+        protected int CalculateMigrationCost()
         {
             return _calculator.GetCheckpointTime(NeededLoad.MemorySize) +
                    _calculator.GetRestorationTime(NeededLoad.MemorySize);
@@ -160,7 +160,7 @@ namespace Simulation.DataCenter.Containers
         {
             lock (lck)
             {
-                return new ContainerLoadInfo(this.ContainerId, this.MigrationCount, CalculateMigrationCost(), new Load(NeededLoad));
+                return CarveContainerLoadInfo(NeededLoad);
             }
         }
         public ContainerLoadInfo GetContainerPredictedLoadInfo()
@@ -186,8 +186,13 @@ namespace Simulation.DataCenter.Containers
                         throw new ArgumentOutOfRangeException();
                 }
 
-                return new ContainerLoadInfo(this.ContainerId, this.MigrationCount, CalculateMigrationCost(), new Load(finalLoad));
+                return CarveContainerLoadInfo(finalLoad);
             }
+        }
+
+        protected virtual ContainerLoadInfo CarveContainerLoadInfo(Load load)
+        {
+            return new ContainerLoadInfo(this.ContainerId, 0, this.MigrationCount, CalculateMigrationCost(), new Load(load));
         }
         /// <summary>
         /// Should Simulate Correct checkpoint Time

@@ -51,7 +51,7 @@ namespace Simulation.DataCenter.InformationModules
             }
         }
 
-        private async Task<List<int>> GetImageTree(int imageId)
+        public async Task<List<int>> GetImageTree(int imageId)
         {
             var request = new ImageTreeRequest(int.MaxValue, _communicationModule.MachineId, imageId);
             var r = await _communicationModule.RequestData(request);

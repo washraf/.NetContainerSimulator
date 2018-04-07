@@ -3,12 +3,13 @@ using Simulation.Configuration;
 
 namespace Simulation.Loads
 {
-    public class HostLoadInfo
+    public class HostLoadInfo:LoadInfo
     {
-        public HostLoadInfo(int hostId,Load currentLoad,int containersCount,double cpu,double mem,double io, double dataSizeOut, double dataSizeIn)
+        public HostLoadInfo(int hostId,Load currentLoad,int containersCount,
+            double cpu,double mem,double io, double dataSizeOut, double dataSizeIn)
+            :base(currentLoad)
         {
             HostId = hostId;
-            CurrentLoad = currentLoad;
             ContainersCount = containersCount;
             CPUUtil = cpu;
             MemoryUtil = mem;
@@ -16,10 +17,7 @@ namespace Simulation.Loads
             DataSizeOut = dataSizeOut;
             DataSizeIn = dataSizeIn;
         }
-        /// <summary>
-        /// The Current Load of the Host in terms of CPU Usage, Memory and IO/S
-        /// </summary>
-        public Load CurrentLoad { get; private set; }
+        
 
         public int ContainersCount { get; set; }
         public int HostId { get; private set; }

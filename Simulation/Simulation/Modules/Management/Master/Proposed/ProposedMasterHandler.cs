@@ -147,7 +147,8 @@ namespace Simulation.Modules.Management.Master.Proposed
 
         private void HandlePushRequest(PushRequest message, List<int> candidates)
         {
-            var ncandidates = candidates.Take((int)TestedHostsCount).ToList();
+
+            var ncandidates = candidates.Take(calculateCountFromPercent(candidates.Count, TestedHostsCount)).ToList();
             Auction pushAuction = CreateAuctionInstance(PushAuctionType, message.SenderId, ncandidates, StrategyActionType.PushAction);
             foreach (var candidateHostId in ncandidates)
             {
@@ -156,7 +157,7 @@ namespace Simulation.Modules.Management.Master.Proposed
                     throw new NotImplementedException();
                 }
                 PushLoadAvailabilityRequest request 
-                    = new PushLoadAvailabilityRequest(candidateHostId, this.MachineId, message.SelectedContainerLoadInfo, pushAuction.InstanceId);
+                    = new PushLoadAvailabilityRequest(candidateHostId, this.MachineId, message.SelectedContainerLoadInfo, pushAuction.InstanceId, pushAuction.Owner);
                 CommunicationModule.SendMessage(request);
                 //Console.WriteLine($"+\n\tSending Message for Host #{candidateHostId} and Auction #{auctionId}");
             }
@@ -193,7 +194,7 @@ namespace Simulation.Modules.Management.Master.Proposed
 
         private void HandlePullRequest(PullRequest message, List<int> candidates)
         {
-            var ncandidates = candidates.Take((int)TestedHostsCount).ToList();
+            var ncandidates = candidates.Take(calculateCountFromPercent(candidates.Count,TestedHostsCount)).ToList();
 
             // int count = candidates.Count();
             Auction pullAuction = CreateAuctionInstance(PullAuctionType, message.SenderId, ncandidates, StrategyActionType.PullAction);
@@ -204,7 +205,7 @@ namespace Simulation.Modules.Management.Master.Proposed
                 {
                     throw new NotImplementedException();
                 }
-                PullLoadAvailabilityRequest request = new PullLoadAvailabilityRequest(candidateHostId, this.MachineId, pullAuction.InstanceId);
+                PullLoadAvailabilityRequest request = new PullLoadAvailabilityRequest(candidateHostId, this.MachineId, pullAuction.InstanceId,pullAuction.Owner);
                 CommunicationModule.SendMessage(request);
             }
             if (_masterState.Auction != null)
@@ -344,8 +345,8 @@ namespace Simulation.Modules.Management.Master.Proposed
                     return new LeastFullAuction(instanceId, auctionOwner, candidates, strategyActionType);
                 case AuctionTypes.Random:
                     return new RandomAuction(instanceId, auctionOwner, candidates, strategyActionType);
-                //case AuctionTypes.LeastPulls:
-                //    break;
+                case AuctionTypes.LeastPulls:
+                    return new LeastPullsAuction(instanceId, auctionOwner, candidates, strategyActionType);
                 //case AuctionTypes.MaxEntropy:
                 //    break;
                 //case AuctionTypes.LeastEnergy:
@@ -353,6 +354,13 @@ namespace Simulation.Modules.Management.Master.Proposed
                 default:
                     throw new ArgumentOutOfRangeException("auctionType");
             }
+        }
+
+        private int calculateCountFromPercent(int count,TestedHosts testedHosts)
+        {
+            double newC;
+            newC = ((int)testedHosts)/100.0 * count;
+            return (int)Math.Ceiling(newC);
         }
     }
 }

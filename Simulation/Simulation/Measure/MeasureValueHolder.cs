@@ -19,7 +19,7 @@ namespace Simulation.Measure
         public LoadPrediction Prediction { get; set; }
         public SchedulingAlgorithm Scheduling { get; }
         public int TrialId { get; }
-        public TestedHosts Tested { get; }
+        public TestedHosts TestedPercent { get; }
         public ContainersType ContainerType { get; }
 
         public string Name
@@ -31,7 +31,7 @@ namespace Simulation.Measure
                     + "_" + Prediction.ToString() + "_" + Scheduling.ToString()
                     + "_" + Strategy.ToString() + "_" + ContainerType
                     + "_" + Configuration.PushAuctionType.ToString() + "_" + Configuration.PullAuctionType
-                    + "_" + Tested.ToString() + "_" + TrialId;
+                    + "_" + TestedPercent.ToString() + "_" + TrialId;
             }
         }
 
@@ -42,7 +42,7 @@ namespace Simulation.Measure
             StartUtilization = configuration.StartPercent;
             ChangeAction = configuration.ChangeAction;
             Prediction = configuration.LoadPrediction;
-            Tested = configuration.TestedHosts;
+            TestedPercent = configuration.TestedHosts;
             Scheduling = configuration.SchedulingAlgorithm;
             ContainerType = configuration.ContainersType;
             Configuration = configuration;
@@ -52,7 +52,7 @@ namespace Simulation.Measure
         
 
         public List<MeasuresValues> MeasuredValuesList { set; get; } = new List<MeasuresValues>();
-        public List<HostMeasureValue> HostMeasureValueList { set; get; } = new List<HostMeasureValue>(); 
+        public List<HostMeasureValues> HostMeasureValuesList { set; get; } = new List<HostMeasureValues>(); 
 
         public Dictionary<int, ContainerMeasureValue> ContainerMigrationCount { get; set; } =
             new Dictionary<int, ContainerMeasureValue>();
@@ -73,9 +73,9 @@ namespace Simulation.Measure
                 final.MeasuredValuesList.Add(new MeasuresValues(listItem));
             }
             //Hosts
-            foreach (var item in first.HostMeasureValueList)
+            foreach (var item in first.HostMeasureValuesList)
             {
-                final.HostMeasureValueList.Add(new HostMeasureValue(item));
+                final.HostMeasureValuesList.Add(new HostMeasureValues(item));
             }
 
             //Container Migrations
@@ -104,13 +104,13 @@ namespace Simulation.Measure
                 }
             }
             //hosts
-            for (int i = 0; i < second.HostMeasureValueList.Count; i++)
+            for (int i = 0; i < second.HostMeasureValuesList.Count; i++)
             {
-                if (i < final.HostMeasureValueList.Count)
-                    final.HostMeasureValueList[i] += second.HostMeasureValueList[i];
+                if (i < final.HostMeasureValuesList.Count)
+                    final.HostMeasureValuesList[i] += second.HostMeasureValuesList[i];
                 else
                 {
-                    final.HostMeasureValueList.Add(new HostMeasureValue(second.HostMeasureValueList[i]));
+                    final.HostMeasureValuesList.Add(new HostMeasureValues(second.HostMeasureValuesList[i]));
                 }
             }
             //contianers
@@ -148,9 +148,9 @@ namespace Simulation.Measure
             {
                 final.ContainerMigrationCount.Add(item.Key, item.Value/c);
             }
-            foreach (var item in first.HostMeasureValueList)
+            foreach (var item in first.HostMeasureValuesList)
             {
-                final.HostMeasureValueList.Add(item/c);
+                final.HostMeasureValuesList.Add(item/c);
             }
             foreach (var item in first.PullsPerImage)
             {
@@ -287,7 +287,13 @@ namespace Simulation.Measure
         {
             get
             {
-                return HostMeasureValueList.Average(x => x.Containers);
+                return HostMeasureValuesList.Average(x => x.Containers);
+            }
+        }
+        public double AverageContainersPerHost {
+            get
+            {
+                return HostMeasureValuesList.Average(x => x.ContainersPerHost);
             }
         }
 
@@ -296,7 +302,7 @@ namespace Simulation.Measure
 
             get
             {
-                return HostMeasureValueList.Last().Containers;
+                return HostMeasureValuesList.Last().Containers;
             }
 
         }
@@ -312,7 +318,7 @@ namespace Simulation.Measure
         {
             get
             {
-                return HostMeasureValueList.Average(x => x.AverageDataOut);
+                return HostMeasureValuesList.Average(x => x.AverageDataOut);
             }
         }
         public double AverageDataIn
@@ -320,7 +326,7 @@ namespace Simulation.Measure
             get
             {
 
-                return HostMeasureValueList.Average(x => x.AverageDataIn);
+                return HostMeasureValuesList.Average(x => x.AverageDataIn);
             }
         }
 
@@ -328,9 +334,10 @@ namespace Simulation.Measure
         {
             get
             {
-                return HostMeasureValueList.Average(x => x.AverageDataTotal);
+                return HostMeasureValuesList.Average(x => x.AverageDataTotal);
             }
         }
+
 
         #endregion
 

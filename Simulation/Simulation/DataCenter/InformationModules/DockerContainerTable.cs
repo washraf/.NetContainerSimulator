@@ -30,5 +30,24 @@ namespace Simulation.DataCenter.InformationModules
         {
             await ImageManager.LoadImage(imageId);
         }
+
+        public int GetNumberOfPulls(int imageId)
+        {
+            if (ImageManager.ContainsImage(imageId))
+                return 0;
+            else
+            {
+                var result = 0;
+                var task = ImageManager.GetImageTree(imageId);
+                task.Wait();
+                var ids = task.Result;
+                foreach (var id in ids)
+                {
+                    if (!ImageManager.ContainsImage(id))
+                        result++;
+                }
+                return result;
+            }
+        }
     }
 }

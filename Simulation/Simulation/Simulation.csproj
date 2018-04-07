@@ -76,8 +76,10 @@
     <Compile Include="Configuration\AuctionTypes.cs" />
     <Compile Include="Configuration\SchedulingAlgorithm.cs" />
     <Compile Include="Configuration\SizeUnit.cs" />
+    <Compile Include="Loads\LoadInfo.cs" />
     <Compile Include="LocationStrategies\Auctions\AuctionBid.cs" />
     <Compile Include="LocationStrategies\Auctions\LeastFullAuction.cs" />
+    <Compile Include="LocationStrategies\Auctions\LeastPullsAuction.cs" />
     <Compile Include="LocationStrategies\Auctions\MostFullAuction.cs" />
     <Compile Include="LocationStrategies\Auctions\RandomAuction.cs" />
     <Compile Include="LocationStrategies\BidReasons.cs" />
@@ -137,6 +139,7 @@
     <Compile Include="Messages\MigrateContainerResponse.cs" />
     <Compile Include="Messages\Forsman\WinnerAnnouncementMessage.cs" />
     <Compile Include="Messages\PullLoadAvailabilityRequest.cs" />
+    <Compile Include="Messages\PullsCountRequest.cs" />
     <Compile Include="Modules\LoadManagement\CommonLoadManager.cs" />
     <Compile Include="Modules\LoadManagement\HostLoadManager.cs" />
     <Compile Include="DataCenter\InformationModules\ISwitchTable.cs" />

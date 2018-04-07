@@ -71,7 +71,7 @@ namespace Simulation.DataCenter.Machines
 
                     break;
                 case Strategies.Zhao:
-                    _handler = new ZhaorHostHandler(CommunicationModule, _containerTable, _loadManager, Global.CommonLoadManager);
+                    _handler = new ZhaoHostHandler(CommunicationModule, _containerTable, _loadManager, Global.CommonLoadManager);
 
                     break;
                 case Strategies.ForsmanPush:
@@ -125,7 +125,7 @@ namespace Simulation.DataCenter.Machines
 
         public override Message HandleRequestData(Message message)
         {
-            throw new NotImplementedException();
+            return _handler.HandleRequestData(message);
         }
 
         #endregion

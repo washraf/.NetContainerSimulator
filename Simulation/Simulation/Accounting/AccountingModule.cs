@@ -86,7 +86,7 @@ namespace Simulation.Accounting
                     communicatedSize
                     );
                 
-                MeasureHolder.HostMeasureValueList.Add(new HostMeasureValue(loads));
+                MeasureHolder.HostMeasureValuesList.Add(new HostMeasureValues(loads));
                 MeasureHolder.MeasuredValuesList.Add(mvalues);
                 //Debug.WriteLine($"Communicated Size = {communicatedSize}");
                 //Debug.WriteLine($"Total Data  = {MeasureHolder.HostMeasureValueList.Last().AverageDataTotal}");

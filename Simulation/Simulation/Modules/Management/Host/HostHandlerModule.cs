@@ -38,10 +38,8 @@ namespace Simulation.Modules.Management.Host
         }
         public abstract void HandleMessage(Message message);
 
-        public Message HandleRequestData(Message message)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Message HandleRequestData(Message message);
+        
 
         #region --long running--
         public abstract void MachineAction();

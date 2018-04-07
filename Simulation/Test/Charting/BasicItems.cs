@@ -22,6 +22,7 @@ namespace Test.Charting
         Pull_Load_Availability_Request,
         Migration_Count,
         Container_DownTime,
-        Containers
+        Containers_Per_Host,
+        Containers,
     }
 }

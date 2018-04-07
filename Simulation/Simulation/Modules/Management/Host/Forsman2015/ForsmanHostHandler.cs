@@ -164,6 +164,11 @@ namespace Simulation.Modules.Management.Host.Forsman2015
             }
         }
 
+        public override Message HandleRequestData(Message message)
+        {
+            throw new NotImplementedException();
+        }
+
         private void HandleInitiateMigrationRequest(InitiateMigration message)
         {
             var con = ContainerTable.GetContainerById(message.ContainerId);

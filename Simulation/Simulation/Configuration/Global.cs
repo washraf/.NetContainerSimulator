@@ -52,6 +52,9 @@ namespace Simulation.Configuration
                 case SimulationSize.TwoHundred:
                     Second = strategy != Strategies.Zhao ? 20 : 60;
                     break;
+                case SimulationSize.ThreeHundred:
+                    Second = strategy != Strategies.Zhao ? 30 : 70;
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

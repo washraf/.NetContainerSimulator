@@ -2,11 +2,10 @@
 {
     public enum TestedHosts
     {
-        //One = 1,
-        //Five = 5,
-        Ten = 10,
-        Twenty = 20,
-        All  = int.MaxValue,
+        TwentyFive = 25,
+        Fifty = 50,
+        SeventyFive = 75,
+        Hundred = 100,
     }
 }
 

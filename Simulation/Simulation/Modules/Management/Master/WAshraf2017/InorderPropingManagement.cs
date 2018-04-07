@@ -31,7 +31,7 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
 
             var candidateHostId = inOrderInstance.GetNextCandidate();
             PushLoadAvailabilityRequest request = new PushLoadAvailabilityRequest(candidateHostId, this.MachineId,
-                    message.SelectedContainerLoadInfo, instanceId);
+                    message.SelectedContainerLoadInfo, instanceId,inOrderInstance.Owner);
             CommunicationModule.SendMessage(request);
             if (_currentProping != null)
                 throw new NotImplementedException();
@@ -47,7 +47,7 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
             var inOrderInstance = new InOrderProping(instanceId, message.SenderId, candidates, StrategyActionType.PullAction, null);
             var candidateHostId = inOrderInstance.GetNextCandidate();
             PullLoadAvailabilityRequest request = new PullLoadAvailabilityRequest(candidateHostId, this.MachineId,
-                instanceId);
+                instanceId,inOrderInstance.Owner);
             CommunicationModule.SendMessage(request);
             if (_currentProping != null)
                 throw new NotImplementedException();
@@ -71,13 +71,13 @@ namespace Simulation.Modules.Management.Master.WAshraf2017
                     {
                         case StrategyActionType.PushAction:
                             var aRequest1 = new PushLoadAvailabilityRequest(candidateHostId, this.MachineId,
-                                _currentProping.ContainerLoadInfo, _currentProping.InstanceId);
+                                _currentProping.ContainerLoadInfo, _currentProping.InstanceId,_currentProping.Owner);
                             CommunicationModule.SendMessage(aRequest1);
 
                             break;
                         case StrategyActionType.PullAction:
                             var aRequest2 = new PullLoadAvailabilityRequest(candidateHostId, this.MachineId,
-                                _currentProping.InstanceId);
+                                _currentProping.InstanceId, _currentProping.Owner);
                             CommunicationModule.SendMessage(aRequest2);
 
                             break;

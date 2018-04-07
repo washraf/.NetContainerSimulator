@@ -107,11 +107,21 @@
     <Compile Include="DBE.Designer.cs">
       <DependentUpon>DBE.cs</DependentUpon>
     </Compile>
-    <Compile Include="Form2.cs">
+    <Compile Include="Migrations\201804062229509_updatetested.cs" />
+    <Compile Include="Migrations\201804062229509_updatetested.Designer.cs">
+      <DependentUpon>201804062229509_updatetested.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProposedCharts.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form2.Designer.cs">
-      <DependentUpon>Form2.cs</DependentUpon>
+    <Compile Include="ProposedCharts.Designer.cs">
+      <DependentUpon>ProposedCharts.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OldCharts.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OldCharts.Designer.cs">
+      <DependentUpon>OldCharts.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\201802102235060_update.cs" />
     <Compile Include="Migrations\201802102235060_update.Designer.cs">
@@ -125,6 +135,10 @@
     <Compile Include="Migrations\201804041601499_add auctions.Designer.cs">
       <DependentUpon>201804041601499_add auctions.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201804051427101_average_containerPerHost.cs" />
+    <Compile Include="Migrations\201804051427101_average_containerPerHost.Designer.cs">
+      <DependentUpon>201804051427101_average_containerPerHost.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -134,8 +148,14 @@
     <EmbeddedResource Include="DBE.resx">
       <DependentUpon>DBE.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form2.resx">
-      <DependentUpon>Form2.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201804062229509_updatetested.resx">
+      <DependentUpon>201804062229509_updatetested.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProposedCharts.resx">
+      <DependentUpon>ProposedCharts.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OldCharts.resx">
+      <DependentUpon>OldCharts.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802102235060_update.resx">
       <DependentUpon>201802102235060_update.cs</DependentUpon>
@@ -145,6 +165,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804041601499_add auctions.resx">
       <DependentUpon>201804041601499_add auctions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804051427101_average_containerPerHost.resx">
+      <DependentUpon>201804051427101_average_containerPerHost.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

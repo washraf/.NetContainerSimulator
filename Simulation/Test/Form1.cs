@@ -32,25 +32,8 @@ namespace Test
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            cb_Strategy.DataSource = Enum.GetValues(typeof(Strategies)).Cast<Strategies>();
-            cb_Strategy.SelectedIndex = 2;
-
-            cb_Change.DataSource = Enum.GetValues(typeof(LoadChangeAction)).Cast<LoadChangeAction>();
-            cb_Change.SelectedIndex = 0;
-
-            cb_StartUtil.DataSource = Enum.GetValues(typeof(StartUtilizationPercent)).Cast<StartUtilizationPercent>();
-            cb_StartUtil.SelectedIndex = 0;
-
             cb_GraphItem.DataSource = Enum.GetValues(typeof(BasicItems)).Cast<BasicItems>();
             cb_GraphItem.SelectedIndex = 0;
-
-            cb_HostsCount.DataSource = Enum.GetValues(typeof(SimulationSize)).Cast<SimulationSize>();
-            cb_HostsCount.SelectedIndex = 0;
-
-            cb_Prediction.DataSource = Enum.GetValues(typeof(LoadPrediction)).Cast<LoadPrediction>();
-            cb_Prediction.SelectedIndex = 1;
-
-
         }
         List<MeasureValueHolder> _measuredValueListsTrials = new List<MeasureValueHolder>();
         //AccountingModule _accountingModule = AccountingModule.GetAccountingModule();
@@ -186,9 +169,9 @@ namespace Test
                         break;
 
                     case BasicItems.Needed_Load_Standard_Deviation:
-                        for (int i = 0; i < _measuredValueListsTrials[t].HostMeasureValueList.Count; i++)
+                        for (int i = 0; i < _measuredValueListsTrials[t].HostMeasureValuesList.Count; i++)
                         {
-                            list[0].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValueList[i].StandardDeviation);
+                            list[0].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValuesList[i].StandardDeviation);
                         }
                         myLabel.Text = $"Average Standard Deviation {_measuredValueListsTrials[t].AverageStdDeviation}";
                         break;
@@ -254,18 +237,18 @@ namespace Test
                         list.Add(new PointPairList());
                         labeList[0] = ($"Data Out of Trial {_measuredValueListsTrials[t].Name}");
                         labeList.Add($"Data In of Trial {_measuredValueListsTrials[t].Name}");
-                        for (int i = 0; i < _measuredValueListsTrials[t].HostMeasureValueList.Count; i++)
+                        for (int i = 0; i < _measuredValueListsTrials[t].HostMeasureValuesList.Count; i++)
                         {
-                            list[0].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValueList[i].AverageDataOut);
-                            list[1].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValueList[i].AverageDataIn);
+                            list[0].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValuesList[i].AverageDataOut);
+                            list[1].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValuesList[i].AverageDataIn);
                         }
                         myLabel.Text = $"Average data Out/In = {_measuredValueListsTrials[t].AverageDataOut } / { _measuredValueListsTrials[t].AverageDataIn} MB";
 
                         break;
                     case BasicItems.Containers:
-                        for (int i = 0; i < _measuredValueListsTrials[t].HostMeasureValueList.Count; i++)
+                        for (int i = 0; i < _measuredValueListsTrials[t].HostMeasureValuesList.Count; i++)
                         {
-                            list[0].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValueList[i].Containers);
+                            list[0].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValuesList[i].Containers);
                         }
                         myLabel.Text = $"Average Containers in All the trial = {_measuredValueListsTrials[t].AverageContainers}";
 
@@ -352,6 +335,13 @@ namespace Test
                         list[0].Add(0, _measuredValueListsTrials[t].AveragePullPerImage);
                         myLabel.Text = $"Image Pull Ratio in All the trial = {_measuredValueListsTrials[t].AveragePullPerImage}";
                         break;
+                    case BasicItems.Containers_Per_Host:
+                        for (int i = 0; i < _measuredValueListsTrials[t].HostMeasureValuesList.Count; i++)
+                        {
+                            list[0].Add(i * unit, _measuredValueListsTrials[t].HostMeasureValuesList[i].ContainersPerHost);
+                        }
+                        myLabel.Text = $"Average Containers in All the trial = {_measuredValueListsTrials[t].AverageContainersPerHost}";
+                        break;
                     default:
                         throw new NotImplementedException();
                 }
@@ -428,30 +418,11 @@ namespace Test
             }
             //return Enum.GetValues(typeof(SymbolType)).Cast<SymbolType>().Reverse().ToList()[i];
         }
-        private void cb_Strategy_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
-
-
-        private void cb_StartUtil_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
+        
 
         private void cb_GraphItem_SelectedIndexChanged(object sender, EventArgs e)
         {
             CreateGraph(zedGraphControl1, cb_GraphItem.Text, (BasicItems)cb_GraphItem.SelectedValue);
-        }
-
-        private void cb_HostsCount_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
-
-        private void cb_FirstWave_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
-
-        private void cb_Prediction_SelectedIndexChanged(object sender, EventArgs e)
-        {
         }
 
         private void btn_AddData_Click(object sender, EventArgs e)
@@ -467,7 +438,7 @@ namespace Test
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Form2 f = new Form2();
+            OldCharts f = new OldCharts();
             f.Show(this);
             f.FormClosing += (a, b) =>
             {
@@ -479,6 +450,17 @@ namespace Test
         private void DBE_Click(object sender, EventArgs e)
         {
             DBE f = new DBE();
+            f.Show(this);
+            f.FormClosing += (a, b) =>
+            {
+                f.Owner?.Show();
+            };
+            this.Hide();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            ProposedCharts f = new ProposedCharts();
             f.Show(this);
             f.FormClosing += (a, b) =>
             {

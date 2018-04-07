@@ -26,6 +26,10 @@
         ImageLoadRequest,
         ImageLoadResponce,
 
+        //Pulls
+        PullsCountRequest,
+        PullsCountResponce,
+
         //Scheduling
         CanHaveContainerRequest,
         CanHaveContainerResponce,

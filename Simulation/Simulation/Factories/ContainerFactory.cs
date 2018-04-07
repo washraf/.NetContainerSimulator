@@ -28,7 +28,7 @@ namespace Simulation.Factories
             var conId = RandomNumberGenerator.GetContainerRandomNumber();
             if (Containertype == ContainersType.D)
             {
-                int imgId = random.Next((int)_simulationSize * 3, (int)_simulationSize * 6);
+                int imgId = random.Next((int)_simulationSize * 10, (int)_simulationSize * 15);
                 return new DockerContainer(conId, load, predictionStrategy, imgId);
             }
             else

@@ -18,7 +18,7 @@ namespace Test.Database
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<TrialResult>()
-                .HasKey(t => new { t.Size,t.StartUtil,t.Change,t.Algorithm,t.Tested, t.SchedulingAlgorithm, t.TrialId,t.PushAuctionType,t.PullAcutionType});
+                .HasKey(t => new { t.Size,t.StartUtil,t.Change,t.Algorithm,t.TestedPercent, t.SchedulingAlgorithm, t.TrialId,t.PushAuctionType,t.PullAuctionType});
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -18,7 +18,6 @@ namespace Simulation.LocationStrategies
 
         public int ContainerId { get; private set; }
         public BidReasons Reason { get; set; }
-        public int ImagePulls { get; }
         public int BiddingHost { get; private set; }
         public bool Valid { get; private set; }
         public HostLoadInfo NewLoadInfo { get; private set; }

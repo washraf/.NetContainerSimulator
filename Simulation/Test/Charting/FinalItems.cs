@@ -22,6 +22,6 @@ namespace Test.Charting
         Total_Image_Pulls,
         Average_Pulls_PerImage,
         Containers_Average,
-        
+        Container_Density
     }
 }

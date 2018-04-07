@@ -17,13 +17,13 @@ namespace Simulation.Modules.Management.Host.Other
     /// <summary>
     /// http://ieeexplore.ieee.org/document/5331732/?reload=true
     /// </summary>
-    public class ZhaorHostHandler:HostHandlerModule
+    public class ZhaoHostHandler:HostHandlerModule
     {
         private readonly CommonLoadManager _commonLoadManager;
         private object _hostLock = new object();
         //public int BidLock { get; set; } = -1;
 
-        public ZhaorHostHandler(NetworkInterfaceCard communicationModule, ContainerTable containerTable, ILoadManager loadManager,CommonLoadManager commonLoadManager) : base(communicationModule, containerTable, loadManager)
+        public ZhaoHostHandler(NetworkInterfaceCard communicationModule, ContainerTable containerTable, ILoadManager loadManager,CommonLoadManager commonLoadManager) : base(communicationModule, containerTable, loadManager)
         {
             _commonLoadManager = commonLoadManager;
         }
@@ -126,6 +126,12 @@ namespace Simulation.Modules.Management.Host.Other
                 }
             }
         }
+
+        public override Message HandleRequestData(Message message)
+        {
+            throw new NotImplementedException();
+        }
+
         private void HandleMigrateContainerResponse(MigrateContainerResponse message)
         {
             if (message.Done)

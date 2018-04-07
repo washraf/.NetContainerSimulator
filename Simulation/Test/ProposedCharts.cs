@@ -18,14 +18,14 @@ using Test.Database;
 
 namespace Test
 {
-    public partial class Form2 : Form
+    public partial class ProposedCharts : Form
     {
-        public Form2()
+        public ProposedCharts()
         {
             InitializeComponent();
         }
 
-        private void Form2_Load(object sender, EventArgs e)
+        private void ProposedCharts_Load(object sender, EventArgs e)
         {
             var LoadChangeActionItems = Enum.GetValues(typeof(LoadChangeAction)).Cast<LoadChangeAction>().Select(x=>x.ToString()).ToList();
             LoadChangeActionItems.Add("All");
@@ -83,140 +83,108 @@ namespace Test
             myPane.YAxis.Scale.MaxAuto = true;
 
             // Set the Titles
-            myPane.Title.Text = yAxis.ToString().Replace('_',' ');
-            myPane.XAxis.Title.Text = $"Number of Hosts (N)";
+            myPane.Title.Text = yAxis.ToString().Replace('_', ' ');
+            myPane.XAxis.Title.Text = $"Host Selection Policy";
             myPane.YAxis.Title.Text = yAxis.ToString().Replace('_', ' ');
             Dictionary<string, PointPairList> all = new Dictionary<string, PointPairList>();
             //all.Add(Strategies.Proposed2018+"_"+1, new PointPairList());
             //all.Add(Strategies.Proposed2018 + "_" + 5, new PointPairList());
             //all.Add(Strategies.Proposed2018 + "_" + 10, new PointPairList());
             //all.Add(Strategies.Proposed2018 + "_" + 20, new PointPairList());
-            all.Add(Strategies.WAshraf2017.ToString(),new PointPairList());
-            all.Add(Strategies.Zhao.ToString(), new PointPairList());
-            all.Add(Strategies.ForsmanPush.ToString(), new PointPairList());
-            all.Add(Strategies.ForsmanPull.ToString(), new PointPairList());
-            
+            all.Add(AuctionTypes.MostFull.ToString(), new PointPairList());
+            all.Add(AuctionTypes.LeastFull.ToString(), new PointPairList());
+            all.Add(AuctionTypes.Random.ToString(), new PointPairList());
+            all.Add(AuctionTypes.LeastPulls.ToString(), new PointPairList());
+
 
             foreach (var trial in trials)
             {
-                var st = (Strategies) Enum.Parse(typeof (Strategies), trial.Algorithm);
+                var st = (AuctionTypes)Enum.Parse(typeof(AuctionTypes), trial.PushAuctionType);
 
 
                 //trials.Single(
                 //    x => x.Size == trial.Size && x.Algorithm == Strategies.InOrderProping.ToString());
-                var k = st == Strategies.Proposed2018 ? Strategies.Proposed2018 + "_" + trial.Tested : st.ToString();
+                var k = st.ToString();
+                int tested = trial.TestedPercent;
                 switch (yAxis)
                 {
-                    
+
                     case FinalItems.Hosts:
-                        all[k].Add(trial.Size, trial.Hosts);
+                        all[k].Add(tested, trial.Hosts);
+                        //all[k].Add(trial.Tested, trial.Hosts);
                         myPane.YAxis.Title.Text = "Number Of Used Hosts";
                         break;
                     case FinalItems.RMSE:
-                        all[k].Add(trial.Size, trial.RMSE);
+                        all[k].Add(tested, trial.RMSE);
                         myPane.YAxis.Title.Text = "RMSE";
                         break;
                     case FinalItems.RMSE_Ratio:
                         var rmseval = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.RMSE);
                         var rmseMaxtrial = trials.First(x => x.Size == trial.Size && x.Change == trial.Change && x.RMSE == rmseval);
-                        all[k].Add(trial.Size, trial.RMSE/rmseMaxtrial.RMSE);
+                        all[k].Add(tested, trial.RMSE / rmseMaxtrial.RMSE);
                         myPane.YAxis.Title.Text = "RMSE Ratio";
                         break;
                     case FinalItems.Power:
-                        var val = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.Power);
-                        var mtrial = trials.Single(x => x.Size == trial.Size && x.Change == trial.Change && x.Power == val);
-                        all[k].Add(trial.Size, trial.Power / mtrial.Power);
-                        myPane.YAxis.Title.Text = "Power Consumption Ratio";
+                        all[k].Add(tested, trial.Power);
+                        myPane.YAxis.Title.Text = "Power Consumption";
                         break;
                     //case DrawItems.StdDev:
                     //    all[st].Add(trial.Size, trial.StdDev);
                     //    break;
                     case FinalItems.Average_Entropy:
-                        all[k].Add(trial.Size, trial.AverageEntropy);
+                        all[k].Add(tested, trial.AverageEntropy);
                         myPane.YAxis.Scale.Min = 0.99;
                         myPane.YAxis.Scale.Max = 1.01;
                         break;
                     case FinalItems.Average_Entropy_Ratio:
                         var AEval = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.AverageEntropy);
                         var AEMaxtrial = trials.First(x => x.Size == trial.Size && x.Change == trial.Change && x.AverageEntropy == AEval);
-                        all[k].Add(trial.Size, trial.AverageEntropy / AEMaxtrial.AverageEntropy);
+                        all[k].Add(tested, trial.AverageEntropy / AEMaxtrial.AverageEntropy);
                         myPane.YAxis.Title.Text = "Average Entropy Ratio";
                         break;
                     case FinalItems.Final_Entropy:
-                        all[k].Add(trial.Size, trial.FinalEntropy);
+                        all[k].Add(tested, trial.FinalEntropy);
                         myPane.YAxis.Scale.Min = 0.99;
                         myPane.YAxis.Scale.Max = 1.01;
                         break;
                     case FinalItems.Migrations:
-                        val = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.Migrations);
-                        mtrial = trials.First(x => x.Size == trial.Size && x.Change == trial.Change && x.Migrations == val);
-
-                        all[k].Add(trial.Size, trial.Migrations / mtrial.Migrations);
+                        all[k].Add(tested, trial.Migrations);
                         myPane.YAxis.Title.Text = "Migrations Count Ratio";
                         break;
                     case FinalItems.SLA_Violations:
-                        all[k].Add(trial.Size, trial.SlaViolations);
+                        all[k].Add(tested, trial.SlaViolations);
                         break;
                     case FinalItems.Messages:
-                        val = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.TotalMessages);
-
-                        mtrial = trials.Single(x => x.Size == trial.Size && x.Change == trial.Change && x.TotalMessages == val);
-
-                        myPane.YAxis.Title.Text = "Message Count Ratio";
-                        all[k].Add(trial.Size, trial.TotalMessages / mtrial.TotalMessages);
+                        myPane.YAxis.Title.Text = "Message Count";
+                        all[k].Add(tested, trial.TotalMessages);
                         break;
                     case FinalItems.Total_Image_Pulls:
-                        all[k].Add(trial.Size, trial.ImagePullsTotal);
+                        all[k].Add(tested, trial.ImagePullsTotal);
                         myPane.YAxis.Title.Text = "Total Image Pulls";
                         break;
                     case FinalItems.Average_Pulls_PerImage:
-                        all[k].Add(trial.Size, trial.ImagePullsRatio);
+                        all[k].Add(tested, trial.ImagePullsRatio);
                         myPane.YAxis.Title.Text = "Average Pulls PerImage";
                         break;
                     case FinalItems.Containers_Average:
-                        all[k].Add(trial.Size, trial.ContainersAverage);
+                        all[k].Add(tested, trial.ContainersAverage);
                         myPane.YAxis.Title.Text = "Containers Average";
                         break;
-                    
+                    case FinalItems.Container_Density:
+                        all[k].Add(tested, trial.AverageContainerPerHost);
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(yAxis), yAxis, null);
                 }
             }
-            float d = 0;
             foreach (var a in all)
             {
-                var st = (Strategies) Enum.Parse(typeof(Strategies), a.Key.Split('_')[0]);
-                TestedHosts t = TestedHosts.All;
-                if (st == Strategies.Proposed2018)
-                    t = (TestedHosts)int.Parse(a.Key.Split('_')[1]);
-                
-                LineItem l = new LineItem
-                    (a.Key == "WAshraf2017" ? "Proposed Algorithm" : a.Key.ToString(),
-                    a.Value, GetColor(st,t), SymbolType.Square,3);
-                l.Symbol.Size = 5;
-                l.Symbol.Fill = new Fill(GetColor(st,t));
-                l.Line.Style = GetDash(st,t);
-                //l.Line.DashOn = d;
-                //l.Line.DashOff = d*2;
-
-                d++;
-                myPane.CurveList.Add(l);
-                
+                var st = (AuctionTypes)Enum.Parse(typeof(AuctionTypes), a.Key);
+                myPane.AddBar(a.Key, null, a.Value.Select(x => x.Y).ToArray(), GetColor(st));
             }
-            myPane.Legend.Position = LegendPos.BottomCenter;
-            //myPane.Chart.Fill = new Fill(Color.White, Color.LightCyan, 360.0f);
-
-            
-            if (yAxis== FinalItems.Messages || 
-                yAxis == FinalItems.Power || 
-                yAxis == FinalItems.Migrations || 
-                yAxis == FinalItems.RMSE_Ratio ||
-                yAxis == FinalItems.Average_Entropy_Ratio)
-                myPane.YAxis.Scale.Format = "#.### %";
-            else
-            {
-                myPane.YAxis.Scale.Format = "";
-            }
+            myPane.XAxis.MajorTic.IsBetweenLabels = true;
+            myPane.XAxis.Scale.TextLabels = trials.Select(x => x.TestedPercent.ToString()).Distinct().ToArray();
+            myPane.XAxis.Type = AxisType.Text;
             // Tell ZedGraph to reconfigure the
             // axes since the data have changed
             zgc.AxisChange();
@@ -224,51 +192,37 @@ namespace Test
 
         }
 
-        private DashStyle GetDash(Strategies key, TestedHosts tested)
+        private DashStyle GetDash(AuctionTypes key)
         {
             switch (key)
             {
-                case Strategies.Proposed2018:
+                case AuctionTypes.LeastFull:
                     return DashStyle.Solid;
-                case Strategies.WAshraf2017:
+                case AuctionTypes.MostFull:
                     return DashStyle.Solid;
-                case Strategies.Zhao:
+                case AuctionTypes.Random:
                     return DashStyle.Dash;
-                case Strategies.ForsmanPush:
+                case AuctionTypes.LeastPulls:
                     return DashStyle.Dot;
-                case Strategies.ForsmanPull:
-                    return DashStyle.DashDotDot;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(key), key, null);
             }
         }
 
-        private Color GetColor(Strategies key, TestedHosts tested)
+        private Color GetColor(AuctionTypes auctionTypes)
         {
-            switch (key)
+            switch (auctionTypes)
             {
-                case Strategies.Proposed2018:
-                    switch (tested)
-                    {
-                        case TestedHosts.Ten:
-                            return Color.Indigo;
-                        case TestedHosts.Twenty:
-                            return Color.CadetBlue;
-                        case TestedHosts.All:
-                            return Color.DarkViolet;
-                        default:
-                            throw new NotImplementedException();
-                    }
-                case Strategies.WAshraf2017:
+                case AuctionTypes.LeastFull:
                     return Color.Red;
-                case Strategies.Zhao:
+                case AuctionTypes.MostFull:
+                    return Color.Yellow;
+                case AuctionTypes.Random:
                     return Color.Blue;
-                case Strategies.ForsmanPush:
+                case AuctionTypes.LeastPulls:
                     return Color.Green;
-                case Strategies.ForsmanPull:
-                    return Color.Black;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(key), key, null);
+                    throw new ArgumentOutOfRangeException(nameof(auctionTypes), auctionTypes, null);
             }
         }
 
@@ -276,6 +230,7 @@ namespace Test
         {
             SimulationContext context = new SimulationContext();
             var trials = context.TrialResults.AsQueryable();
+            trials = trials.Where(x => x.Algorithm == "Proposed2018" & x.Size == 200);
             if (cb_StartUtil.Text != "All")
                 trials = trials.Where(x => x.StartUtil == cb_StartUtil.Text);
             if (cb_Change.Text != "All")
@@ -283,10 +238,10 @@ namespace Test
 
            var  ftrials = trials
                 .ToList()
-                .GroupBy(x => new { x.Algorithm, x.Size})
+                .GroupBy(x => new { x.PushAuctionType,x.PullAuctionType,x.TestedPercent})
                 .Select(x => new TrialResult()
                 {
-                    Algorithm = x.Key.Algorithm,
+                    Algorithm = x.First().Algorithm,
                     AverageEntropy = x.Average(y => y.AverageEntropy),
                     Change = x.First().Change,
                     ContainersAverage = x.Average(y => y.ContainersAverage),
@@ -303,11 +258,14 @@ namespace Test
                     SlaViolations = x.Average(y => y.SlaViolations),
                     StartUtil = x.First().StartUtil,
                     StdDev = x.Average(y => y.StdDev),
-                    Tested = x.First().Tested,
+                    TestedPercent = x.First().TestedPercent,
                     TotalContainers = x.Average(y => y.TotalContainers),
                     TotalMessages = x.Average(y => y.TotalMessages),
                     TrialId = 0,
-                }).OrderBy(y => y.Size).ToList();
+                    AverageContainerPerHost = x.Average(y=>y.AverageContainerPerHost),
+                    PushAuctionType = x.Key.PushAuctionType,
+                    PullAuctionType = x.Key.PullAuctionType,
+                }).OrderBy(y => y.TestedPercent).ToList();
             return ftrials;
         }
 

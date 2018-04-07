@@ -185,9 +185,32 @@ namespace Simulation.Modules.Management.Host.Proposed
             }
         }
 
+        public override Message HandleRequestData(Message message)
+        {
+            switch (message.MessageType)
+            {
+                case MessageTypes.PullsCountRequest:
+                    return HandlePullsCountReques(message as PullsCountRequest);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        #endregion
+        
+        #region --Message Requests --
+        private PullsCountResponce HandlePullsCountReques(PullsCountRequest request)
+        {
+            var pulls = CalculatePullsCount(request.ImageId);
+            PullsCountResponce responce = new PullsCountResponce(request.SenderId, this.MachineId, pulls);
+            return responce;
+        }
+        #endregion
+
+        #region --Scheduling -- 
         private void HanleAddContainerRequest(AddContainerRequest addContainerRequest)
         {
-            Task t = new Task( async () => {
+            Task t = new Task(async () => {
                 var table = ContainerTable as DockerContainerTable;
                 var dockerCon = addContainerRequest.NewContainer as DockerContainer;
                 await table.LoadImage(dockerCon.ImageId);
@@ -195,28 +218,29 @@ namespace Simulation.Modules.Management.Host.Proposed
             });
             t.Start();
         }
-
         private void HandlaCanHaveContainerRequest(CanHaveContainerRequest message)
         {
             //ContainerTable.AddContainer(message.ScheduledContainer.ContainerId, message.ScheduledContainer);
             var load = LoadManager.GetHostLoadInfoAfterContainer(message.NewContainerLoadInfo);
             var newState = load.CalculateTotalUtilizationState(MinUtilization, MaxUtilization);
-            Bid bid= null;
+            Bid bid = null;
             if (!_hostState.EvacuationMode
-                && LoadManager.CanITakeLoad(message.NewContainerLoadInfo) && newState!= UtilizationStates.OverUtilization) {
-                 bid = new AuctionBid(this.MachineId, true, load, message.AuctionId, message.NewContainerLoadInfo.ContainerId, BidReasons.ValidBid);
+                && LoadManager.CanITakeLoad(message.NewContainerLoadInfo) && newState != UtilizationStates.OverUtilization)
+            {
+                var pulls = CalculatePullsCount(message.NewContainerLoadInfo.ImageId);
+                bid = new AuctionBid(this.MachineId, true, load, message.AuctionId, message.NewContainerLoadInfo.ContainerId, BidReasons.ValidBid, pulls);
 
             }
             else
             {
-                 bid = new AuctionBid(this.MachineId, false, null, message.AuctionId, message.NewContainerLoadInfo.ContainerId, BidReasons.CantBid);
+                bid = new AuctionBid(this.MachineId, false, null, message.AuctionId, message.NewContainerLoadInfo.ContainerId, BidReasons.CantBid, 0);
 
             }
             CanHaveContainerResponce responce = new CanHaveContainerResponce(0, MachineId, bid);
             CommunicationModule.SendMessage(responce);
         }
-
         #endregion
+
         #region --Push Message Handlers--
         private void HandlePushLoadAvailabilityRequest(PushLoadAvailabilityRequest message)
         {
@@ -234,12 +258,13 @@ namespace Simulation.Modules.Management.Host.Proposed
                 {
 
                     bid = new AuctionBid(MachineId, false, load, message.AuctionId,
-                        message.NewContainerLoadInfo.ContainerId, BidReasons.FullLoad);
+                        message.NewContainerLoadInfo.ContainerId, BidReasons.FullLoad,0);
                 }
                 else
                 {
+                    int pulls = CalculatePullsCount(message.NewContainerLoadInfo.ImageId);
                     bid = new AuctionBid(MachineId, true, load, message.AuctionId, message.NewContainerLoadInfo.ContainerId,
-                        BidReasons.ValidBid);
+                        BidReasons.ValidBid, pulls);
                     _hostState.CurrentAction = HostCurrentAction.Bidding;
                     _hostState.AuctionId = message.AuctionId;
                 }
@@ -247,13 +272,16 @@ namespace Simulation.Modules.Management.Host.Proposed
             else
             {
                 bid = new AuctionBid(MachineId, false, null, message.AuctionId, message.NewContainerLoadInfo.ContainerId,
-                    BidReasons.CantBid);
+                    BidReasons.CantBid,0);
             }
             LoadAvailabilityResponce availabilityResponce =
                         new LoadAvailabilityResponce(message.SenderId, this.MachineId, message.AuctionId, bid);
             CommunicationModule.SendMessage(availabilityResponce);
         }
+
+        
         #endregion
+
         #region --Pull Message Handlers --
         private void HandlePullLoadAvailabilityRequest(PullLoadAvailabilityRequest message)
         {
@@ -269,11 +297,16 @@ namespace Simulation.Modules.Management.Host.Proposed
 
                     if (oldstate == UtilizationStates.Normal && newState == UtilizationStates.UnderUtilization)
                     {
-                        bid = new AuctionBid(MachineId, false, load, message.AuctionId, -1, BidReasons.MinimumLoad);
+                        bid = new AuctionBid(MachineId, false, load, message.AuctionId, -1, BidReasons.MinimumLoad,0);
                     }
                     else
                     {
-                        bid = new AuctionBid(MachineId, true, load, message.AuctionId, selectedContainerload.ContainerId, BidReasons.ValidBid);
+                        //try to find how many pulls the target will need !!!
+                        var pullsCountRequest = new PullsCountRequest(message.RequestOwner, this.MachineId, selectedContainerload.ImageId); 
+                        var t = CommunicationModule.RequestData(pullsCountRequest);
+                        t.Wait();
+                        var pullsCountResponce = t.Result as PullsCountResponce;
+                        bid = new AuctionBid(MachineId, true, load, message.AuctionId, selectedContainerload.ContainerId, BidReasons.ValidBid, pullsCountResponce.PullsCount);
                         _hostState.CurrentAction = HostCurrentAction.Bidding;
                         _hostState.AuctionId = message.AuctionId;
                     }
@@ -281,13 +314,13 @@ namespace Simulation.Modules.Management.Host.Proposed
                 }
                 else
                 {
-                    bid = new AuctionBid(MachineId, false, null, message.AuctionId, -1, BidReasons.Empty);
+                    bid = new AuctionBid(MachineId, false, null, message.AuctionId, -1, BidReasons.Empty,0);
                 }
 
             }
             else
             {
-                bid = new AuctionBid(MachineId, false, null, message.AuctionId, -1, BidReasons.CantBid);
+                bid = new AuctionBid(MachineId, false, null, message.AuctionId, -1, BidReasons.CantBid,0);
             }
 
 
@@ -296,6 +329,7 @@ namespace Simulation.Modules.Management.Host.Proposed
             CommunicationModule.SendMessage(availabilityResponce);
         }
         #endregion
+
         private void HandleRejectRequest(RejectRequest message)
         {
             switch (message.RejectAction)
@@ -459,6 +493,12 @@ namespace Simulation.Modules.Management.Host.Proposed
             {
                 return r.GetContainerPredictedLoadInfo();
             }
+        }
+        private int CalculatePullsCount(int imageId)
+        {
+            var table = ContainerTable as DockerContainerTable;
+            var pulls = table.GetNumberOfPulls(imageId);
+            return pulls;
         }
 
     }
