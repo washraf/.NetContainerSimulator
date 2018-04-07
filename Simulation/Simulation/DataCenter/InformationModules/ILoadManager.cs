@@ -18,5 +18,7 @@ namespace Simulation.DataCenter.InformationModules
         UtilizationStates CheckSystemState(bool act,double min,double max);
         void Start();
         int CalculateSlaViolations();
+        double CalculateSlaViolationsPercent();
+
     }
 }

@@ -151,8 +151,11 @@ namespace Test
                         all[k].Add(tested, trial.Migrations);
                         myPane.YAxis.Title.Text = "Migrations Count Ratio";
                         break;
-                    case FinalItems.SLA_Violations:
+                    case FinalItems.SLA_Violations_Count:
                         all[k].Add(tested, trial.SlaViolations);
+                        break;
+                    case FinalItems.SLA_Violations_Percent:
+                        all[k].Add(tested, trial.SlaViolationsPercent);
                         break;
                     case FinalItems.Messages:
                         myPane.YAxis.Title.Text = "Message Count";
@@ -169,6 +172,10 @@ namespace Test
                     case FinalItems.Containers_Average:
                         all[k].Add(tested, trial.ContainersAverage);
                         myPane.YAxis.Title.Text = "Containers Average";
+                        break;
+                    case FinalItems.Average_Down_Time:
+                        all[k].Add(tested, trial.AverageDownTime);
+                        myPane.YAxis.Title.Text = "Average DownTime";
                         break;
                     case FinalItems.Container_Density:
                         all[k].Add(tested, trial.AverageContainerPerHost);

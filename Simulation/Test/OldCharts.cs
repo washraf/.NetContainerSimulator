@@ -154,8 +154,11 @@ namespace Test
                         all[k].Add(trial.Size, trial.Migrations / mtrial.Migrations);
                         myPane.YAxis.Title.Text = "Migrations Count Ratio";
                         break;
-                    case FinalItems.SLA_Violations:
+                    case FinalItems.SLA_Violations_Count:
                         all[k].Add(trial.Size, trial.SlaViolations);
+                        break;
+                    case FinalItems.SLA_Violations_Percent:
+                        all[k].Add(trial.Size, trial.SlaViolationsPercent);
                         break;
                     case FinalItems.Messages:
                         val = trials.Where(x => x.Size == trial.Size && x.Change == trial.Change).Max(x => x.TotalMessages);
@@ -168,6 +171,10 @@ namespace Test
                     case FinalItems.Total_Image_Pulls:
                         all[k].Add(trial.Size, trial.ImagePullsTotal);
                         myPane.YAxis.Title.Text = "Total Image Pulls";
+                        break;
+                    case FinalItems.Average_Down_Time:
+                        all[k].Add(trial.Size, trial.AverageDownTime);
+                        myPane.YAxis.Title.Text = "Average Downtime";
                         break;
                     case FinalItems.Average_Pulls_PerImage:
                         all[k].Add(trial.Size, trial.ImagePullsRatio);

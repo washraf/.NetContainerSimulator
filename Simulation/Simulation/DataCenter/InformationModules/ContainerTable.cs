@@ -166,6 +166,16 @@ namespace Simulation.DataCenter.InformationModules
                 return slaViolations;
             }
         }
+        public double CalculateSlaViolationsPercent(Load loadDifference)
+        {
+            lock (_lock)
+            {
+                var containersLoad = GetContainersTotalNeededLoad();
+                List<int> slaViolations = new List<int>();
+                return ContainersTable.Values.Select(x => x.ViolationPercentage(loadDifference, containersLoad)).Average();
+            }
+        }
+
 
         public List<ContainerLoadInfo> GetAllContainersLoadInfo()
         {

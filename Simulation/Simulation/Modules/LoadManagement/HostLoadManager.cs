@@ -89,7 +89,8 @@ namespace Simulation.Modules.LoadManagement
             StartLoadPrediction();
             StartSLAViolationCounter();
         }
-        Dictionary<int,int> violatedContainers = new Dictionary<int, int>(); 
+        Dictionary<int,int> violatedContainers = new Dictionary<int, int>();
+        List<double> violationHistory = new List<double>();
         private void StartSLAViolationCounter()
         {
             Task t = new Task( async () =>
@@ -99,9 +100,12 @@ namespace Simulation.Modules.LoadManagement
                     await Task.Delay(Global.Second);
                     var needed = GetNeededHostLoadInfo();
                     var v = needed.Volume;
+
                     if (v > 1)
                     {
-                        var  vioCon = _containerTable.CalculateSlaViolations(needed.CurrentLoad - _maxLoad);
+                        var loaddiff = needed.CurrentLoad - _maxLoad;
+                        var  vioCon = _containerTable.CalculateSlaViolations(loaddiff);
+                        violationHistory.Add(_containerTable.CalculateSlaViolationsPercent(loaddiff));
                         foreach (var conId in vioCon)
                         {
                             lock (_lock)
@@ -117,6 +121,10 @@ namespace Simulation.Modules.LoadManagement
                             }
                         }
                     }
+                    else
+                    {
+                        //violationhistory.Add(0);
+                    }
                 }
             });
             t.Start();
@@ -126,9 +134,20 @@ namespace Simulation.Modules.LoadManagement
         {
             lock (_lock)
             {
-                var count = violatedContainers.Count(x => x.Value > 1);
+                var count = violatedContainers.Select(x => x.Value).Sum();
                 violatedContainers.Clear();
                 return count;
+            }
+        }
+        public double CalculateSlaViolationsPercent()
+        {
+            lock (_lock)
+            {
+                if (violationHistory.Count == 0)
+                    return 0;
+                var avg = violationHistory.Average();
+                violationHistory.Clear();
+                return avg;
             }
         }
 

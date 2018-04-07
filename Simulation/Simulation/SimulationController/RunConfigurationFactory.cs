@@ -45,7 +45,7 @@ namespace Simulation.SimulationController
                 {
                     foreach (var t in tested)
                     {
-                        for (int tId = 0; tId < Global.NoOfTrials; tId++)
+                        for (int tId = 10; tId < Global.NoOfTrials; tId++)
                         {
                             Trials.Add(new RunConfiguration(size,
                                 StartUtilizationPercent.Fifty,

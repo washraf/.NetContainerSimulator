@@ -251,5 +251,15 @@ namespace Simulation.DataCenter.Containers
                 }
             }
         }
+        public double ViolationPercentage(Load loadDifference, Load totalLoad)
+        {
+            lock (lck)
+            {
+                double myPercent = NeededLoad.CpuLoad / totalLoad.CpuLoad;
+                var currentLoad = NeededLoad - loadDifference * myPercent;
+                myPercent = currentLoad.CpuLoad / NeededLoad.CpuLoad;
+                return myPercent;
+            }
+        }
     }
 }

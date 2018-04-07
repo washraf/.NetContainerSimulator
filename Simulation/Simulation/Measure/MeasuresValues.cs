@@ -12,7 +12,7 @@ namespace Simulation.Measure
             double pushLoadAvailabilityRequest, double pullLoadAvailabilityRequest,
             double avgNeededVol, double avgPredictedVol,double minNeeded,double maxNeeded,
             double underHosts, double overHosts, double normalHosts, double evacuatingHosts,
-            double slaViolations,double power,double stdDev,double imagePulls, double communicatedSize)
+            double slaViolationsCount,double slaViolationPercent,double power,double stdDev,double imagePulls, double communicatedSize)
         {
             PushRequests = pushRequests;
             PullRequests = pullRequests;
@@ -32,7 +32,7 @@ namespace Simulation.Measure
             OverHosts = overHosts;
             NormalHosts = normalHosts;
             EvacuatingHosts = evacuatingHosts;
-            SlaViolations = slaViolations;
+            SlaViolationsCount = slaViolationsCount;
             Power = power;
             StdDev = stdDev;
             ImagePulls = imagePulls;
@@ -56,7 +56,8 @@ namespace Simulation.Measure
             MaxNeeded = listItem.MaxNeeded;
             UnderHosts = listItem.UnderHosts;
             OverHosts = listItem.OverHosts;
-            SlaViolations = listItem.SlaViolations;
+            SlaViolationsCount = listItem.SlaViolationsCount;
+            SlaViolationsPercentage = listItem.SlaViolationsPercentage;
             Power = listItem.Power;
             StdDev = listItem.StdDev;
             ImagePulls = listItem.ImagePulls;
@@ -81,7 +82,8 @@ namespace Simulation.Measure
         public double OverHosts { get; private set; }
         public double NormalHosts { get; }
         public double EvacuatingHosts { get; }
-        public double SlaViolations { get; set; }
+        public double SlaViolationsCount { get; }
+        public double SlaViolationsPercentage { get; }
         public double Power { get; set; }
         public double StdDev { get; set; }
         public double ImagePulls { get; }
@@ -107,7 +109,8 @@ namespace Simulation.Measure
                 first.OverHosts + second.OverHosts,
                 first.NormalHosts + second.NormalHosts,
                 first.EvacuatingHosts + second.EvacuatingHosts,
-                first.SlaViolations + second.SlaViolations,
+                first.SlaViolationsCount + second.SlaViolationsCount,
+                first.SlaViolationsPercentage + second.SlaViolationsPercentage,
                 first.Power + second.Power,
                 first.StdDev + second.StdDev,
                 first.ImagePulls + second.ImagePulls,
@@ -135,7 +138,8 @@ namespace Simulation.Measure
                 first.OverHosts / count,
                 first.NormalHosts/count,
                 first.EvacuatingHosts/count,
-                first.SlaViolations/count, 
+                first.SlaViolationsCount/count, 
+                first.SlaViolationsPercentage/count,
                 first.Power/count,
                 first.StdDev/count,
                 first.ImagePulls/count,

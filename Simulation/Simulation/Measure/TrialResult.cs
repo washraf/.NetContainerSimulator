@@ -26,7 +26,10 @@ namespace Simulation.Measure
         public double StdDev { get; set; }
         public double Hosts { get; set; }
         public double Migrations { get; set; }
+        public double AverageDownTime { get; set; }
         public double SlaViolations { get; set; }
+        public double SlaViolationsPercent { get; set; }
+
         public double TotalMessages { get; set; }
         public string PredictionAlg { get; set; }
         public double ImagePullsTotal { get; set; }

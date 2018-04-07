@@ -59,8 +59,8 @@ namespace Simulation.Accounting
 
                 CalculateOutOfBoundHosts(out int underUtilized, out int overUtilizedHosts,out int normal,out int evacuating);
 
-                int slaViolations = CalculateSlaViolations();
-
+                int slaViolationsCount = CalculateSlaViolationsCount();
+                double slaViolationPercent = CalculateSlaViolationsPercent();
                 double imagePulls = _currentRequests[MessageTypes.ImagePullRequest];
                 var mvalues = new MeasuresValues(
                     _currentRequests[MessageTypes.PushRequest],
@@ -79,7 +79,8 @@ namespace Simulation.Accounting
                     overUtilizedHosts,
                     normal,
                     evacuating,
-                    slaViolations,
+                    slaViolationsCount,
+                    slaViolationPercent,
                     loads.PowerConsumption(),
                     loads.StandardDeviation(),
                     imagePulls,
@@ -96,6 +97,8 @@ namespace Simulation.Accounting
             }
 
         }
+
+       
 
         public void RequestCreated(MessageTypes type, double messageSize)
         {
@@ -134,7 +137,7 @@ namespace Simulation.Accounting
             return loads;
         }
 
-        private int CalculateSlaViolations()
+        private int CalculateSlaViolationsCount()
         {
             int slaViolations = 0;
             foreach (var machine in _machineTable.GetAllMachines().Skip(1).Where(x => x.MachineId < int.MaxValue))
@@ -142,6 +145,16 @@ namespace Simulation.Accounting
                 slaViolations+=(machine as HostMachine).CalculateSlaViolations();
             }
             return slaViolations;
+        }
+        private double CalculateSlaViolationsPercent()
+        {
+            double slaViolations = 0;
+            var currentMachines = _machineTable.GetAllMachines().Skip(1).Where(x => x.MachineId < int.MaxValue);
+            foreach (var machine in currentMachines)
+            {
+                slaViolations += (machine as HostMachine).CalculateSlaViolationsPercent();
+            }
+            return slaViolations / currentMachines.Count(); ;
         }
 
         private void ClearInformation()
@@ -243,7 +256,7 @@ namespace Simulation.Accounting
                 {
                     finalDictionary.Add(item.Key, item.Value);
                 }
-                MeasureHolder.ContainerMigrationCount = finalDictionary;
+                MeasureHolder.ContainerMeasureValuesList = finalDictionary;
             }
         }
 

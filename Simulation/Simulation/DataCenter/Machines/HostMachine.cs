@@ -184,6 +184,10 @@ namespace Simulation.DataCenter.Machines
         {
             return _loadManager.CalculateSlaViolations();
         }
+        public double CalculateSlaViolationsPercent()
+        {
+            return _loadManager.CalculateSlaViolationsPercent();
+        }
 
         #endregion
 

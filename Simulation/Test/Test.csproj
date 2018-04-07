@@ -111,6 +111,14 @@
     <Compile Include="Migrations\201804062229509_updatetested.Designer.cs">
       <DependentUpon>201804062229509_updatetested.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201804072119340_SLaViolationPercent.cs" />
+    <Compile Include="Migrations\201804072119340_SLaViolationPercent.Designer.cs">
+      <DependentUpon>201804072119340_SLaViolationPercent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804072135258_downTime.cs" />
+    <Compile Include="Migrations\201804072135258_downTime.Designer.cs">
+      <DependentUpon>201804072135258_downTime.cs</DependentUpon>
+    </Compile>
     <Compile Include="ProposedCharts.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -150,6 +158,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804062229509_updatetested.resx">
       <DependentUpon>201804062229509_updatetested.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804072119340_SLaViolationPercent.resx">
+      <DependentUpon>201804072119340_SLaViolationPercent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804072135258_downTime.resx">
+      <DependentUpon>201804072135258_downTime.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProposedCharts.resx">
       <DependentUpon>ProposedCharts.cs</DependentUpon>

@@ -54,7 +54,7 @@ namespace Simulation.Measure
         public List<MeasuresValues> MeasuredValuesList { set; get; } = new List<MeasuresValues>();
         public List<HostMeasureValues> HostMeasureValuesList { set; get; } = new List<HostMeasureValues>(); 
 
-        public Dictionary<int, ContainerMeasureValue> ContainerMigrationCount { get; set; } =
+        public Dictionary<int, ContainerMeasureValue> ContainerMeasureValuesList { get; set; } =
             new Dictionary<int, ContainerMeasureValue>();
         public Dictionary<int, int> PullsPerImage { get; set; } = 
             new Dictionary<int, int>();
@@ -79,9 +79,9 @@ namespace Simulation.Measure
             }
 
             //Container Migrations
-            foreach (var item in first.ContainerMigrationCount)
+            foreach (var item in first.ContainerMeasureValuesList)
             {
-                final.ContainerMigrationCount.Add(item.Key, item.Value);
+                final.ContainerMeasureValuesList.Add(item.Key, item.Value);
             }
             //Images
             foreach (var item in first.PullsPerImage)
@@ -114,13 +114,13 @@ namespace Simulation.Measure
                 }
             }
             //contianers
-            foreach (var item in second.ContainerMigrationCount)
+            foreach (var item in second.ContainerMeasureValuesList)
             {
-                if (final.ContainerMigrationCount.ContainsKey(item.Key))
-                    final.ContainerMigrationCount[item.Key] += item.Value;
+                if (final.ContainerMeasureValuesList.ContainsKey(item.Key))
+                    final.ContainerMeasureValuesList[item.Key] += item.Value;
                 else
                 {
-                    final.ContainerMigrationCount.Add(item.Key, item.Value);
+                    final.ContainerMeasureValuesList.Add(item.Key, item.Value);
                 }
             }
 
@@ -144,9 +144,9 @@ namespace Simulation.Measure
                 final.MeasuredValuesList.Add(listItem/c);
             }
 
-            foreach (var item in first.ContainerMigrationCount)
+            foreach (var item in first.ContainerMeasureValuesList)
             {
-                final.ContainerMigrationCount.Add(item.Key, item.Value/c);
+                final.ContainerMeasureValuesList.Add(item.Key, item.Value/c);
             }
             foreach (var item in first.HostMeasureValuesList)
             {
@@ -238,7 +238,7 @@ namespace Simulation.Measure
 
         public double AvgMigrations
         {
-            get { return ContainerMigrationCount.Select(x => x.Value.MigrationCount).Average(); }
+            get { return ContainerMeasureValuesList.Select(x => x.Value.MigrationCount).Average(); }
         }
 
         public double TotalPushAvailabilityRequests
@@ -251,14 +251,19 @@ namespace Simulation.Measure
             get { return MeasuredValuesList.Select(x => x.PullLoadAvailabilityRequest).Sum(); }
         }
 
-        public double TotalSlaViolations
+        public double TotalSlaViolationsCount
         {
-            get { return MeasuredValuesList.Select(x => x.SlaViolations).Sum(); }
+            get { return MeasuredValuesList.Select(x => x.SlaViolationsCount).Sum(); }
+        }
+
+        public double AverageSlaViolationsPercent
+        {
+            get { return MeasuredValuesList.Select(x => x.SlaViolationsPercentage).Sum(); }
         }
 
         public double AvgDownTime
         {
-            get { return ContainerMigrationCount.Values.Select(x => x.Downtime*1.0).Average(); }
+            get { return ContainerMeasureValuesList.Values.Select(x => x.Downtime*1.0).Average(); }
         }
 
         public double PowerConsumption
@@ -335,6 +340,14 @@ namespace Simulation.Measure
             get
             {
                 return HostMeasureValuesList.Average(x => x.AverageDataTotal);
+            }
+        }
+
+        public double AverageDownTime
+        {
+            get
+            {
+                return ContainerMeasureValuesList.Values.Select(x => x.Downtime).Average();
             }
         }
 

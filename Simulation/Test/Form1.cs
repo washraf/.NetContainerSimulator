@@ -280,7 +280,7 @@ namespace Test
 
                         break;
                     case BasicItems.Migration_Count:
-                        foreach (var item in _measuredValueListsTrials[t].ContainerMigrationCount)
+                        foreach (var item in _measuredValueListsTrials[t].ContainerMeasureValuesList)
                         {
                             list[0].Add(item.Key, item.Value.MigrationCount);
                         }
@@ -305,17 +305,26 @@ namespace Test
                         myLabel.Text = $"Total Pull Availability Requests in All the trial = {_measuredValueListsTrials[t].TotalPullAvailabilityRequests}";
 
                         break;
-                    case BasicItems.Utilization_SLA_Violations:
+                    case BasicItems.Utilization_SLA_Violations_Count:
                         for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
                         {
                             list[0].Add(i * unit,
-                                _measuredValueListsTrials[t].MeasuredValuesList[i].SlaViolations);
+                                _measuredValueListsTrials[t].MeasuredValuesList[i].SlaViolationsCount);
                         }
-                        myLabel.Text = $"Total SLA Violations the trial = {_measuredValueListsTrials[t].TotalSlaViolations}";
+                        myLabel.Text = $"Total SLA Violations the trial = {_measuredValueListsTrials[t].TotalSlaViolationsCount}";
+
+                        break;
+                    case BasicItems.SLA_Violations_Percent:
+                        for (int i = 0; i < _measuredValueListsTrials[t].MeasuredValuesList.Count; i++)
+                        {
+                            list[0].Add(i * unit,
+                                _measuredValueListsTrials[t].MeasuredValuesList[i].SlaViolationsPercentage);
+                        }
+                        myLabel.Text = $"Average SLA Violations % = {_measuredValueListsTrials[t].AverageSlaViolationsPercent}";
 
                         break;
                     case BasicItems.Container_DownTime:
-                        foreach (var item in _measuredValueListsTrials[t].ContainerMigrationCount)
+                        foreach (var item in _measuredValueListsTrials[t].ContainerMeasureValuesList)
                         {
                             list[0].Add(item.Key, item.Value.Downtime);
                         }

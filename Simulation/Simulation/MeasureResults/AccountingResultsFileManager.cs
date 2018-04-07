@@ -47,7 +47,8 @@ namespace Simulation.AccountingResults
                                      "PullRequests," +
                                      "PullLoadAvailabilityRequest," +
                                      "TotalMessages," +
-                                     "SlaViolations," +
+                                     "SlaViolationsCount," +
+                                     "SlaViolationsPercent," +
                                      "MinNeeded," +
                                      "MaxNeeded," +
                                      "Power," +
@@ -75,7 +76,8 @@ namespace Simulation.AccountingResults
                                          $"{value.PullRequests}," +
                                          $"{value.PullLoadAvailabilityRequest}," +
                                          $"{value.TotalMessages}," +
-                                         $"{value.SlaViolations}," +
+                                         $"{value.SlaViolationsCount}," +
+                                         $"{value.SlaViolationsPercentage}," +
                                          $"{value.MinNeeded}," +
                                          $"{value.MaxNeeded}," +
                                          $"{value.Power}," +
@@ -93,7 +95,7 @@ namespace Simulation.AccountingResults
                     writer.WriteLine("id," +
                                      "Migrations" +
                                      "DTime");
-                    foreach (var item in measureValueHolder.ContainerMigrationCount)
+                    foreach (var item in measureValueHolder.ContainerMeasureValuesList)
                     {
                         writer.WriteLine($"{item.Key}," +
                                          $"{item.Value.MigrationCount}," +
@@ -196,20 +198,22 @@ namespace Simulation.AccountingResults
                     double pullRequests = Convert.ToDouble(line[14]);
                     double pullLoadAvailabilityRequest = Convert.ToDouble(line[15]);
                     double totalMessages = Convert.ToDouble(line[16]);
-                    double slaViolations = Convert.ToDouble(line[17]);
-                    double minNeeded = Convert.ToDouble(line[18]);
-                    double maxNeeded = Convert.ToDouble(line[19]);
-                    double power = Convert.ToDouble(line[20]);
-                    double stdDev = Convert.ToDouble(line[21]);
-                    double imagePulls = Convert.ToDouble(line[22]);
-                    double communicatedSize = Convert.ToDouble(line[23]);
+                    double slaViolationsCount = Convert.ToDouble(line[17]);
+                    double slaViolationsPercent = Convert.ToDouble(line[18]);
+
+                    double minNeeded = Convert.ToDouble(line[19]);
+                    double maxNeeded = Convert.ToDouble(line[20]);
+                    double power = Convert.ToDouble(line[21]);
+                    double stdDev = Convert.ToDouble(line[22]);
+                    double imagePulls = Convert.ToDouble(line[23]);
+                    double communicatedSize = Convert.ToDouble(line[24]);
                     MeasuresValues m = new MeasuresValues(pushRequests, pullRequests, idealHostCount, noHosts,
                         migrations,
                         totalMessages, entropy, predictedEntropy, pushLoadAvailabilityRequest,
                         pullLoadAvailabilityRequest,
                         avgRealVolume, avgPredictedVolume, minNeeded, maxNeeded,
                         underHosts, overHosts, normalHosts, evacuatingHosts,
-                        slaViolations,
+                        slaViolationsCount,slaViolationsPercent,
                         power, stdDev, imagePulls,communicatedSize);
                     holder.MeasuredValuesList.Add(m);
                 }
@@ -225,7 +229,7 @@ namespace Simulation.AccountingResults
                     int conId = Convert.ToInt32(line[0]);
                     double count = Convert.ToDouble(line[1]);
                     double time = Convert.ToDouble(line[2]);
-                    holder.ContainerMigrationCount.Add(conId, new ContainerMeasureValue(conId, count, time));
+                    holder.ContainerMeasureValuesList.Add(conId, new ContainerMeasureValue(conId, count, time));
                 }
             }
 

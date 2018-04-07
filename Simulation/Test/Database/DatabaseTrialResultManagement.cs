@@ -43,13 +43,15 @@ namespace Test
             t.RMSE = holder.RMSE;
             t.TotalMessages = holder.TotalMessages;
             t.Migrations = holder.TotalMigrations;
-            t.SlaViolations = holder.TotalSlaViolations;
+            t.SlaViolations = holder.TotalSlaViolationsCount;
+            t.SlaViolationsPercent = holder.AverageSlaViolationsPercent;
             t.ImagePullsTotal = holder.ImagePulls;
             t.ImagePullsRatio = holder.AveragePullPerImage;
             t.FinalEntropy = holder.FinalEntropy;
             t.ContainersAverage = holder.AverageContainers;
             t.AverageContainerPerHost = holder.AverageContainersPerHost;
             t.TotalContainers = holder.TotalContainers;
+            t.AverageDownTime = holder.AverageDownTime;
             context.TrialResults.AddOrUpdate(t);
             context.SaveChanges();
         }
