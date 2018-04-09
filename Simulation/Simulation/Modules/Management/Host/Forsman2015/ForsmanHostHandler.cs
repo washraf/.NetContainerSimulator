@@ -14,6 +14,7 @@ using Simulation.LocationStrategies.Auctions;
 using Simulation.LocationStrategies.Forsman2015;
 using Simulation.Messages;
 using Simulation.Messages.Forsman;
+using Simulation.DataCenter.Containers;
 
 namespace Simulation.Modules.Management.Host.Forsman2015
 {
@@ -200,6 +201,13 @@ namespace Simulation.Modules.Management.Host.Forsman2015
         private void HandleMigrateContainerRequest(MigrateContainerRequest message)
         {
             message.MigratedContainer.Restore(this.MachineId);
+            if (message.MigratedContainer.ContainerType == ContainersType.D)
+            {
+                var table = ContainerTable as DockerContainerTable;
+                var container = message.MigratedContainer as DockerContainer;
+                var t = table.LoadImage(container.ImageId);
+                t.Wait();
+            }
             ContainerTable.AddContainer(message.MigratedContainer.ContainerId, message.MigratedContainer);
             var responce =
                 new MigrateContainerResponse(message.SenderId, this.MachineId, message.MigratedContainer.ContainerId,

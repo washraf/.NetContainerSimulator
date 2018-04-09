@@ -16,7 +16,7 @@ namespace Simulation.Configuration
         /// Ideal steps = 180
         /// </summary>
         public static int Steps = 180;
-        public static int NoOfTrials { get; } = 20;
+        public static int NoOfTrials { get; } = 5;
 
         public static int GetSimulationTime
         {
@@ -114,12 +114,10 @@ namespace Simulation.Configuration
         /// <param name="size"></param>
         /// <param name="speed"></param>
         /// <returns></returns>
-        public static int GetNetworkDelay(double size, NetworkSpeed speed = NetworkSpeed.HundredG)
+        public static int GetNetworkDelay(double size, bool networkDelay, NetworkSpeed speed = NetworkSpeed.HundredG)
         {
-            if (size > 1)
-            {
-
-            }
+            if (!networkDelay)
+                return 0;
             var p = 0.0001;
             var mss = 1524;
             var RTT = 400 / Math.Pow(10,6);

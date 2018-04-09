@@ -19,12 +19,12 @@ namespace Simulation.SimulationController
                 //SimulationSize.Five,
                 //SimulationSize.Ten,
                 //SimulationSize.ThreeHundred,
-                SimulationSize.TwoHundred,
+                //SimulationSize.TwoHundred,
                 //SimulationSize.Hundred,
                 //SimulationSize.Fifty,
                 //SimulationSize.Twenty,
             };
-            var tested = new List<TestedHosts>()
+            var TestedPercent = new List<TestedHosts>()
             {
                 TestedHosts.TwentyFive,
                 TestedHosts.Fifty,
@@ -43,33 +43,78 @@ namespace Simulation.SimulationController
             {
                 foreach (var auction in auctionTypes)
                 {
-                    foreach (var t in tested)
+                    foreach (var testedPercent in TestedPercent)
                     {
-                        for (int tId = 10; tId < Global.NoOfTrials; tId++)
+                        for (int tId = 0; tId < Global.NoOfTrials; tId++)
                         {
-                            Trials.Add(new RunConfiguration(size,
-                                StartUtilizationPercent.Fifty,
-                                LoadChangeAction.Burst,
-                                LoadPrediction.None,
-                                Strategies.Proposed2018,
-                                auction,
-                                auction,
-                                SchedulingAlgorithm.FF,
-                                t, ContainersType.D, tId));
                             //Trials.Add(new RunConfiguration(size,
-                            //    StartUtilizationPercent.Seventy,
-                            //    LoadChangeAction.Drain,
+                            //    StartUtilizationPercent.Fifty,
+                            //    LoadChangeAction.Burst,
                             //    LoadPrediction.None,
                             //    Strategies.Proposed2018,
                             //    auction,
                             //    auction,
                             //    SchedulingAlgorithm.FF,
-                            //    t, ContainersType.D, tId));
+                            //    testedPercent,
+                            //    ContainersType.D,
+                            //    tId));
+                            Trials.Add(new RunConfiguration(size,
+                                StartUtilizationPercent.Seventy,
+                                LoadChangeAction.Drain,
+                                LoadPrediction.None,
+                                Strategies.Proposed2018,
+                                auction,
+                                auction,
+                                SchedulingAlgorithm.FF,
+                                testedPercent,
+                                ContainersType.D,
+                                true,
+                                tId));
                         }
                     }
                 }
             }
-            //Trials.AddRange(GetNoneConfigurations());
+            Trials.AddRange(GetOtherConfiguration());
+            return Trials;
+        }
+        public static List<RunConfiguration> GetOtherConfiguration()
+        {
+            var Trials = new List<RunConfiguration>();
+            var Sizes = new List<SimulationSize>()
+            {
+                SimulationSize.TwoHundred,
+            };
+            var Algorithsms = new List<Strategies>()
+            {
+                Strategies.ForsmanPull,
+                Strategies.ForsmanPush,
+                Strategies.Zhao,
+            };
+            var prediction = LoadPrediction.None;
+
+            for (int tid = 1; tid <= 5; tid++)
+            {
+                foreach (var size in Sizes)
+                {
+                    foreach (var alg in Algorithsms)
+                    {
+                        if (alg == Strategies.ForsmanPush || alg == Strategies.ForsmanPull)
+                            prediction = LoadPrediction.Ewma;
+                        Trials.Add(new RunConfiguration(size,
+                                    StartUtilizationPercent.Fifty,
+                                    LoadChangeAction.Burst,
+                                    prediction,
+                                    alg,
+                                    AuctionTypes.Ignore,
+                                    AuctionTypes.Ignore,
+                                    SchedulingAlgorithm.FF,
+                                    TestedHosts.Hundred,
+                                    ContainersType.D,
+                                    true,
+                                    tid));
+                    }
+                }
+            }
             return Trials;
         }
         public static List<RunConfiguration> GetNoneConfigurations()
@@ -110,7 +155,9 @@ namespace Simulation.SimulationController
                         AuctionTypes.LeastFull,
                         AuctionTypes.MostFull,
                         scheduling,
-                        t, ContainersType.D, 0));
+                        t, ContainersType.D,
+                        true,
+                        0));
                     }
                 }
 
@@ -140,7 +187,7 @@ namespace Simulation.SimulationController
             {
                 foreach (var strategy in strategies)
                 {
-                    for (int i = 7; i <= Global.NoOfTrials; i++)
+                    for (int i = 0; i <= Global.NoOfTrials; i++)
                     {
                         LoadPrediction prediction;
                         switch (strategy)
@@ -179,6 +226,7 @@ namespace Simulation.SimulationController
                         SchedulingAlgorithm.FF,
                         TestedHosts.Hundred,
                         ContainersType.N,
+                        false,
                         i));
 
                         //Reverse
@@ -192,6 +240,7 @@ namespace Simulation.SimulationController
                         SchedulingAlgorithm.FF,
                         TestedHosts.Hundred,
                         ContainersType.N,
+                        false,
                         i));
                         Trials.Add(new RunConfiguration(size,
                         StartUtilizationPercent.Seventy,
@@ -203,6 +252,7 @@ namespace Simulation.SimulationController
                         SchedulingAlgorithm.FF,
                         TestedHosts.Hundred,
                         ContainersType.N,
+                        false,
                         i));
 
                         //Opposite
@@ -216,6 +266,7 @@ namespace Simulation.SimulationController
                         SchedulingAlgorithm.FF,
                         TestedHosts.Hundred,
                         ContainersType.N,
+                        false,
                         i));
                         Trials.Add(new RunConfiguration(size,
                         StartUtilizationPercent.Seventy,
@@ -227,6 +278,7 @@ namespace Simulation.SimulationController
                         SchedulingAlgorithm.FF,
                         TestedHosts.Hundred,
                         ContainersType.N,
+                        false,
                         i));
 
                     }

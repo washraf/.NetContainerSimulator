@@ -10,7 +10,7 @@ using Simulation.Helpers;
 namespace Simulation.Loads
 {
 
-    public class LoadGenerator
+    public class LoadFactory
     {
         
         //public static Load GetStartLoad(int conId)

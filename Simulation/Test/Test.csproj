@@ -119,6 +119,14 @@
     <Compile Include="Migrations\201804072135258_downTime.Designer.cs">
       <DependentUpon>201804072135258_downTime.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201804081542272_communicatedSize.cs" />
+    <Compile Include="Migrations\201804081542272_communicatedSize.Designer.cs">
+      <DependentUpon>201804081542272_communicatedSize.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804090952474_Container_Delay_Keys.cs" />
+    <Compile Include="Migrations\201804090952474_Container_Delay_Keys.Designer.cs">
+      <DependentUpon>201804090952474_Container_Delay_Keys.cs</DependentUpon>
+    </Compile>
     <Compile Include="ProposedCharts.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -164,6 +172,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804072135258_downTime.resx">
       <DependentUpon>201804072135258_downTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804081542272_communicatedSize.resx">
+      <DependentUpon>201804081542272_communicatedSize.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804090952474_Container_Delay_Keys.resx">
+      <DependentUpon>201804090952474_Container_Delay_Keys.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProposedCharts.resx">
       <DependentUpon>ProposedCharts.cs</DependentUpon>

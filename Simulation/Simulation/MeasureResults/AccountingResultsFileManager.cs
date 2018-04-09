@@ -23,7 +23,8 @@ namespace Simulation.AccountingResults
                            measureValueHolder.Scheduling + "\\" +
                             measureValueHolder.Strategy + "_" + measureValueHolder.ContainerType +"\\"+
                             measureValueHolder.Configuration.PushAuctionType + "_" + measureValueHolder.Configuration.PullAuctionType + "\\" +
-                            measureValueHolder.TestedPercent + "\\" + measureValueHolder.TrialId + "\\";
+                            measureValueHolder.TestedPercent + "\\"+measureValueHolder.NetworkDelay.ToString()+"\\" + 
+                            measureValueHolder.TrialId + "\\";
             try
             {
                 using (
@@ -170,8 +171,10 @@ namespace Simulation.AccountingResults
             AuctionTypes pushAuctionType = (AuctionTypes)Enum.Parse(typeof(AuctionTypes), config[8].Split('_')[0]);
             AuctionTypes pullAuctionType = (AuctionTypes)Enum.Parse(typeof(AuctionTypes), config[8].Split('_')[1]);
             TestedHosts testedHosts = (TestedHosts)Enum.Parse(typeof(TestedHosts), config[9]);
-            int TrialId = int.Parse(config[10]);
-            var conf = new RunConfiguration(simulationSize, perecent,changeAction,loadPrediction,strategy,pushAuctionType,pullAuctionType,schedulingAlgorithm, testedHosts,containerType,TrialId);
+            bool delay = bool.Parse(config[10]);
+
+            int TrialId = int.Parse(config[11]);
+            var conf = new RunConfiguration(simulationSize, perecent,changeAction,loadPrediction,strategy,pushAuctionType,pullAuctionType,schedulingAlgorithm, testedHosts,containerType,delay,TrialId);
             MeasureValueHolder holder =
                 new MeasureValueHolder(conf);
 

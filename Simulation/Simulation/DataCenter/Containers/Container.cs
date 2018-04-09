@@ -122,7 +122,7 @@ namespace Simulation.DataCenter.Containers
 
         public void ChangeLoad(LoadChangeAction changeAction)
         {
-            var finalLoad = LoadGenerator.GetUpdatedContainerLoad(this.ContainerId, changeAction, NeededLoad);
+            var finalLoad = LoadFactory.GetUpdatedContainerLoad(this.ContainerId, changeAction, NeededLoad);
 
             switch (Global.LoadChangeStrategy)
             {
@@ -221,7 +221,7 @@ namespace Simulation.DataCenter.Containers
 
                 int rTime = _calculator.GetRestorationTime(this.NeededLoad.MemorySize);
                 DownTime += 1.0 * rTime / Global.Second;
-                DownTime += Global.GetNetworkDelay(this.NeededLoad.MemorySize);
+                DownTime += Global.GetNetworkDelay(this.NeededLoad.MemorySize,true);
                 await Task.Delay(rTime);
                 Started = true;
                 StartPrediction();

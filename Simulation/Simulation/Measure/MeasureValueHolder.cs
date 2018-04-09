@@ -21,6 +21,8 @@ namespace Simulation.Measure
         public int TrialId { get; }
         public TestedHosts TestedPercent { get; }
         public ContainersType ContainerType { get; }
+        public bool NetworkDelay { get; set; }
+
 
         public string Name
         {
@@ -30,6 +32,7 @@ namespace Simulation.Measure
                     + "_" + ChangeAction.ToString()
                     + "_" + Prediction.ToString() + "_" + Scheduling.ToString()
                     + "_" + Strategy.ToString() + "_" + ContainerType
+                    + "_" + NetworkDelay.ToString()
                     + "_" + Configuration.PushAuctionType.ToString() + "_" + Configuration.PullAuctionType
                     + "_" + TestedPercent.ToString() + "_" + TrialId;
             }
@@ -47,6 +50,7 @@ namespace Simulation.Measure
             ContainerType = configuration.ContainersType;
             Configuration = configuration;
             TrialId = configuration.TrialId;
+            NetworkDelay = configuration.NetworkDealy;
         }
 
         
@@ -350,6 +354,7 @@ namespace Simulation.Measure
                 return ContainerMeasureValuesList.Values.Select(x => x.Downtime).Average();
             }
         }
+
 
 
         #endregion

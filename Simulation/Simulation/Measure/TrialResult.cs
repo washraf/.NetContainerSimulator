@@ -18,6 +18,9 @@ namespace Simulation.Measure
         public string PullAuctionType { get; set; }
         public int TestedPercent { get; set; }
         public int TrialId { get; set; }
+        public string ContainerType { get; set; }
+        public bool NetworkDelay { get; set; }
+
         //Results
         public double AverageEntropy { get; set; }
         public double FinalEntropy { get; set; }
@@ -31,6 +34,7 @@ namespace Simulation.Measure
         public double SlaViolationsPercent { get; set; }
 
         public double TotalMessages { get; set; }
+        public double TotalCommunicatedData { get; set; }
         public string PredictionAlg { get; set; }
         public double ImagePullsTotal { get; set; }
         public double ImagePullsRatio { get; set; }

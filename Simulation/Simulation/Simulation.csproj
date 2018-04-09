@@ -76,6 +76,7 @@
     <Compile Include="Configuration\AuctionTypes.cs" />
     <Compile Include="Configuration\SchedulingAlgorithm.cs" />
     <Compile Include="Configuration\SizeUnit.cs" />
+    <Compile Include="Loads\LoadFactory.cs" />
     <Compile Include="Loads\LoadInfo.cs" />
     <Compile Include="LocationStrategies\Auctions\AuctionBid.cs" />
     <Compile Include="LocationStrategies\Auctions\LeastFullAuction.cs" />
@@ -145,7 +146,6 @@
     <Compile Include="DataCenter\InformationModules\ISwitchTable.cs" />
     <Compile Include="DataCenter\InformationModules\MachineTable.cs" />
     <Compile Include="Helpers\CheckpointAndResotoreCalculator.cs" />
-    <Compile Include="Loads\LoadGenerator.cs" />
     <Compile Include="LocationStrategies\Auctions\Auction.cs" />
     <Compile Include="LocationStrategies\LocationStrategy.cs" />
     <Compile Include="LocationStrategies\StrategyActionType.cs" />

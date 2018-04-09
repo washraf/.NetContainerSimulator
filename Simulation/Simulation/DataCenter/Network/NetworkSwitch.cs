@@ -15,15 +15,17 @@ namespace Simulation.DataCenter.Network
     public class NetworkSwitch : Component
     {
 
-        public NetworkSwitch(ISwitchTable switchTable, IAccountingModule accountingModule)
+        public NetworkSwitch(ISwitchTable switchTable, IAccountingModule accountingModule, bool networkDelay)
         {
             _switchTable = switchTable;
             _accountingModule = accountingModule;
+            NetworkDelay = networkDelay;
         }
 
         private readonly ISwitchTable _switchTable;
         private readonly IAccountingModule _accountingModule;
         public override bool Started { get; set; } = true;
+        public bool NetworkDelay { get; }
 
         public bool ReceiveMessage(Message message)
         {
@@ -34,7 +36,7 @@ namespace Simulation.DataCenter.Network
                     {
                         if (_switchTable.ValidateMachineId(message.TargetId))
                         {
-                            var nd = Global.GetNetworkDelay(message.MessageSize);
+                            var nd = Global.GetNetworkDelay(message.MessageSize,NetworkDelay);
                             await Task.Delay(nd * Global.Second);
                             _accountingModule.RequestCreated(message.MessageType,message.MessageSize);
                             HandleMessage(message);
@@ -58,7 +60,7 @@ namespace Simulation.DataCenter.Network
                     throw new NullReferenceException();
                 if (message.TargetId == -1)
                 {
-                    List<int> idList = _switchTable.GetAllMachineIds(message.SenderId);
+                    List<int> idList = _switchTable.GetAllMachineIds(message.SenderId).Where(x=> x<int.MaxValue).ToList();
                     foreach (var id in idList)
                     {
                         _switchTable.GetMachineById(id).CommunicationModule.ReceiveMessage(message);
@@ -79,13 +81,13 @@ namespace Simulation.DataCenter.Network
                 if (message == null)
                     throw new NullReferenceException();
                 //Dangerous is commented
-                var nd = Global.GetNetworkDelay(message.MessageSize);
+                var nd = Global.GetNetworkDelay(message.MessageSize, NetworkDelay);
                 await Task.Delay(nd * Global.Second);
                 _accountingModule.RequestCreated(message.MessageType,message.MessageSize);
 
                 var machine = _switchTable.GetMachineById(message.TargetId);
                 var result =  machine.CommunicationModule.HandleRequestData(message);
-                nd = Global.GetNetworkDelay(message.MessageSize);
+                nd = Global.GetNetworkDelay(message.MessageSize, NetworkDelay);
                 await Task.Delay(nd * Global.Second);
                 _accountingModule.RequestCreated(result.MessageType, result.MessageSize);
                 return result;

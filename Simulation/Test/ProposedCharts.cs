@@ -268,10 +268,13 @@ namespace Test
                     TestedPercent = x.First().TestedPercent,
                     TotalContainers = x.Average(y => y.TotalContainers),
                     TotalMessages = x.Average(y => y.TotalMessages),
+                    TotalCommunicatedData = x.Average(y=>y.TotalCommunicatedData),
                     TrialId = 0,
                     AverageContainerPerHost = x.Average(y=>y.AverageContainerPerHost),
                     PushAuctionType = x.Key.PushAuctionType,
                     PullAuctionType = x.Key.PullAuctionType,
+                    AverageDownTime = x.Average(y=>y.AverageDownTime),
+                    SlaViolationsPercent = x.Average(y=>y.SlaViolationsPercent),
                 }).OrderBy(y => y.TestedPercent).ToList();
             return ftrials;
         }

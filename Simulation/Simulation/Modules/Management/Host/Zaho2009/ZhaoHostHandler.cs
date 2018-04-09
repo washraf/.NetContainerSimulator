@@ -11,6 +11,7 @@ using Simulation.Helpers;
 using Simulation.Loads;
 using Simulation.Messages;
 using Simulation.Modules.LoadManagement;
+using Simulation.DataCenter.Containers;
 
 namespace Simulation.Modules.Management.Host.Other
 {
@@ -21,7 +22,10 @@ namespace Simulation.Modules.Management.Host.Other
     {
         private readonly CommonLoadManager _commonLoadManager;
         private object _hostLock = new object();
-        //public int BidLock { get; set; } = -1;
+        /// <summary>
+        /// New Thing
+        /// </summary>
+        private bool Busy { get; set; } = false;
 
         public ZhaoHostHandler(NetworkInterfaceCard communicationModule, ContainerTable containerTable, ILoadManager loadManager,CommonLoadManager commonLoadManager) : base(communicationModule, containerTable, loadManager)
         {
@@ -36,16 +40,11 @@ namespace Simulation.Modules.Management.Host.Other
                 Thread.Sleep(GetBackOffTime());
                 lock (_hostLock)
                 {
-                    //if (BidLock == -1)
+                    if (!Busy)
                     {
-                    //    BidLock =0;
                         UpdateInformation();
                         CompareAndBalance();
                     }
-                    //else
-                    //{
-                    //    IncreaseBackOffTime();
-                    //}
                 }
                 
             }
@@ -77,6 +76,7 @@ namespace Simulation.Modules.Management.Host.Other
             
             var result = r.GetRandomFromContainerToHost(list);
             MigrationContainer(result);
+            Busy = true;
 
         }
 
@@ -137,6 +137,7 @@ namespace Simulation.Modules.Management.Host.Other
             if (message.Done)
             {
                 ContainerTable.FreeLockedContainer();
+                Busy = false;
                 //ResetBackOff();
 
                 //_containersTable.Remove(sendContainerResponce.ContainerId);
@@ -150,27 +151,19 @@ namespace Simulation.Modules.Management.Host.Other
         }
         private void HandleMigrateContainerRequest(MigrateContainerRequest message)
         {
-            //if (BidLock == -1)
+            message.MigratedContainer.Restore(this.MachineId);
+            if (message.MigratedContainer.ContainerType == ContainersType.D)
             {
-                //BidLock = message.SenderId;
-                message.MigratedContainer.Restore(this.MachineId);
-                ContainerTable.AddContainer(message.MigratedContainer.ContainerId, message.MigratedContainer);
-                var responce =
-                    new MigrateContainerResponse(message.SenderId, this.MachineId, message.MigratedContainer.ContainerId,
-                        true);
-                CommunicationModule.SendMessage(responce);
-                //BidLock = -1;
-                //IncreaseBackOffTime();
+                var table = ContainerTable as DockerContainerTable;
+                var container = message.MigratedContainer as DockerContainer;
+                var t =  table.LoadImage(container.ImageId);
+                t.Wait();
             }
-            //else
-            //{
-            //    var responce =
-            //       new MigrateContainerResponse(message.SenderId, this.MachineId, message.MigratedContainer.ContainerId,
-            //           false);
-            //    CommunicationModule.SendMessage(responce);
-            //}
-            //_lastDelay = 5;
-            //ResetBackOff();
+            ContainerTable.AddContainer(message.MigratedContainer.ContainerId, message.MigratedContainer);
+            var responce =
+                new MigrateContainerResponse(message.SenderId, this.MachineId, message.MigratedContainer.ContainerId,
+                    true);
+            CommunicationModule.SendMessage(responce);
         }
 
     }

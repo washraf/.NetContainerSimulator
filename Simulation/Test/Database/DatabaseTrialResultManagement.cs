@@ -24,7 +24,10 @@ namespace Test
                                                              && x.PullAuctionType == holder.Configuration.PullAuctionType.ToString()
                                                              && x.TestedPercent == (int)holder.TestedPercent
                                                              && x.SchedulingAlgorithm == holder.Scheduling.ToString()
+                                                             && x.NetworkDelay == holder.NetworkDelay
+                                                             && x.ContainerType == holder.ContainerType.ToString()
                                                              && x.TrialId == holder.TrialId;
+
             TrialResult t = context.TrialResults.SingleOrDefault(selecTionFunction)??new TrialResult();
             t.Size = ((int)holder.SimulationSize);
             t.StartUtil = holder.StartUtilization.ToString();
@@ -34,6 +37,8 @@ namespace Test
             t.PullAuctionType = holder.Configuration.PullAuctionType.ToString();
             t.TestedPercent = (int)holder.TestedPercent;
             t.SchedulingAlgorithm = holder.Scheduling.ToString();
+            t.ContainerType = holder.ContainerType.ToString();
+            t.NetworkDelay = holder.NetworkDelay;
             t.TrialId = holder.TrialId;
             t.PredictionAlg = holder.Prediction.ToString();
             t.AverageEntropy = holder.AverageEntropy;
@@ -42,6 +47,7 @@ namespace Test
             t.Hosts = holder.AverageHosts;
             t.RMSE = holder.RMSE;
             t.TotalMessages = holder.TotalMessages;
+            t.TotalCommunicatedData = holder.TotalCommunicatedSize;
             t.Migrations = holder.TotalMigrations;
             t.SlaViolations = holder.TotalSlaViolationsCount;
             t.SlaViolationsPercent = holder.AverageSlaViolationsPercent;

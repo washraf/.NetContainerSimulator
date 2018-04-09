@@ -299,7 +299,7 @@ namespace Simulation.Modules.LoadManagement
         {
             var loadInfo = GetPredictedHostLoadInfo();
             var hoststate = loadInfo.CalculateTotalUtilizationState(min,max);
-            if ((act && hoststate != LastState)|| f==0)
+            if ((act && hoststate != LastState)|| (f==0 && act))
             {
                 ReportUtilizationStateChange(hoststate, loadInfo.CPUUtil);
                 LastState = hoststate;

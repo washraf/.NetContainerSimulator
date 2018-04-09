@@ -48,7 +48,7 @@ namespace Simulation.SimulationController
             UtilizationTable = new UtilizationTable();
             AccountingModuleObject = new AccountingModule(MachineTableObject, UtilizationTable,
                 CurrentConfiguration);
-            _networkSwitchObject = new NetworkSwitch(MachineTableObject, AccountingModuleObject);
+            _networkSwitchObject = new NetworkSwitch(MachineTableObject, AccountingModuleObject,configuration.NetworkDealy);
 
             MachineControllerObject 
                 = new MachineController(UtilizationTable, MachineTableObject, CurrentConfiguration.ContainersType);
@@ -87,7 +87,7 @@ namespace Simulation.SimulationController
 
             for (int i = 1; i <= (int)CurrentConfiguration.SimulationSize; i++)
             {
-                List<Load> loads = LoadGenerator.GenerateLoadList(CurrentConfiguration.StartPercent, CurrentConfiguration.SimulationSize);
+                List<Load> loads = LoadFactory.GenerateLoadList(CurrentConfiguration.StartPercent, CurrentConfiguration.SimulationSize);
                 foreach (var load in loads)
                 {
                     
@@ -147,7 +147,7 @@ namespace Simulation.SimulationController
                     }
                     for (int i = 0; i < s & anotherTest(c); i++)
                     {
-                        masterMachine.AddContainer(_containerFactory.GetContainer(LoadGenerator.GetRandomLoad()));
+                        masterMachine.AddContainer(_containerFactory.GetContainer(LoadFactory.GetRandomLoad()));
 
                     }
                 }

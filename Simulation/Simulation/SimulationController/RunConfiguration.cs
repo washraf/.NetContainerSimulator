@@ -13,6 +13,7 @@ namespace Simulation.SimulationController
             SchedulingAlgorithm schedulingAlgorithm,
             TestedHosts testedHosts,
             ContainersType containersType,
+            bool networkDealy,
             int trialId)
         {
             LoadPrediction = loadPrediction;
@@ -25,7 +26,9 @@ namespace Simulation.SimulationController
             ChangeAction = changeAction;
             TestedHosts = testedHosts;
             ContainersType = containersType;
+            NetworkDealy = networkDealy;
             TrialId = trialId;
+           
         }
 
         public LoadPrediction LoadPrediction { get; }
@@ -38,6 +41,7 @@ namespace Simulation.SimulationController
         public LoadChangeAction ChangeAction { get; }
         public TestedHosts TestedHosts { get; }
         public ContainersType ContainersType { get; }
+        public bool NetworkDealy { get; }
         public int TrialId { get; }
     }    
 }
