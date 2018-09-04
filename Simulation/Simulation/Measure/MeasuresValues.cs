@@ -33,6 +33,7 @@ namespace Simulation.Measure
             NormalHosts = normalHosts;
             EvacuatingHosts = evacuatingHosts;
             SlaViolationsCount = slaViolationsCount;
+            SlaViolationsPercentage = slaViolationPercent;
             Power = power;
             StdDev = stdDev;
             ImagePulls = imagePulls;
@@ -56,6 +57,7 @@ namespace Simulation.Measure
             MaxNeeded = listItem.MaxNeeded;
             UnderHosts = listItem.UnderHosts;
             OverHosts = listItem.OverHosts;
+            NormalHosts = listItem.NormalHosts;
             SlaViolationsCount = listItem.SlaViolationsCount;
             SlaViolationsPercentage = listItem.SlaViolationsPercentage;
             Power = listItem.Power;

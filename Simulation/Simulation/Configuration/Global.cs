@@ -16,7 +16,7 @@ namespace Simulation.Configuration
         /// Ideal steps = 180
         /// </summary>
         public static int Steps = 180;
-        public static int NoOfTrials { get; } = 5;
+        public static int NoOfTrials { get; } = 10;
 
         public static int GetSimulationTime
         {
@@ -51,9 +51,6 @@ namespace Simulation.Configuration
                     break;
                 case SimulationSize.TwoHundred:
                     Second = strategy != Strategies.Zhao ? 20 : 60;
-                    break;
-                case SimulationSize.ThreeHundred:
-                    Second = strategy != Strategies.Zhao ? 30 : 70;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -128,26 +125,8 @@ namespace Simulation.Configuration
             var noofPackets = Math.Ceiling(sizeinByte / 1460.0);
             var finalSize = sizeinByte + 64 * noofPackets;
             var delay =  finalSize/throuputinByte;
+            //delay *= 10;
             return Convert.ToInt32(delay);
-            //decimal finalSize = size;
-            //finalSize *= 8;
-            //finalSize *= 1024;
-            //finalSize *= 1024;
-            //decimal finalDelay = Convert.ToDecimal(Math.Pow(10, 6));
-            //switch (speed)
-            //{
-            //    case NetworkSpeed.TenG:
-            //        finalDelay *= 10;
-            //        break;
-            //    case NetworkSpeed.HundredG:
-            //        finalDelay *= 100;
-            //        break;
-            //    default:
-            //        throw new ArgumentOutOfRangeException(nameof(speed), speed, null);
-            //}
-
-            //var result = finalSize / finalDelay;
-            //return Convert.ToInt32(result);
         }
 
         //Move to network resource

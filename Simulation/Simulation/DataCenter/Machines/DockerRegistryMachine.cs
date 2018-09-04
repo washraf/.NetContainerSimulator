@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Simulation.Messages;
 using Simulation.Configuration;
+using Simulation.DataCenter.Images;
 
 namespace Simulation.DataCenter.Machines
 {
@@ -83,6 +84,11 @@ namespace Simulation.DataCenter.Machines
         public Dictionary<int, int> GetPullsPerImage()
         {
             return _registryTable.GetPullsPerImage();
+        }
+        
+        public List<Image> GetImagesList(int imageId)
+        {
+            return _registryTable.GetImageList(imageId);
         }
         #endregion
     }

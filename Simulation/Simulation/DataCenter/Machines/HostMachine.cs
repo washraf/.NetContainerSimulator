@@ -21,6 +21,7 @@ using Simulation.Modules.Management.Host.WAshraf2017;
 using Simulation.DataCenter.Containers;
 using Simulation.DataCenter.Network;
 using Simulation.Measure;
+using Simulation.DataCenter.Images;
 
 namespace Simulation.DataCenter.Machines
 {
@@ -152,19 +153,16 @@ namespace Simulation.DataCenter.Machines
             }
         }
 
-        public void AddContainer(Container container)
+        public void AddContainer(Container container, List<Image> images = null)
         {
-            Task t = new Task(async () =>
+            if (container.ContainerType == ContainersType.D)
             {
-                if(container.ContainerType == ContainersType.D)
-                {
-                    var dockerCon = container as DockerContainer;
-                    var table = _containerTable as DockerContainerTable;
-                    await table.LoadImage(dockerCon.ImageId);
-                }
-                _containerTable.AddContainer(container.ContainerId, container);
-            });
-            t.Start();
+                //var dockerCon = container as DockerContainer;
+                var table = _containerTable as DockerContainerTable;
+                //await table.LoadImage(dockerCon.ImageId);
+                table.AddImages(images);
+            }
+            _containerTable.AddContainer(container.ContainerId, container);
         }
 
         public Dictionary<int, ContainerMeasureValue> CollectMigrationCounts()

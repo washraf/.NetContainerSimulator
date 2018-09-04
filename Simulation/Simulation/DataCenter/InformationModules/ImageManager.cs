@@ -58,6 +58,19 @@ namespace Simulation.DataCenter.InformationModules
             var result = r as ImageTreeResponce;
             return result.ImageTree;
         }
+
+        internal void AddImages(List<Image> images)
+        {
+            foreach (var image in images)
+            {
+                if (!ContainsImage(image.Id))
+                {
+
+                    dictionary.Add(image.Id, image);
+                }
+            }
+        }
+
         private async Task<Image> GetImage(int imageId)
         {
             var request = new ImagePullRequest(int.MaxValue, _communicationModule.MachineId, imageId);

@@ -43,7 +43,7 @@ namespace Test
             Thread t = new Thread(
                 () =>
                 {
-
+                    int x = 0;
                     foreach (var configuration in RunConfigurationFactory.GetConfigurations())
                     {
                         btn_Start.Invoke(new Action(() => { btn_Start.Enabled = false; }));
@@ -51,6 +51,11 @@ namespace Test
                         SimulationController controller = new SimulationController(configuration);
                         controller.StartSimulation();
                         accountingResultsManager.WriteDataToDisk(controller.AccountingModuleObject.MeasureHolder);
+                        if (x != configuration.TrialId)
+                        {
+                            x = configuration.TrialId;
+                            WriteLastIndex(x);
+                        }
                         Thread.Sleep(5000);
                         btn_Start.Invoke(new Action(() =>
                         {
@@ -64,11 +69,28 @@ namespace Test
             t.Start();
         }
 
+        private void WriteLastIndex(int x)
+        {
+            try
+            {
+                StreamWriter r = new StreamWriter("D:/Last.txt",false);
+                r.WriteLine(x);
+                r.Flush();
+                r.Close();
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
         private void AddDataHolder(MeasureValueHolder holder)
         {
             var dbHelper = new DatabaseTrialResultManagement();
             dbHelper.Save(holder);
             _measuredValueListsTrials.Add(holder);
+            if (_measuredValueListsTrials.Count > 10)
+                _measuredValueListsTrials.RemoveAt(0);
             var btn = new Button()
             {
                 Text = holder.Name,
@@ -76,6 +98,7 @@ namespace Test
             };
             btn.Click += Btn_Click;
             flowLayoutPanel1.Controls.Add(btn);
+            flowLayoutPanel1.Controls.RemoveAt(0);
             CreateGraph(zedGraphControl1, cb_GraphItem.Text, (BasicItems)cb_GraphItem.SelectedValue);
         }
 

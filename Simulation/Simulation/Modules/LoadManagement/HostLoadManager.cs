@@ -105,7 +105,13 @@ namespace Simulation.Modules.LoadManagement
                     {
                         var loaddiff = needed.CurrentLoad - _maxLoad;
                         var  vioCon = _containerTable.CalculateSlaViolations(loaddiff);
-                        violationHistory.Add(_containerTable.CalculateSlaViolationsPercent(loaddiff));
+                        //var vhis = _containerTable.CalculateSlaViolationsPercent(loaddiff);
+                        var vhis = (1-(1 / v))*100;
+                        if (vhis != 0)
+                        {
+
+                        }
+                        violationHistory.Add(vhis);
                         foreach (var conId in vioCon)
                         {
                             lock (_lock)

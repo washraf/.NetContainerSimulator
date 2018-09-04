@@ -2,6 +2,8 @@
 using Simulation.DataCenter.Containers;
 using Simulation.Configuration;
 using System.Threading.Tasks;
+using Simulation.DataCenter.Images;
+using System.Collections.Generic;
 
 namespace Simulation.DataCenter.InformationModules
 {
@@ -48,6 +50,11 @@ namespace Simulation.DataCenter.InformationModules
                 }
                 return result;
             }
+        }
+
+        internal void AddImages(List<Image> images)
+        {
+            ImageManager.AddImages(images);
         }
     }
 }

@@ -55,13 +55,13 @@ namespace Simulation.DataCenter.InformationModules
                 dic.Add(id, new Image(id, $"Final {id}", imageSize, bimg));
             }
 
-            for (int i = 0; i < 5 * size; i++)
-            {
-                var id = i + 10 * size;
-                var bimg = random.Next(6*size, 10 * size);
-                int imageSize = (int)random.NextGaussian(50, 20);
-                dic.Add(id, new Image(id, $"Final {id}", imageSize, bimg));
-            }
+            //for (int i = 0; i < 5 * size; i++)
+            //{
+            //    var id = i + 10 * size;
+            //    var bimg = random.Next(6*size, 10 * size);
+            //    int imageSize = (int)random.NextGaussian(50, 20);
+            //    dic.Add(id, new Image(id, $"Final {id}", imageSize, bimg));
+            //}
 
             return dic;
         }
@@ -86,6 +86,20 @@ namespace Simulation.DataCenter.InformationModules
                 //image = dictionary[image.Id];
                 image = dictionary[image.BaseImage.Value];
                 list.Add(image.Id);
+            }
+            list.Reverse();
+            return list;
+        }
+
+        internal List<Image> GetImageList(int imageId)
+        {
+            List<Image> list = new List<Image>();
+            var image = dictionary[imageId];
+            list.Add(image);
+            while (image.BaseImage.HasValue)
+            {
+                image = dictionary[image.BaseImage.Value];
+                list.Add(image);
             }
             list.Reverse();
             return list;

@@ -295,6 +295,7 @@ namespace Simulation.Modules.Management.Host.Proposed
                     var load = LoadManager.GetHostLoadInfoAWithoutContainer(selectedContainerload);
                     var newState = load.CalculateTotalUtilizationState(MinUtilization, MaxUtilization);
 
+                    //Comment this condition
                     if (oldstate == UtilizationStates.Normal && newState == UtilizationStates.UnderUtilization)
                     {
                         bid = new AuctionBid(MachineId, false, load, message.AuctionId, -1, BidReasons.MinimumLoad,0);

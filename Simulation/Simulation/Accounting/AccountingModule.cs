@@ -154,7 +154,7 @@ namespace Simulation.Accounting
             {
                 slaViolations += (machine as HostMachine).CalculateSlaViolationsPercent();
             }
-            return slaViolations / currentMachines.Count(); ;
+            return slaViolations / currentMachines.Count();
         }
 
         private void ClearInformation()

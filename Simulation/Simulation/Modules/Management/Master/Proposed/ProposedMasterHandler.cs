@@ -169,14 +169,13 @@ namespace Simulation.Modules.Management.Master.Proposed
             _masterState.Auction = pushAuction;
         }
 
+        /// <summary>
+        /// Master can test normal or not
+        /// </summary>
+        /// <param name="message"></param>
         private void HandlePullRequest(PullRequest message)
         {
             var candidates = DataHolder.GetCandidateHosts(UtilizationStates.OverUtilization, message.SenderId);
-
-            //if (!candidates.Any())
-            //{
-            //    candidates = DataHolder.GetCandidateHosts(UtilizationStates.UnderUtilization, message.SenderId);
-            //}
 
             if (!candidates.Any())
             {

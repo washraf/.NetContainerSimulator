@@ -19,6 +19,7 @@ using Simulation.DataCenter.Machines;
 using Simulation.DataCenter.Network;
 using Simulation.Factories;
 using System.Diagnostics;
+using Simulation.DataCenter.Images;
 
 namespace Simulation.SimulationController
 {
@@ -26,7 +27,7 @@ namespace Simulation.SimulationController
     {
         private RunConfiguration CurrentConfiguration;
 
-        
+
         public MachineTable MachineTableObject { get; private set; }
         public MachineController MachineControllerObject { get; private set; }
 
@@ -41,25 +42,25 @@ namespace Simulation.SimulationController
         private readonly MachineFactory _registryFactory;
         private readonly ContainerFactory _containerFactory;
 
-        public SimulationController( RunConfiguration configuration)
+        public SimulationController(RunConfiguration configuration)
         {
             CurrentConfiguration = configuration;
             MachineTableObject = new MachineTable();
             UtilizationTable = new UtilizationTable();
             AccountingModuleObject = new AccountingModule(MachineTableObject, UtilizationTable,
                 CurrentConfiguration);
-            _networkSwitchObject = new NetworkSwitch(MachineTableObject, AccountingModuleObject,configuration.NetworkDealy);
+            _networkSwitchObject = new NetworkSwitch(MachineTableObject, AccountingModuleObject, configuration.NetworkDealy);
 
-            MachineControllerObject 
+            MachineControllerObject
                 = new MachineController(UtilizationTable, MachineTableObject, CurrentConfiguration.ContainersType);
-            _masterFactory 
+            _masterFactory
                 = new MasterFactory(_networkSwitchObject, MachineControllerObject, UtilizationTable,
-                CurrentConfiguration.Strategy,CurrentConfiguration.PushAuctionType,CurrentConfiguration.PullAuctionType, CurrentConfiguration.SchedulingAlgorithm, CurrentConfiguration.TestedHosts);
+                CurrentConfiguration.Strategy, CurrentConfiguration.PushAuctionType, CurrentConfiguration.PullAuctionType, CurrentConfiguration.SchedulingAlgorithm, CurrentConfiguration.TestedHosts);
             var h = new Load(Global.DataCenterHostConfiguration);
             _hostFactory = new HostFactory(h,
                     _networkSwitchObject, CurrentConfiguration.LoadPrediction, CurrentConfiguration.Strategy, CurrentConfiguration.ContainersType, configuration.SimulationSize);
             _registryFactory = new RegistryFactory(_networkSwitchObject, configuration.SimulationSize);
-            _containerFactory = new ContainerFactory(CurrentConfiguration.ContainersType,configuration.SimulationSize,configuration.LoadPrediction);
+            _containerFactory = new ContainerFactory(CurrentConfiguration.ContainersType, configuration.SimulationSize, configuration.LoadPrediction);
         }
 
         public void StartSimulation()
@@ -68,7 +69,7 @@ namespace Simulation.SimulationController
             Global.CommonLoadManager = new CommonLoadManager(AccountingModuleObject);
 
             //Master Machine
-            MasterMachine masterMachine = (MasterMachine) _masterFactory.GetMachine();
+            MasterMachine masterMachine = (MasterMachine)_masterFactory.GetMachine();
             MachineControllerObject.AddMachine(masterMachine);
 
             //Host Machines
@@ -90,8 +91,19 @@ namespace Simulation.SimulationController
                 List<Load> loads = LoadFactory.GenerateLoadList(CurrentConfiguration.StartPercent, CurrentConfiguration.SimulationSize);
                 foreach (var load in loads)
                 {
-                    
-                    (hosts[i] as HostMachine).AddContainer( _containerFactory.GetContainer(load));
+                    var container = _containerFactory.GetContainer(load);
+                    if (container.ContainerType == ContainersType.D)
+                    {
+                        var dockerregistry = hosts.Last() as DockerRegistryMachine;
+                        var dockercontainer = container as DockerContainer;
+                        List<Image> images = dockerregistry.GetImagesList(dockercontainer.ImageId);
+                        (hosts[i] as HostMachine).AddContainer(container, images);
+
+                    }
+                    else
+                    {
+                        (hosts[i] as HostMachine).AddContainer(container);
+                    }
                 }
             }
 

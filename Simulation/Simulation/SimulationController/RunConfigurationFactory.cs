@@ -1,5 +1,6 @@
 ﻿using Simulation.Configuration;
 using System;
+using System.IO;
 using System.Collections.Generic;
 
 namespace Simulation.SimulationController
@@ -16,19 +17,16 @@ namespace Simulation.SimulationController
             var Trials = new List<RunConfiguration>();
             var sizes = new List<SimulationSize>()
             {
-                //SimulationSize.Five,
-                //SimulationSize.Ten,
-                //SimulationSize.ThreeHundred,
                 //SimulationSize.TwoHundred,
-                //SimulationSize.Hundred,
-                //SimulationSize.Fifty,
-                //SimulationSize.Twenty,
+                SimulationSize.Hundred,
+                SimulationSize.Fifty,
+                SimulationSize.Twenty,
             };
             var TestedPercent = new List<TestedHosts>()
             {
-                TestedHosts.TwentyFive,
-                TestedHosts.Fifty,
-                TestedHosts.SeventyFive,
+                //TestedHosts.TwentyFive,
+                //TestedHosts.Fifty,
+                //TestedHosts.SeventyFive,
                 TestedHosts.Hundred,
             };
             var auctionTypes = new List<AuctionTypes>()
@@ -38,30 +36,31 @@ namespace Simulation.SimulationController
                 AuctionTypes.Random,
                 AuctionTypes.LeastPulls
             };
-
-            foreach (var size in sizes)
+            var lastindex = getLastIndex();
+            for (int tId = 1+lastindex; tId <= Global.NoOfTrials+lastindex; tId++)
             {
-                foreach (var auction in auctionTypes)
+                foreach (var size in sizes)
                 {
-                    foreach (var testedPercent in TestedPercent)
+                    foreach (var auction in auctionTypes)
                     {
-                        for (int tId = 0; tId < Global.NoOfTrials; tId++)
+                        foreach (var testedPercent in TestedPercent)
                         {
-                            //Trials.Add(new RunConfiguration(size,
-                            //    StartUtilizationPercent.Fifty,
-                            //    LoadChangeAction.Burst,
-                            //    LoadPrediction.None,
-                            //    Strategies.Proposed2018,
-                            //    auction,
-                            //    auction,
-                            //    SchedulingAlgorithm.FF,
-                            //    testedPercent,
-                            //    ContainersType.D,
-                            //    tId));
+                            Trials.Add(new RunConfiguration(size,
+                                StartUtilizationPercent.Fifty,
+                                LoadChangeAction.Burst,
+                                LoadPrediction.Arma,
+                                Strategies.Proposed2018,
+                                auction,
+                                auction,
+                                SchedulingAlgorithm.FF,
+                                testedPercent,
+                                ContainersType.D,
+                                true,
+                                tId));
                             Trials.Add(new RunConfiguration(size,
                                 StartUtilizationPercent.Seventy,
                                 LoadChangeAction.Drain,
-                                LoadPrediction.None,
+                                LoadPrediction.Arma,
                                 Strategies.Proposed2018,
                                 auction,
                                 auction,
@@ -73,16 +72,35 @@ namespace Simulation.SimulationController
                         }
                     }
                 }
+                Trials.AddRange(GetOtherConfiguration(tId));
             }
-            Trials.AddRange(GetOtherConfiguration());
             return Trials;
         }
-        public static List<RunConfiguration> GetOtherConfiguration()
+
+        private static int getLastIndex()
+        {
+            try
+            {
+                StreamReader r = new StreamReader("D:/Last.txt");
+                var x = r.ReadToEnd();
+                var i = int.Parse(x);
+                return i;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        public static List<RunConfiguration> GetOtherConfiguration(int trialId)
         {
             var Trials = new List<RunConfiguration>();
             var Sizes = new List<SimulationSize>()
             {
-                SimulationSize.TwoHundred,
+                //SimulationSize.TwoHundred,
+                SimulationSize.Hundred,
+                SimulationSize.Fifty,
+                SimulationSize.Twenty,
             };
             var Algorithsms = new List<Strategies>()
             {
@@ -92,31 +110,44 @@ namespace Simulation.SimulationController
             };
             var prediction = LoadPrediction.None;
 
-            for (int tid = 1; tid <= 5; tid++)
+            foreach (var size in Sizes)
             {
-                foreach (var size in Sizes)
+                foreach (var alg in Algorithsms)
                 {
-                    foreach (var alg in Algorithsms)
-                    {
-                        if (alg == Strategies.ForsmanPush || alg == Strategies.ForsmanPull)
-                            prediction = LoadPrediction.Ewma;
-                        Trials.Add(new RunConfiguration(size,
-                                    StartUtilizationPercent.Fifty,
-                                    LoadChangeAction.Burst,
-                                    prediction,
-                                    alg,
-                                    AuctionTypes.Ignore,
-                                    AuctionTypes.Ignore,
-                                    SchedulingAlgorithm.FF,
-                                    TestedHosts.Hundred,
-                                    ContainersType.D,
-                                    true,
-                                    tid));
-                    }
+                    if (alg == Strategies.ForsmanPush || alg == Strategies.ForsmanPull)
+                        prediction = LoadPrediction.Ewma;
+                    else
+                        prediction = LoadPrediction.None;
+                    Trials.Add(new RunConfiguration(size,
+                                StartUtilizationPercent.Fifty,
+                                LoadChangeAction.Burst,
+                                prediction,
+                                alg,
+                                AuctionTypes.Ignore,
+                                AuctionTypes.Ignore,
+                                SchedulingAlgorithm.FF,
+                                TestedHosts.Hundred,
+                                ContainersType.D,
+                                true,
+                                trialId));
+                    Trials.Add(new RunConfiguration(size,
+                                StartUtilizationPercent.Seventy,
+                                LoadChangeAction.Drain,
+                                prediction,
+                                alg,
+                                AuctionTypes.Ignore,
+                                AuctionTypes.Ignore,
+                                SchedulingAlgorithm.FF,
+                                TestedHosts.Hundred,
+                                ContainersType.D,
+                                true,
+                                trialId));
                 }
+
             }
             return Trials;
         }
+
         public static List<RunConfiguration> GetNoneConfigurations()
         {
             var Trials = new List<RunConfiguration>();
