@@ -107,25 +107,9 @@
     <Compile Include="DBE.Designer.cs">
       <DependentUpon>DBE.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201804062229509_updatetested.cs" />
-    <Compile Include="Migrations\201804062229509_updatetested.Designer.cs">
-      <DependentUpon>201804062229509_updatetested.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201804072119340_SLaViolationPercent.cs" />
-    <Compile Include="Migrations\201804072119340_SLaViolationPercent.Designer.cs">
-      <DependentUpon>201804072119340_SLaViolationPercent.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201804072135258_downTime.cs" />
-    <Compile Include="Migrations\201804072135258_downTime.Designer.cs">
-      <DependentUpon>201804072135258_downTime.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201804081542272_communicatedSize.cs" />
-    <Compile Include="Migrations\201804081542272_communicatedSize.Designer.cs">
-      <DependentUpon>201804081542272_communicatedSize.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201804090952474_Container_Delay_Keys.cs" />
-    <Compile Include="Migrations\201804090952474_Container_Delay_Keys.Designer.cs">
-      <DependentUpon>201804090952474_Container_Delay_Keys.cs</DependentUpon>
+    <Compile Include="Migrations\201809101721330_final.cs" />
+    <Compile Include="Migrations\201809101721330_final.Designer.cs">
+      <DependentUpon>201809101721330_final.cs</DependentUpon>
     </Compile>
     <Compile Include="ProposedCharts.cs">
       <SubType>Form</SubType>
@@ -139,22 +123,6 @@
     <Compile Include="OldCharts.Designer.cs">
       <DependentUpon>OldCharts.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201802102235060_update.cs" />
-    <Compile Include="Migrations\201802102235060_update.Designer.cs">
-      <DependentUpon>201802102235060_update.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201802220026494_trial-RMSE.cs" />
-    <Compile Include="Migrations\201802220026494_trial-RMSE.Designer.cs">
-      <DependentUpon>201802220026494_trial-RMSE.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201804041601499_add auctions.cs" />
-    <Compile Include="Migrations\201804041601499_add auctions.Designer.cs">
-      <DependentUpon>201804041601499_add auctions.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201804051427101_average_containerPerHost.cs" />
-    <Compile Include="Migrations\201804051427101_average_containerPerHost.Designer.cs">
-      <DependentUpon>201804051427101_average_containerPerHost.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -164,38 +132,14 @@
     <EmbeddedResource Include="DBE.resx">
       <DependentUpon>DBE.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201804062229509_updatetested.resx">
-      <DependentUpon>201804062229509_updatetested.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201804072119340_SLaViolationPercent.resx">
-      <DependentUpon>201804072119340_SLaViolationPercent.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201804072135258_downTime.resx">
-      <DependentUpon>201804072135258_downTime.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201804081542272_communicatedSize.resx">
-      <DependentUpon>201804081542272_communicatedSize.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201804090952474_Container_Delay_Keys.resx">
-      <DependentUpon>201804090952474_Container_Delay_Keys.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201809101721330_final.resx">
+      <DependentUpon>201809101721330_final.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProposedCharts.resx">
       <DependentUpon>ProposedCharts.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OldCharts.resx">
       <DependentUpon>OldCharts.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201802102235060_update.resx">
-      <DependentUpon>201802102235060_update.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201802220026494_trial-RMSE.resx">
-      <DependentUpon>201802220026494_trial-RMSE.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201804041601499_add auctions.resx">
-      <DependentUpon>201804041601499_add auctions.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201804051427101_average_containerPerHost.resx">
-      <DependentUpon>201804051427101_average_containerPerHost.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
