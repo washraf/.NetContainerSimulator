@@ -49,7 +49,7 @@ The Simular Accounting Module is able to measure:
 [2]: https://www.criu.org/Main_Page
 [3]: https://github.com/washraf/runcbm
 [im1]: https://github.com/washraf/.NetContainerSimulator/blob/master/Images/CRtimes.jpg
-[im2]: https://github.com/washraf/.NetContainerSimulator/blob/master/Images/Infrastucture.jpg
+[im2]: https://github.com/washraf/.NetContainerSimulator/blob/master/Images/Infrastructure.jpg
 [im3]: https://github.com/washraf/.NetContainerSimulator/blob/master/Images/Architecture.jpg
 [im4]: https://github.com/washraf/.NetContainerSimulator/blob/master/Images/SimulatorArchitecture.jpg
 [im5]: https://github.com/washraf/.NetContainerSimulator/blob/master/Images/SimulatorDesign.jpg
