@@ -12,21 +12,22 @@ The simulator is equibed with multiple parameters for different simulations such
 ### Modeling Container Migration :
 The migration time is measured using runC benchmarking tool [“runcbm”][3] developed by the research team.  
 
-![alt text](".\Images\CRtimes.jpg")
+![alt text][im1]
 
 ### Infrastructure Architecture 
 
-![alt text](".\Images\Infrastructure.jpg")
+![alt text][im2]
 
 ### CaaS Architecture Model
-![alt text](".\Images\Architecture.jpg") 
+![alt text][im3]
 
 ### Simulator Architecture
-![alt text](".\Images\SimulatorArchitecture.jpg")
+![alt text][im4]
 
 ### Simulation Design
 CaaS datacenter Simulation encompasses different elements such as machines, containers, and switches. In addition, the simulation must include the simulation of different policies for management purposes. The main classes of our simulation are depicted in Figure ‎3.5.  
-![alt text](".\Images\SimulatorDesign.jpg")
+![alt text][im5]
+
 ### Performance Evaluation Metrics
 The Simular Accounting Module is able to measure:
 * RMSE (btween Actual and Needed Hosts)
@@ -43,8 +44,12 @@ The Simular Accounting Module is able to measure:
 * Containers
 * Containers Per Host
 
-## Reference
 
 [1]: https://runc.io/ 
 [2]: https://www.criu.org/Main_Page
 [3]: https://github.com/washraf/runcbm
+[im1]: https://github.com/washraf/.NetContainerSimulator/blob/master/Images/CRtimes.jpg
+[im2]: https://github.com/washraf/.NetContainerSimulator/blob/master/Images/Infrastucture.jpg
+[im3]: https://github.com/washraf/.NetContainerSimulator/blob/master/Images/Architecture.jpg
+[im4]: https://github.com/washraf/.NetContainerSimulator/blob/master/Images/SimulatorArchitecture.jpg
+[im5]: https://github.com/washraf/.NetContainerSimulator/blob/master/Images/SimulatorDesign.jpg
