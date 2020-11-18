@@ -2,7 +2,7 @@
 .net Container Simulator is the first Container and Cloud Simulation tool built in .Net Framework.
 The Simulator allows the implementation of multiple policies, Currently the Implemented Policies are:
 
-* Elasticity Management: Under Publication
+* Elasticity Control Algorithm: 10.1109/ACCESS.2019.2907171
 * Hanafy et al.- 10.1109/ICCES.2017.8275296
 * Forsman et al. - 10.1016/j.jss.2014.11.044
 * Zhao and Huang - 10.1109/NCM.2009.350
